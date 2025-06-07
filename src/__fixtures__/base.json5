@@ -1,0 +1,9 @@
+{
+  appURL: "http://localhost:3000",
+  /**
+   * API CONFIGURATION
+   */
+  api: {
+    port: 3000,
+  },
+}

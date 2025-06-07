@@ -1,0 +1,4 @@
+appURL: http://localhost:3000
+api:
+  # The port will be used to start the API server
+  port: 5959
