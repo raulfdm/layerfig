@@ -1,26 +1,26 @@
 {
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "ESNext",
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "moduleDetection": "force",
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "ESNext",
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+		"isolatedModules": true,
+		"verbatimModuleSyntax": true,
 
-    /* Strictness */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
+		/* Strictness */
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
 
-    "module": "preserve",
-    "noEmit": true,
+		"module": "preserve",
+		"noEmit": true,
 
-    /* If your code doesn't run in the DOM: */
-    "lib": ["ES2023"],
-    "allowImportingTsExtensions": true
-  },
-  "include": ["**/*"],
-  "exclude": ["node_modules", "dist", ".tsup"]
+		/* If your code doesn't run in the DOM: */
+		"lib": ["ES2023"],
+		"allowImportingTsExtensions": true
+	},
+	"include": ["**/*"],
+	"exclude": ["node_modules", "dist", ".tsup"]
 }
