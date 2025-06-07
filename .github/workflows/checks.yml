@@ -20,4 +20,4 @@ jobs:
         run: bun i
 
       - name: Run Biome
-        run: biome ci .
+        run: bun biome ci .
