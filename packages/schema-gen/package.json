@@ -14,7 +14,12 @@
 		"check-exports": "./bin/index.js",
 		"check-types": "tsc"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"chokidar": "4.0.3",
+		"esbuild": "0.25.5",
+		"meow": "13.2.0",
+		"zod": "3.25.56"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@layerfig/tsconfig": "workspace:*",
