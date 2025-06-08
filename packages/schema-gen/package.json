@@ -3,9 +3,15 @@
 	"description": "TODO",
 	"version": "0.0.1",
 	"type": "module",
+	"bin": {
+		"layerfig": "./bin/index.js"
+	},
+	"exports": {
+		".": "dist/index.js"
+	},
 	"scripts": {
 		"build": "tsdown",
-		"check-exports": "attw --pack .",
+		"check-exports": "attw --pack . --profile node16 --profile esm-only",
 		"check-types": "tsc"
 	},
 	"dependencies": {},
