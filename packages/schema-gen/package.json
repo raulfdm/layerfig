@@ -8,6 +8,7 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
 		"@layerfig/tsconfig": "workspace:*",
 		"typescript": "5.8.3"
 	}
