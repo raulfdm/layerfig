@@ -4,11 +4,13 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"check-types": "tsc",
-		"build": "tsdown"
+		"build": "tsdown",
+		"check-exports": "attw --pack .",
+		"check-types": "tsc"
 	},
 	"dependencies": {},
 	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.1",
 		"@types/bun": "1.2.15",
 		"tsdown": "0.12.7",
 		"typescript": "5.8.3"
