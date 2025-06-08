@@ -4,13 +4,15 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"check-types": "tsc"
+		"check-types": "tsc",
+		"build": "tsdown"
 	},
 	"dependencies": {},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@layerfig/tsconfig": "workspace:*",
 		"@types/bun": "1.2.15",
+		"tsdown": "0.12.7",
 		"typescript": "5.8.3"
 	}
 }

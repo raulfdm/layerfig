@@ -6,7 +6,8 @@
 	"packageManager": "bun@1.2.15",
 	"scripts": {
 		"ci": "biome ci .",
-		"check-types": "turbo check-types"
+		"check-types": "turbo check-types",
+		"build": "turbo build"
 	},
 	"devDependencies": {
 		"turbo": "2.5.4"

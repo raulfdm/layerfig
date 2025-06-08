@@ -4,11 +4,13 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"check-types": "tsc"
+		"check-types": "tsc",
+		"build": "tsdown"
 	},
 	"dependencies": {},
 	"devDependencies": {
 		"@types/bun": "1.2.15",
+		"tsdown": "0.12.7",
 		"typescript": "5.8.3"
 	}
 }
