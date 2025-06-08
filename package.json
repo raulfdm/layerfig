@@ -4,6 +4,9 @@
 	"private": true,
 	"workspaces": ["packages/*"],
 	"packageManager": "bun@1.2.15",
+	"scripts": {
+		"ci": "biome ci ."
+	},
 	"devDependencies": {
 		"turbo": "2.5.4"
 	}
