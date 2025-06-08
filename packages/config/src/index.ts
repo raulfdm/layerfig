@@ -1,1 +1,1 @@
-console.log("config");
+export { AppConfigBuilder } from "./app-config-builder";
