@@ -20,8 +20,10 @@
     "packages/schema-gen": {
       "name": "@layerfig/schema-gen",
       "version": "0.0.1",
+      "bin": {
+        "layerfig": "./bin/index.js",
+      },
       "devDependencies": {
-        "@arethetypeswrong/cli": "0.18.1",
         "@biomejs/biome": "1.9.4",
         "@layerfig/tsconfig": "workspace:*",
         "@types/bun": "1.2.15",
