@@ -4,7 +4,6 @@
     "": {
       "name": "app-config",
       "devDependencies": {
-        "@types/bun": "1.2.15",
         "turbo": "2.5.4",
       },
     },
@@ -12,6 +11,7 @@
       "name": "@layerfig/config",
       "version": "0.0.1",
       "devDependencies": {
+        "@types/bun": "1.2.15",
         "typescript": "5.8.3",
       },
     },
@@ -21,6 +21,7 @@
       "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@layerfig/tsconfig": "workspace:*",
+        "@types/bun": "1.2.15",
         "typescript": "5.8.3",
       },
     },
