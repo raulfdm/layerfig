@@ -1,0 +1,9 @@
+{
+	"name": "@layerfig/schema-gen",
+	"description": "TODO",
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {},
+	"dependencies": {},
+	"devDependencies": {}
+}

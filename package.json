@@ -1,60 +1,6 @@
 {
-	"name": "app-config",
-	"description": "12-factor, layered configuration library for Node apps",
-	"version": "0.0.1",
-	"type": "module",
-	"module": "./dist/index.js",
-	"main": "./dist/index.cjs",
-	"types": "./dist/index.d.ts",
-	"files": ["dist", "bin"],
-	"bin": {
-		"app-config": "./bin/app-config"
-	},
-	"exports": {
-		"./package.json": "./package.json",
-		".": {
-			"import": {
-				"types": "./dist/index.d.ts",
-				"default": "./dist/index.js"
-			},
-			"require": {
-				"types": "./dist/index.d.cts",
-				"default": "./dist/index.cjs"
-			}
-		}
-	},
-	"scripts": {
-		"bootstrap": "pnpm run build",
-		"check-exports": "attw --pack .",
-		"build": "tsup",
-		"dev": "tsup --watch",
-		"test": "bun test",
-		"format": "biome format --write",
-		"lint": "biome lint --write",
-		"typecheck": "tsc",
-		"prepare": "husky"
-	},
-	"peerDependencies": {
-		"zod": "^3.24.2"
-	},
-	"dependencies": {
-		"chokidar": "4.0.3",
-		"esbuild": "0.25.0",
-		"json5": "2.2.3",
-		"meow": "13.2.0",
-		"yaml": "2.7.0",
-		"zod-to-json-schema": "3.24.1"
-	},
-	"devDependencies": {
-		"@arethetypeswrong/cli": "0.18.1",
-		"@biomejs/biome": "1.9.4",
-		"@types/bun": "1.2.15",
-		"@types/lodash-es": "4.17.12",
-		"husky": "^9.1.7",
-		"lint-staged": "16.1.0",
-		"lodash-es": "4.17.21",
-		"tsup": "8.5.0",
-		"typescript": "5.8.3",
-		"zod": "3.24.2"
-	}
+	"name": "layerfig",
+	"version": "0.0.0-development",
+	"private": true,
+	"workspaces": ["packages/*"]
 }
