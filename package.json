@@ -8,7 +8,8 @@
 		"build": "turbo build",
 		"check-types": "turbo check-types",
 		"check-exports": "turbo check-exports",
-		"ci": "biome ci ."
+		"ci": "biome ci .",
+		"format": "biome format --write"
 	},
 	"devDependencies": {
 		"turbo": "2.5.4"
