@@ -7,15 +7,36 @@
     "packages/config": {
       "name": "@layerfig/config",
       "version": "0.0.1",
+      "devDependencies": {
+        "typescript": "5.8.3",
+      },
     },
     "packages/schema-gen": {
       "name": "@layerfig/schema-gen",
       "version": "0.0.1",
+      "devDependencies": {
+        "@layerfig/tsconfig": "workspace:*",
+        "typescript": "5.8.3",
+      },
+    },
+    "packages/tsconfig": {
+      "name": "@layerfig/tsconfig",
+      "version": "0.0.1",
+      "devDependencies": {
+        "typescript": "5.8.3",
+      },
+      "peerDependencies": {
+        "typescript": "^5.8.3",
+      },
     },
   },
   "packages": {
     "@layerfig/config": ["@layerfig/config@workspace:packages/config"],
 
     "@layerfig/schema-gen": ["@layerfig/schema-gen@workspace:packages/schema-gen"],
+
+    "@layerfig/tsconfig": ["@layerfig/tsconfig@workspace:packages/tsconfig"],
+
+    "typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
   }
 }

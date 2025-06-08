@@ -3,7 +3,12 @@
 	"description": "TODO",
 	"version": "0.0.1",
 	"type": "module",
-	"scripts": {},
+	"scripts": {
+		"typecheck": "tsc"
+	},
 	"dependencies": {},
-	"devDependencies": {}
+	"devDependencies": {
+		"@layerfig/tsconfig": "workspace:*",
+		"typescript": "5.8.3"
+	}
 }
