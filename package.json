@@ -2,5 +2,9 @@
 	"name": "layerfig",
 	"version": "0.0.0-development",
 	"private": true,
-	"workspaces": ["packages/*"]
+	"workspaces": ["packages/*"],
+	"packageManager": "bun@1.2.15",
+	"devDependencies": {
+		"turbo": "2.5.4"
+	}
 }
