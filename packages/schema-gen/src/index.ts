@@ -4,6 +4,7 @@ import chokidar from "chokidar";
 import { build } from "esbuild";
 import meow from "meow";
 import { z } from "zod/v4";
+import type * as z4 from "zod/v4/core";
 import pkgJson from "../package.json" with { type: "json" };
 
 const cli = meow(
@@ -97,15 +98,17 @@ async function loadUserSchemaFromTranspiledFile() {
 		 * the old schema will be used.
 		 */
 		`${PATHS.userSchema.transpiled.absolutePath}?updated=${Date.now()}`
-		// biome-ignore lint/suspicious/noExplicitAny: I don't know at the point exactly what would be the type
-	) as Promise<any>);
-	const transpiledUserSchema = transpiledUserSchemaModule?.default;
+	) as Promise<Maybe<{ default: z4.$ZodType }>>);
+
+	let transpiledUserSchema = transpiledUserSchemaModule?.default;
 
 	if (!transpiledUserSchema) {
 		throw new Error("Schema file should export a default value.");
 	}
 
-	if (transpiledUserSchema?._def?.typeName !== "ZodObject") {
+	transpiledUserSchema = transpiledUserSchemaModule?.default;
+
+	if (!transpiledUserSchema?._zod.def) {
 		throw new Error("Schema file should export a ZodObject.");
 	}
 
@@ -116,16 +119,13 @@ async function loadUserSchemaFromTranspiledFile() {
 	 * Deep partial so the users don't get warnings due to missing properties in their config.
 	 * At the end, all merged config will be validated against the original schema in runtime.
 	 */
-	return z.intersection(
-		transpiledUserSchemaTyped.partial(),
+	return transpiledUserSchemaTyped.extend({
 		/**
 		 * We have to include the "$schema" property so the referred JSON schema don't complain about
 		 * the "$schema" property being present. (A bit weird tbh)
 		 */
-		z.object({
-			$schema: z.string(),
-		}),
-	);
+		$schema: z.string(),
+	});
 }
 
 async function transpileTS(entryPoint: string): Promise<string> {
@@ -191,3 +191,5 @@ async function exists(pathToCheck: string) {
 function clearConsole() {
 	process.stdout.write("\x1Bc");
 }
+
+type Maybe<T> = T | null | undefined;

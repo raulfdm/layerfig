@@ -9,10 +9,12 @@
 	"exports": {
 		".": "dist/index.js"
 	},
+	"files": ["dist", "bin"],
 	"scripts": {
 		"build": "tsdown",
 		"check-exports": "./bin/index.js",
-		"check-types": "tsc"
+		"check-types": "tsc",
+		"test": "bun test"
 	},
 	"dependencies": {
 		"chokidar": "4.0.3",
