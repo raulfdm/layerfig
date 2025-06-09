@@ -1,0 +1,19 @@
+{
+	"name": "@layerfig/docs",
+	"private": true,
+	"type": "module",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "12.5.4",
+		"@astrojs/starlight": "0.34.3",
+		"astro": "5.9.1",
+		"sharp": "0.34.2"
+	}
+}
