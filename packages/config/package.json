@@ -22,7 +22,8 @@
 	"scripts": {
 		"build": "tsdown",
 		"check-exports": "attw --pack . --profile node16",
-		"check-types": "tsc"
+		"check-types": "tsc",
+		"test": "bun test"
 	},
 	"dependencies": {},
 	"devDependencies": {

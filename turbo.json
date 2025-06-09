@@ -11,6 +11,7 @@
 		"check-exports": {
 			"dependsOn": ["^build", "^check-exports"]
 		},
+		"test": {},
 		"dev": {
 			"persistent": true,
 			"cache": false
