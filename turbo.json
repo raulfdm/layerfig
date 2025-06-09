@@ -9,7 +9,7 @@
 			"dependsOn": ["^check-types"]
 		},
 		"check-exports": {
-			"dependsOn": ["^build", "^check-exports"]
+			"dependsOn": ["build"]
 		},
 		"test": {},
 		"dev": {
