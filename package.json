@@ -2,8 +2,8 @@
 	"name": "layerfig",
 	"version": "0.0.0-development",
 	"private": true,
-	"workspaces": ["packages/*"],
 	"packageManager": "bun@1.2.15",
+	"workspaces": ["packages/*", "docs"],
 	"scripts": {
 		"build": "turbo build",
 		"check-types": "turbo check-types",
