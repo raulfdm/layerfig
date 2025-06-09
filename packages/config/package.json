@@ -25,10 +25,15 @@
 		"check-types": "tsc",
 		"test": "bun test"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"json5": "2.2.3",
+		"lodash-es": "4.17.21",
+		"yaml": "2.8.0"
+	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.1",
 		"@types/bun": "1.2.15",
+		"@types/lodash-es": "4.17.12",
 		"tsdown": "0.12.7",
 		"typescript": "5.8.3"
 	}
