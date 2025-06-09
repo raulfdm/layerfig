@@ -1,0 +1,16 @@
+{
+	"name": "@layerfig/tsconfig",
+	"private": true,
+	"description": "TODO",
+	"version": "0.0.1",
+	"type": "module",
+	"exports": {
+		".": "./tsconfig.json"
+	},
+	"peerDependencies": {
+		"typescript": "^5.8.3"
+	},
+	"devDependencies": {
+		"typescript": "5.8.3"
+	}
+}

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { z } from "zod";
 
-import type { Result } from "./types.ts";
+import type { Result } from "./types";
 
 export function readIfExist(filePath: string): Result<string, string> {
 	if (fs.existsSync(filePath)) {

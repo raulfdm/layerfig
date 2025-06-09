@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import { z } from "zod";
-import { AppConfigBuilder } from "./app-config-builder.ts";
+import { AppConfigBuilder } from "./app-config-builder";
 
 const schema = z.object({
 	appURL: z.string(),

@@ -1,0 +1,32 @@
+{
+	"name": "@layerfig/schema-gen",
+	"description": "TODO",
+	"version": "0.0.1",
+	"type": "module",
+	"bin": {
+		"layerfig": "./bin/index.js"
+	},
+	"exports": {
+		".": "dist/index.js"
+	},
+	"files": ["dist", "bin"],
+	"scripts": {
+		"build": "tsdown",
+		"check-exports": "./bin/index.js --schema ./src/__fixtures__/basic-schema.ts",
+		"check-types": "tsc",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"chokidar": "4.0.3",
+		"esbuild": "0.25.5",
+		"meow": "13.2.0",
+		"zod": "3.25.56"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@layerfig/tsconfig": "workspace:*",
+		"@types/bun": "1.2.15",
+		"tsdown": "0.12.7",
+		"typescript": "5.8.3"
+	}
+}

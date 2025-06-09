@@ -1,0 +1,40 @@
+{
+	"name": "@layerfig/config",
+	"description": "TODO",
+	"version": "0.0.1",
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"import": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		}
+	},
+	"scripts": {
+		"build": "tsdown",
+		"check-exports": "attw --pack . --profile node16",
+		"check-types": "tsc",
+		"test": "bun test"
+	},
+	"dependencies": {
+		"json5": "2.2.3",
+		"lodash-es": "4.17.21",
+		"yaml": "2.8.0"
+	},
+	"devDependencies": {
+		"@arethetypeswrong/cli": "0.18.1",
+		"@types/bun": "1.2.15",
+		"@types/lodash-es": "4.17.12",
+		"tsdown": "0.12.7",
+		"typescript": "5.8.3"
+	}
+}
