@@ -18,17 +18,85 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: "Documentation",
+					label: "Start Here",
 					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: "Intro", slug: "documentation/intro", link: "intro" },
+						{ label: "Introduction", slug: "introduction", link: "intro" },
+						{ label: "Getting Started", slug: "getting-started" },
+					],
+				},
+				{
+					label: "Configuration",
+					items: [
+						{
+							label: "Schema",
+							slug: "configuration/schema",
+						},
+						{
+							label: "Config Folder",
+							slug: "configuration/config-folder",
+						},
+						{
+							label: "File Formats",
+							slug: "configuration/file-formats",
+						},
+					],
+				},
+				{
+					label: "Sources",
+					items: [
+						{
+							label: "Concept",
+							slug: "sources/intro",
+						},
+						{
+							label: "JSON like",
+							slug: "sources/json",
+						},
+						{
+							label: "YAML",
+							slug: "sources/yaml",
+						},
+						{
+							label: "Environment Variables",
+							slug: "sources/env-vars",
+						},
+					],
+				},
+				{
+					label: "Typed JSON",
+					items: [
+						{
+							label: "Overview",
+							slug: "typed-json/overview",
+						},
+						{
+							label: "CLI",
+							slug: "typed-json/cli",
+						},
+					],
+				},
+				{
+					label: "Guides & Best Practices",
+					items: [
+						{
+							label: "Docker",
+							slug: "guides/docker",
+						},
+						{
+							label: "12 Factor App",
+							slug: "guides/12-factor-app",
+						},
+						{
+							label: "FAQ",
+							slug: "guides/faq",
+						},
 					],
 				},
 			],
 		}),
 	],
 	redirects: {
-		"/": "/documentation/intro",
+		"/": "/introduction",
 	},
 
 	adapter: cloudflare({
