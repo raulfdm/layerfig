@@ -8,7 +8,7 @@ import cloudflare from "@astrojs/cloudflare";
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: "My Docs",
+			title: "Layerfig",
 			social: [
 				{
 					icon: "github",
@@ -18,19 +18,18 @@ export default defineConfig({
 			],
 			sidebar: [
 				{
-					label: "Guides",
+					label: "Documentation",
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: "Example Guide", slug: "guides/example" },
+						{ label: "Intro", slug: "documentation/intro", link: "intro" },
 					],
-				},
-				{
-					label: "Reference",
-					autogenerate: { directory: "reference" },
 				},
 			],
 		}),
 	],
+	redirects: {
+		"/": "/documentation/intro",
+	},
 
 	adapter: cloudflare({
 		imageService: "compile",
