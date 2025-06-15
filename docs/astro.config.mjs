@@ -21,24 +21,15 @@ export default defineConfig({
 					label: "Start Here",
 					items: [
 						{ label: "Introduction", slug: "introduction", link: "intro" },
-						{ label: "Getting Started", slug: "getting-started" },
+						"getting-started",
 					],
 				},
 				{
 					label: "Configuration",
 					items: [
-						{
-							label: "Schema",
-							slug: "configuration/schema",
-						},
-						{
-							label: "Config Folder",
-							slug: "configuration/config-folder",
-						},
-						{
-							label: "File Formats",
-							slug: "configuration/file-formats",
-						},
+						"configuration/schema",
+						"configuration/config-folder",
+						"configuration/file-formats",
 					],
 				},
 				{
