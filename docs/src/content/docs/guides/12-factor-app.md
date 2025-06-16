@@ -1,12 +1,4 @@
 ---
-title: Intro
+title: 12 Factor App
 description: This is a page in my Starlight-powered site
 ---
-
-## Introduction
-
-## Features
-
-## Instalation
-
-## Requirements

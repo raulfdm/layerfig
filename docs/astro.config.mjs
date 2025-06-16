@@ -35,53 +35,19 @@ export default defineConfig({
 				{
 					label: "Sources",
 					items: [
+						"sources/intro",
 						{
-							label: "Concept",
-							slug: "sources/intro",
+							label: "JSON",
+							collapsed: true,
+							items: ["sources/json/overview", "sources/json/cli"],
 						},
-						{
-							label: "JSON like",
-							slug: "sources/json",
-						},
-						{
-							label: "YAML",
-							slug: "sources/yaml",
-						},
-						{
-							label: "Environment Variables",
-							slug: "sources/env-vars",
-						},
-					],
-				},
-				{
-					label: "Typed JSON",
-					items: [
-						{
-							label: "Overview",
-							slug: "typed-json/overview",
-						},
-						{
-							label: "CLI",
-							slug: "typed-json/cli",
-						},
+						"sources/yaml",
+						"sources/env-vars",
 					],
 				},
 				{
 					label: "Guides & Best Practices",
-					items: [
-						{
-							label: "Docker",
-							slug: "guides/docker",
-						},
-						{
-							label: "12 Factor App",
-							slug: "guides/12-factor-app",
-						},
-						{
-							label: "FAQ",
-							slug: "guides/faq",
-						},
-					],
+					items: ["guides/docker", "guides/12-factor-app", "guides/faq"],
 				},
 			],
 		}),
