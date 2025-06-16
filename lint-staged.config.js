@@ -1,6 +1,6 @@
 export default {
 	// Run Biome on staged files that have the following extensions: js, ts, jsx, tsx, json and jsonc
-	"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+	"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc,astro}": [
 		"biome check --files-ignore-unknown=true", // Check formatting and lint
 		"biome check --write --no-errors-on-unmatched", // Format, sort imports, lint, and apply safe fixes
 		"biome check --write --organize-imports-enabled=false --no-errors-on-unmatched", // format and apply safe fixes
