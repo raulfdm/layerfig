@@ -1,1 +1,1 @@
-export { ConfigBuilder as AppConfigBuilder } from "./config-builder";
+export { ConfigBuilder } from "./config-builder";

@@ -2,3 +2,113 @@
 title: Environment Variables
 description: This is a page in my Starlight-powered site
 ---
+
+Imagine this scenario:
+
+Your application has its configuration files committed, and you've built a Docker image for production. You need to run the image locally to debug or test a specific behavior. However, since the configuration values are hardcoded, modifying them requires rebuilding the image.
+
+This process can be cumbersome, especially if your application is large and takes time to build. Additionally, you're not testing the exact image intended for production but a modified version.
+
+To solve this, you can use `ConfigBuilder.createEnvVarSource()` to dynamically override configurations without modifying the files.
+
+```ts
+import { ConfigBuilder } from "app-config";
+
+const config = new ConfigBuilder(AppConfigSchema)
+  .addSource("base.yaml")
+  .addSource(ConfigBuilder.createEnvVarSource())
+  .build();
+```
+
+By default, the library looks for environment variables with:
+
+- **Prefix:** `"APP"`
+- **Prefix separator:** `"_"`
+
+This means it recognizes environment variables starting with `APP_` (e.g., `APP_port`).
+
+> [!IMPORTANT]
+> Configuration keys in environment variables must match the keys in your schema.
+
+### Example Usage
+
+To override values via environment variables:
+
+```yaml
+appURL: http://localhost:4444
+port: 4444
+```
+
+```ts
+const AppConfigSchema = z.object({
+  appURL: z.string(),
+  port: z.number(),
+});
+
+const config = new ConfigBuilder(AppConfigSchema)
+  .addSource("base.yaml")
+  .addSource(ConfigBuilder.createEnvVarSource())
+  .build();
+```
+
+```bash
+APP_appURL=http://localhost:4444 APP_port=4444 node index.js
+```
+
+Since `ConfigBuilder.createEnvVarSource` is the last loaded source, the configuration values will be the ones defined via environment variables.
+
+### Overriding Nested Objects
+
+For nested configurations, the default **separator** is `__` (double underscore). This allows for deep overrides:
+
+```ts
+const AppConfigSchema = z.object({
+  api: z.object({
+    vendor: z.object({
+      aws: z.object({
+        apiToken: z.string(),
+      }),
+    }),
+  }),
+});
+
+const config = new ConfigBuilder(AppConfigSchema)
+  .addSource("base.yaml")
+  .addSource(ConfigBuilder.createEnvVarSource())
+  .build();
+```
+
+```bash
+APP_api__vendor__aws__apiToken=12345 node index.js
+```
+
+### Customizing Environment Variable Settings
+
+You can modify the prefix, prefix separator, and nested key separator as needed:
+
+```ts
+const AppConfigSchema = z.object({
+  api: z.object({
+    vendor: z.object({
+      aws: z.object({
+        apiToken: z.string(),
+      }),
+    }),
+  }),
+});
+
+const config = new ConfigBuilder(AppConfigSchema)
+  .addSource("base.yaml")
+  .addSource(
+    ConfigBuilder.createEnvVarSource({
+      prefix: "VULCAN",
+      prefixSeparator: "--",
+      separator: "----",
+    })
+  )
+  .build();
+```
+
+```bash
+VULCAN--api----vendor----aws----apiToken=12345 node index.js
+```

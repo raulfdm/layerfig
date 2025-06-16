@@ -8,4 +8,56 @@ import Instalation from './getting-started/installation.astro';
 
 ## Installation
 
-<Instalation/>
+<Instalation />
+
+## Usage
+
+Given the following configuration files:
+
+```
+app/
+└─ config/
+   ├─ base.jsonc
+   └─ live.jsonc
+```
+
+**Example: `base.jsonc`**
+
+```jsonc
+// ./app/config/base.jsonc
+{
+  "appURL": "http://localhost:3000",
+  "port": 3000
+}
+```
+
+**Example: `live.jsonc`**
+
+```jsonc
+// ./app/config/live.jsonc
+{
+  "appURL": "https://live.my-app.company"
+}
+```
+
+To define your application configuration:
+
+```tsx
+// ./path/to/config.ts
+import { ConfigBuilder } from "app-config";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder(schema)
+  .addSource("base.jsonc")
+  .addSource("live.jsonc")
+  .build();
+```
+
+Now, you can access the configuration anywhere in your server-side code:
+
+```ts
+import { config } from "./path/to/config.ts";
+
+config.appURL; // string => "https://live.my-app.company"
+config.port; // number => 3000
+```
