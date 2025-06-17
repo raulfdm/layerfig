@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import { z } from "zod";
-import { AppConfigBuilder } from "./app-config-builder";
+import { ConfigBuilder } from "./config-builder";
 
 const schema = z.object({
 	appURL: z.string(),
@@ -14,7 +14,7 @@ const schema = z.object({
 });
 
 describe("createAppConfig", () => {
-	const config = new AppConfigBuilder(schema, {
+	const config = new ConfigBuilder(schema, {
 		configFolder: "./src/__fixtures__",
 	});
 
@@ -28,7 +28,7 @@ describe("createAppConfig", () => {
 				const apiPortMockEnv = injectEnvVar("APP_api__port", "3000");
 
 				const result = config
-					.addSource(AppConfigBuilder.createEnvVarSource())
+					.addSource(ConfigBuilder.createEnvVarSource())
 					.build();
 
 				expect(result).toEqual({
@@ -45,7 +45,7 @@ describe("createAppConfig", () => {
 			it("loads source from a different runtime", () => {
 				const runtimeEnv = import.meta.env as Record<
 					string,
-					string | boolean | number | undefined
+					string | undefined
 				>;
 
 				const appUrlMockEnv = injectEnvVar(
@@ -61,7 +61,7 @@ describe("createAppConfig", () => {
 
 				const result = config
 					.addSource(
-						AppConfigBuilder.createEnvVarSource({
+						ConfigBuilder.createEnvVarSource({
 							runtimeEnv,
 						}),
 					)
@@ -87,7 +87,7 @@ describe("createAppConfig", () => {
 
 				const result = config
 					.addSource(
-						AppConfigBuilder.createEnvVarSource({
+						ConfigBuilder.createEnvVarSource({
 							prefix: "TEST",
 							prefixSeparator: "-",
 							separator: "_-_",
@@ -108,7 +108,7 @@ describe("createAppConfig", () => {
 		});
 
 		describe("from yaml", () => {
-			const config = new AppConfigBuilder(schema, {
+			const config = new ConfigBuilder(schema, {
 				configFolder: "./src/__fixtures__",
 			});
 
@@ -159,7 +159,7 @@ describe("createAppConfig", () => {
 					bar: z.string(),
 				});
 
-				const config = new AppConfigBuilder(schema, {
+				const config = new ConfigBuilder(schema, {
 					configFolder: "./src/__fixtures__",
 				});
 
@@ -185,7 +185,7 @@ describe("createAppConfig", () => {
 		});
 
 		describe("from json", () => {
-			const config = new AppConfigBuilder(schema, {
+			const config = new ConfigBuilder(schema, {
 				configFolder: "./src/__fixtures__",
 			});
 
@@ -252,7 +252,7 @@ describe("createAppConfig", () => {
 	});
 
 	it("should return the expected valued combining all addSource", () => {
-		const config = new AppConfigBuilder(schema, {
+		const config = new ConfigBuilder(schema, {
 			configFolder: "./src/__fixtures__",
 		});
 
@@ -262,7 +262,7 @@ describe("createAppConfig", () => {
 			.addSource("base.jsonc")
 			.addSource("dev.json")
 			.addSource("base.yml")
-			.addSource(AppConfigBuilder.createEnvVarSource())
+			.addSource(ConfigBuilder.createEnvVarSource())
 			.build();
 
 		expect(result).toEqual({

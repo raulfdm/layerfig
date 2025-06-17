@@ -11,19 +11,23 @@ import {
 	type PartialEnvVarSource,
 	jsonExtensions,
 	yamlExtensions,
-} from "./types.ts";
-import { readIfExist } from "./utils.ts";
+} from "./types";
+import { readIfExist } from "./utils";
 
 const APP_ROOT_PATH = process.cwd();
 
-export class AppConfigBuilder<TSchema extends z.ZodType<object>> {
+interface ConfigBuilderOptions {
+	configFolder?: string;
+}
+
+export class ConfigBuilder<TSchema extends z.ZodType<object>> {
 	#schema: TSchema;
 	#partialConfig: AnyObject = {};
 	#appConfigFolderAbsolutePath: string;
 
 	constructor(
 		schema: TSchema,
-		{ configFolder = "./config" }: { configFolder?: string } = {},
+		{ configFolder = "./config" }: ConfigBuilderOptions = {},
 	) {
 		this.#schema = schema;
 		this.#appConfigFolderAbsolutePath = path.join(APP_ROOT_PATH, configFolder);

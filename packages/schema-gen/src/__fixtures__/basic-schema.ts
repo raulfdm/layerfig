@@ -1,8 +1,8 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const configSchema = z.object({
 	api: z.object({
-		url: z.url(),
+		url: z.string().url(),
 	}),
 });
 
