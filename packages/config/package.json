@@ -25,6 +25,9 @@
 		"check-types": "tsc",
 		"test": "bun test"
 	},
+	"peerDependencies": {
+		"zod": "^3.25.0"
+	},
 	"dependencies": {
 		"json5": "2.2.3",
 		"lodash-es": "4.17.21",
@@ -35,6 +38,7 @@
 		"@types/bun": "1.2.15",
 		"@types/lodash-es": "4.17.12",
 		"tsdown": "0.12.7",
-		"typescript": "5.8.3"
+		"typescript": "5.8.3",
+		"zod": "3.25.67"
 	}
 }
