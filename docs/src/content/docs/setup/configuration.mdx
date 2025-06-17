@@ -1,0 +1,41 @@
+---
+title: Configuration
+---
+
+## schema
+
+When invoking `ConfigBuilder`, you must provide a schema. A schema, defined using `zod` (version 4), ensures that the final configuration object is both type-safe and validated at runtime.
+
+```ts
+import { z } from "zod/v4";
+
+export const schema = z.object({
+	appURL: z.url(),
+	port: z.number(),
+});
+```
+
+This can be in the same or in a separated file as where you declare your config.
+
+This schema must be passed when we invoke `ConfigBuilder`:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder(schema).build();
+```
+
+## configFolder
+
+By default, when using `addSource` for file-based configurations, the library expects a `config` folder in the project's root. However, you can customize this path:
+
+```ts
+const config = new ConfigBuilder(schema, {
+	configFolder: "./path/to/config-folder",
+})
+	.addSource("base.yaml")
+	.build();
+```
+
+In this case, the library will look for `<root>/path/to/config-folder/base.yaml` and load it.

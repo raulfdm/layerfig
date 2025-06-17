@@ -1,6 +1,5 @@
 ---
 title: Environment Variables
-description: This is a page in my Starlight-powered site
 ---
 
 Imagine this scenario:
@@ -12,9 +11,9 @@ This process can be cumbersome, especially if your application is large and take
 To solve this, you can use `ConfigBuilder.createEnvVarSource()` to dynamically override configurations without modifying the files.
 
 ```ts
-import { ConfigBuilder } from "app-config";
+import { ConfigBuilder } from "@layerfig/config";
 
-const config = new ConfigBuilder(AppConfigSchema)
+const config = new ConfigBuilder(schema)
   .addSource("base.yaml")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();

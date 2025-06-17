@@ -28,21 +28,15 @@ export default defineConfig({
 					label: "Setup",
 					items: [
 						"setup/configuration",
-						"setup/config-folder",
-						"setup/file-formats",
-					],
-				},
-				{
-					label: "Sources",
-					items: [
-						"sources/intro",
 						{
-							label: "JSON",
-							collapsed: true,
-							items: ["sources/json/overview", "sources/json/cli"],
+							label: "Sources",
+							items: [
+								"setup/sources/overview",
+								"setup/sources/files",
+								"setup/sources/env-var",
+								"setup/sources/json-schema",
+							],
 						},
-						"sources/yaml",
-						"sources/env-vars",
 					],
 				},
 				{

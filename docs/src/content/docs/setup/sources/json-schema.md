@@ -1,6 +1,5 @@
 ---
-title: Schema Generation
-description: This is a page in my Starlight-powered site
+title: JSON Schema
 ---
 
 If you're using JSON configuration files, you can leverage the `$schema` declaration to enable type inference for the properties in your config.
@@ -11,7 +10,7 @@ First, create a `schema.ts` file. This file must default-export a Zod schema:
 
 ```ts
 // ./path/to/schema.ts
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export default z.object({
   port: z.number(),
