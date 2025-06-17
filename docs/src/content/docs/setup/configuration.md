@@ -1,6 +1,5 @@
 ---
-title: Schema
-description: This is a page in my Starlight-powered site
+title: Configuration
 ---
 
 When invoking `ConfigBuilder`, you must provide a schema. A schema, defined using `zod`, ensures that the final configuration object is both type-safe and validated at runtime.

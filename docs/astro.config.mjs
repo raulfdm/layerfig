@@ -25,11 +25,11 @@ export default defineConfig({
 					],
 				},
 				{
-					label: "Configuration",
+					label: "Setup",
 					items: [
-						"configuration/schema",
-						"configuration/config-folder",
-						"configuration/file-formats",
+						"setup/configuration",
+						"setup/config-folder",
+						"setup/file-formats",
 					],
 				},
 				{
