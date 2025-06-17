@@ -2,7 +2,7 @@ import path from "node:path";
 import json5 from "json5";
 import { merge, set } from "lodash-es";
 import yaml from "yaml";
-import type { z } from "zod/v4";
+import type { z } from "zod";
 
 import {
 	type AcceptedFileType,

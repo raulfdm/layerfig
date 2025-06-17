@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
 
-import { z } from "zod/v4";
+import { z } from "zod";
 import { ConfigBuilder } from "./config-builder";
 
 const schema = z.object({
@@ -170,12 +170,13 @@ describe("createAppConfig", () => {
 					expect(e.message).toMatchInlineSnapshot(`
             "Fail to parse config: [
               {
-                "expected": "string",
                 "code": "invalid_type",
+                "expected": "string",
+                "received": "undefined",
                 "path": [
                   "bar"
                 ],
-                "message": "Invalid input: expected string, received undefined"
+                "message": "Required"
               }
             ]"
           `);

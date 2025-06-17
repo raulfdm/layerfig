@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import type { Result } from "./types";
 
