@@ -1,0 +1,54 @@
+---
+import { Code, TabItem, Tabs } from "@astrojs/starlight/components";
+
+interface Tab {
+	label: string;
+	code: string;
+	language: string;
+}
+
+const tabs: Tab[] = [
+	{
+		label: "index.ts",
+		language: "ts",
+		code: `import { ConfigBuilder } from "@layerfig/config";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder(schema)
+  .addSource("base.jsonc")
+  .addSource("live.jsonc")
+  .build();`,
+	},
+	{
+		label: "schema.ts",
+		language: "ts",
+		code: `import {z} from 'zod/v4'
+
+ export const schema = z.object({
+   appURL: z.url(),
+   port: z.number()
+ })`,
+	},
+	{
+		label: "base.jsonc",
+		language: "jsonc",
+		code: `{
+  "appURL": "http://localhost:3000",
+  "port": 3000
+}`,
+	},
+	{
+		label: "live.jsonc",
+		language: "jsonc",
+		code: `{
+  "appURL": "https://live.my-app.company"
+}`,
+	},
+];
+---
+
+<Tabs>
+    {tabs.map(tab => <TabItem label={tab.label}>
+      <Code  code={tab.code} lang={tab.language}/>
+    </TabItem>)}
+</Tabs>

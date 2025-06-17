@@ -3,61 +3,41 @@ title: Getting Started
 description: This is a page in my Starlight-powered site
 ---
 
+import { FileTree, Steps } from '@astrojs/starlight/components';
 import Instalation from './getting-started/installation.astro';
+import BaseFiles from './getting-started/base-files.astro';
 
 
-## Installation
+<Steps>
+    1. Install the dependencies
 
-<Instalation />
+        <Instalation />
 
-## Usage
+    2. Define your files
 
-Given the following configuration files:
+        <FileTree>
+        - app
+            - config
+                - base.jsonc
+                - live.jsonc
+            - src
+                - ...
+                - config
+                    - index.ts
+                    - schema.ts
 
-```
-app/
-└─ config/
-   ├─ base.jsonc
-   └─ live.jsonc
-```
+        </FileTree>
 
-**Example: `base.jsonc`**
+        <BaseFiles />
 
-```jsonc
-// ./app/config/base.jsonc
-{
-  "appURL": "http://localhost:3000",
-  "port": 3000
-}
-```
+    3. Use your type-safe config
 
-**Example: `live.jsonc`**
+        Now, you can access the configuration anywhere in your server-side code:
 
-```jsonc
-// ./app/config/live.jsonc
-{
-  "appURL": "https://live.my-app.company"
-}
-```
+        ```ts
+        import { config } from "./config";
 
-To define your application configuration:
-
-```tsx
-// ./path/to/config.ts
-import { ConfigBuilder } from "app-config";
-import { schema } from "./schema";
-
-export const config = new ConfigBuilder(schema)
-  .addSource("base.jsonc")
-  .addSource("live.jsonc")
-  .build();
-```
-
-Now, you can access the configuration anywhere in your server-side code:
-
-```ts
-import { config } from "./path/to/config";
-
-config.appURL; // string => "https://live.my-app.company"
-config.port; // number => 3000
-```
+        config.appURL; // string => "https://live.my-app.company"
+        config.port; // number => 3000
+        ```
+</Steps>

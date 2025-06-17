@@ -28,6 +28,6 @@ const tabs: Tab[] = [
 
 <Tabs>
     {tabs.map(tab => <TabItem label={tab.label}>
-        <Code  code={`${tab.baseCommand} zod @layerfig/config`} lang="shell"/>
+        <Code  code={`${tab.baseCommand} zod@^3.25.0 @layerfig/config`} lang="shell"/>
     </TabItem>)}
 </Tabs>
