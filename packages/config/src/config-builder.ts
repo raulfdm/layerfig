@@ -1,4 +1,5 @@
 import path from "node:path";
+
 import json5 from "json5";
 import { merge, set } from "lodash-es";
 import yaml from "yaml";
@@ -8,8 +9,8 @@ import {
 	type AcceptedFileType,
 	AnyObject,
 	EnvVarSourceOptions,
-	type PartialEnvVarSource,
 	jsonExtensions,
+	type PartialEnvVarSource,
 	yamlExtensions,
 } from "./types";
 import { readIfExist } from "./utils";

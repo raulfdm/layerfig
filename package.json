@@ -3,7 +3,10 @@
 	"version": "0.0.0-development",
 	"private": true,
 	"packageManager": "bun@1.2.15",
-	"workspaces": ["packages/*", "docs"],
+	"workspaces": [
+		"packages/*",
+		"docs"
+	],
 	"scripts": {
 		"build": "turbo build",
 		"check-exports": "turbo check-exports",
@@ -13,6 +16,7 @@
 		"lint": "biome lint --fix"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "2.0.0",
 		"@changesets/cli": "2.29.4",
 		"husky": "9.1.7",
 		"lint-staged": "16.1.0",
