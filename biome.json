@@ -7,7 +7,14 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!**/.history/**/*", "!**/dist/**/*", "!**/.astro/**/*"]
+		"includes": [
+			"**",
+			"!**/.history/**/*",
+			"!**/dist/**/*",
+			"!**/.astro/**/*",
+			"!**/examples/**/*",
+			"!**/.turbo/**/*"
+		]
 	},
 	"formatter": {
 		"enabled": true,
