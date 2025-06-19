@@ -14,7 +14,7 @@
 		"ci": "biome ci .",
 		"format": "biome format --write",
 		"lint": "biome lint --fix",
-		"publish": "turbo publish"
+		"publish": "turbo publish --filter=\"./packages/*\""
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0",
