@@ -14,18 +14,27 @@
 		"types",
 		"intellisense"
 	],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/raulfdm/layerfig.git",
+		"directory": "pacakges/schema"
+	},
+	"author": "Raul Melo <contact@raulmelo.me>",
+	"publishConfig": {
+		"access": "public"
+	},
 	"bin": {
 		"layerfig": "./bin/index.js"
 	},
-	"exports": {
-		".": "dist/index.js"
-	},
 	"files": [
 		"dist",
-		"bin"
+		"bin",
+		"LICENSE"
 	],
 	"scripts": {
 		"prepack": "bun run build",
+		"publish": "bun publish",
 		"build": "tsdown",
 		"check-exports": "./bin/index.js --schema ./src/__fixtures__/basic-schema.ts",
 		"check-types": "tsc",

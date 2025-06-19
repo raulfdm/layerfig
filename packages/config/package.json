@@ -13,12 +13,23 @@
 		"runtime",
 		"env"
 	],
+	"license": "MIT",
+	"author": "Raul Melo <contact@raulmelo.me>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/raulfdm/layerfig.git",
+		"directory": "pacakges/config"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"type": "module",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
-		"dist"
+		"dist",
+		"LICENSE"
 	],
 	"exports": {
 		"./package.json": "./package.json",
@@ -35,6 +46,7 @@
 	},
 	"scripts": {
 		"prepack": "bun run build",
+		"publish": "bun publish",
 		"build": "tsdown",
 		"check-exports": "attw --pack . --profile node16",
 		"check-types": "tsc",
