@@ -46,6 +46,7 @@
 	},
 	"scripts": {
 		"prepack": "bun run build",
+		"publish": "bun publish",
 		"build": "tsdown",
 		"check-exports": "attw --pack . --profile node16",
 		"check-types": "tsc",

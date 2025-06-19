@@ -13,7 +13,8 @@
 		"check-types": "turbo check-types",
 		"ci": "biome ci .",
 		"format": "biome format --write",
-		"lint": "biome lint --fix"
+		"lint": "biome lint --fix",
+		"publish": "turbo publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0",
