@@ -20,7 +20,10 @@
 	"exports": {
 		".": "dist/index.js"
 	},
-	"files": ["dist", "bin"],
+	"files": [
+		"dist",
+		"bin"
+	],
 	"scripts": {
 		"prepack": "bun run build",
 		"build": "tsdown",
