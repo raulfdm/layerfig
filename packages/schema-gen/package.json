@@ -33,7 +33,7 @@
 		"LICENSE"
 	],
 	"scripts": {
-		"publish": "bun publish",
+		"prepack": "bun turbo build --output-logs=errors-only",
 		"build": "tsdown",
 		"check-exports": "./bin/index.js --schema ./src/__fixtures__/basic-schema.ts",
 		"check-types": "tsc",
