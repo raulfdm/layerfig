@@ -19,5 +19,6 @@
 			"persistent": true,
 			"cache": false
 		}
-	}
+	},
+	"globalEnv": ["NPM_TOKEN"]
 }
