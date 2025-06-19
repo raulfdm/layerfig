@@ -1,11 +1,23 @@
 {
 	"name": "@layerfig/config",
-	"description": "TODO",
+	"description": "Layer and runtime-validate type-safe configs for JavaScript apps.",
 	"version": "0.0.1",
+	"keywords": [
+		"configuration",
+		"layered",
+		"config",
+		"javascript",
+		"typescript",
+		"schema",
+		"validation",
+		"runtime",
+		"env"
+	],
 	"type": "module",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"files": ["dist"],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
@@ -20,6 +32,7 @@
 		}
 	},
 	"scripts": {
+		"prepack": "bun run build",
 		"build": "tsdown",
 		"check-exports": "attw --pack . --profile node16",
 		"check-types": "tsc",

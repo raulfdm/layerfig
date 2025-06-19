@@ -1,8 +1,19 @@
 {
 	"name": "@layerfig/schema-gen",
-	"description": "TODO",
+	"description": "Generate JSON Schema and TypeScript types from Layerfig schemas.",
 	"version": "0.0.1",
 	"type": "module",
+	"keywords": [
+		"json-schema",
+		"codegen",
+		"typescript",
+		"cli",
+		"layerfig",
+		"configuration",
+		"schema",
+		"types",
+		"intellisense"
+	],
 	"bin": {
 		"layerfig": "./bin/index.js"
 	},
@@ -11,6 +22,7 @@
 	},
 	"files": ["dist", "bin"],
 	"scripts": {
+		"prepack": "bun run build",
 		"build": "tsdown",
 		"check-exports": "./bin/index.js --schema ./src/__fixtures__/basic-schema.ts",
 		"check-types": "tsc",

@@ -13,6 +13,7 @@
 		"lint": "biome lint --fix"
 	},
 	"devDependencies": {
+		"@changesets/cli": "2.29.4",
 		"husky": "9.1.7",
 		"lint-staged": "16.1.0",
 		"turbo": "2.5.4"
