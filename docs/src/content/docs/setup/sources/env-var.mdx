@@ -2,6 +2,8 @@
 title: Environment Variables
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 Imagine this scenario:
 
 Your application has its configuration files committed, and you've built a Docker image for production. You need to run the image locally to debug or test a specific behavior. However, since the configuration values are hardcoded, modifying them requires rebuilding the image.
@@ -26,8 +28,11 @@ By default, the library looks for environment variables with:
 
 This means it recognizes environment variables starting with `APP_` (e.g., `APP_port`).
 
-> [!IMPORTANT]
-> Configuration keys in environment variables must match the keys in your schema.
+
+<Aside title="Important">
+    Configuration keys in environment variables must match the keys in your schema.
+</Aside>
+
 
 ### Example Usage
 
