@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/schema-gen",
 	"description": "Generate JSON Schema and TypeScript types from Layerfig schemas.",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"type": "module",
 	"keywords": [
 		"json-schema",
