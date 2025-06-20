@@ -40,7 +40,11 @@ export default defineConfig({
 				},
 				{
 					label: "Guides & Best Practices",
-					items: ["guides/docker", "guides/12-factor-app", "guides/dynamic-environment"],
+					items: [
+						"guides/docker",
+						"guides/12-factor-app",
+						"guides/dynamic-environment",
+					],
 				},
 				{
 					label: "Examples",
