@@ -1,0 +1,98 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+
+export function getStaticPaths() {
+  return [{ params: { name: "basic" } }];
+}
+
+type Name = string;
+type ExampleURL = string;
+
+type Examples = Record<Name, ExampleURL>;
+
+const examples: Examples = {
+  basic:
+    "https://stackblitz.com/github/raulfdm/layerfig/tree/main/examples/basic?embed=1&file=src%2Fconfig%2Findex.ts",
+};
+
+const { name } = Astro.params;
+
+if (!name) {
+  throw new Error("Missing name parameter");
+}
+
+const currentExample = examples[name];
+
+if (!currentExample) {
+  Astro.redirect("/404");
+}
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Basic Example",
+    tableOfContents: false,
+  }}
+>
+  <iframe src={currentExample}></iframe>
+</StarlightPage>
+
+<style lang="postcss">
+  :root {
+    --sl-content-margin-inline: none;
+    --sl-content-width: 100% !important;
+  }
+
+  :global(.main-frame, .main-frame > div) {
+    height: calc(100svh - var(--sl-nav-height)) !important;
+  }
+
+  :global(main[data-pagefind-body]) {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .content-panel:nth-child(2) {
+      flex: 1;
+
+      .sl-container,
+      .sl-markdown-content {
+        height: 100%;
+      }
+
+      footer {
+        display: none;
+      }
+    }
+  }
+
+  iframe {
+    width: 100%;
+    border: none;
+    border-radius: 0.8rem;
+    min-height: 100%;
+  }
+</style>
+
+<script>
+  changeTheme();
+
+  const themeSelector = document.querySelector("starlight-theme-select select");
+  if (themeSelector) {
+    themeSelector.addEventListener("change", (e) => {
+      changeTheme();
+    });
+  }
+
+  function changeTheme() {
+    const iframe = document.querySelector("iframe")!;
+    const { theme } = document.documentElement.dataset;
+
+    const url = new URL(iframe.src);
+
+    if (theme) {
+      url.searchParams.set("theme", theme);
+      iframe.src = url.toString();
+    }
+  }
+</script>

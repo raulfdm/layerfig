@@ -29,8 +29,12 @@ jobs:
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1.5.3
-        with:
-          publish: bun run ./scripts/publish.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish
+        if: steps.changesets.outputs.hasChangesets == 'false'
+        # You can do something when a publish should happen.
+        run: bun run ./scripts/publish.ts
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
