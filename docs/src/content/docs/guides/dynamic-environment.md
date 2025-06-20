@@ -1,0 +1,36 @@
+---
+title: Dynamic Environment
+---
+
+If you maintain multiple environments (e.g., `local`, `dev`, `staging`, `prod`), you’ll have a separate configuration file for each one.
+
+However, you can’t load them all at once:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder(schema)
+  .addSource("base.jsonc")
+  .addSource("local.jsonc")
+  .addSource("dev.jsonc")
+  .addSource("staging.jsonc")
+  .addSource("prod.jsonc")
+  .build();
+```
+
+This approach loads every file and merges them, with each subsequent layer overriding the previous.
+
+A better solution is to use an environment variable (for example, `APP_ENV=local|dev|staging|prod`) and name your files accordingly:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder(schema)
+  .addSource("base.jsonc")
+  .addSource(`${process.env.APP_ENV}.jsonc`)
+  .build();
+```
+
+Now, when you run your application with different `APP_ENV` values, it automatically loads the matching configuration file.
