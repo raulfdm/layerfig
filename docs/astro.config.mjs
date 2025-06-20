@@ -42,6 +42,13 @@ export default defineConfig({
 					label: "Guides & Best Practices",
 					items: ["guides/docker", "guides/12-factor-app"],
 				},
+				{
+					label: "Examples",
+					items: [{
+						label: 'Basic',
+						link:'examples/basic'
+					}],
+				},
 			],
 		}),
 	],
