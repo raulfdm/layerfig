@@ -44,10 +44,12 @@ export default defineConfig({
 				},
 				{
 					label: "Examples",
-					items: [{
-						label: 'Basic',
-						link:'examples/basic'
-					}],
+					items: [
+						{
+							label: "Basic",
+							link: "examples/basic",
+						},
+					],
 				},
 			],
 		}),
