@@ -31,6 +31,9 @@ jobs:
         uses: changesets/action@v1.5.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: bun changeset version
+          createGithubReleases: true
 
       - name: Publish
         if: steps.changesets.outputs.hasChangesets == 'false'
