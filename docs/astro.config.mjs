@@ -7,7 +7,12 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: "Layerfig",
+			title: "",
+			logo: {
+				light: "./src/assets/light-logo.svg",
+				dark: "./src/assets/dark-logo.svg",
+				alt: "Layerfig",
+			},
 			social: [
 				{
 					icon: "github",
