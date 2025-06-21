@@ -53,6 +53,10 @@ export default defineConfig({
 							label: "Basic",
 							link: "examples/basic",
 						},
+						{
+							label: "JSON Schema",
+							link: "examples/json-schema",
+						},
 					],
 				},
 			],
