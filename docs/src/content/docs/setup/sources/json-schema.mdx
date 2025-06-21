@@ -8,15 +8,17 @@ If you're using JSON configuration files, you can leverage the `$schema` declara
 
 ### Defining the Schema
 
-First, create a `schema.ts` file. This file must default-export a Zod schema:
+First, create a `schema.ts` file. This file **must** default-export a Zod schema:
 
 ```ts
 // ./path/to/schema.ts
 import { z } from "zod/v4";
 
-export default z.object({
+export const configSchema = z.object({
   port: z.number(),
 });
+
+export default configSchema
 ```
 
 ### Generating the Schema File
