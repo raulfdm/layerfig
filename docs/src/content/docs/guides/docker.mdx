@@ -4,9 +4,13 @@ title: Docker
 
 import { Aside } from '@astrojs/starlight/components';
 
-In a lot cases, we build our application using Docker so we can host it somewhere else.
+In many cases, we build our application with Docker to enable easy hosting on
+external servers.
 
-We can achieve that in various ways but maybe the most optimal one would be by using a technique called [Multi-stage builds](https://docs.docker.com/build/building/multi-stage/), which consist on having a couple of layers preparing the application and at the end, build an image only the production code of our app, here's an example:
+One of the most efficient ways to do this is using a technique called
+[Multi-stage builds](https://docs.docker.com/build/building/multi-stage/), which
+consists of multiple stages that prepare the application and produce a final image
+containing only the production code. Here's an example:
 
 ```dockerfile
 # Phase 1: Build the application
@@ -17,7 +21,6 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-
 RUN npm run build
 
 # Phase 2: Prepare the production image
@@ -39,9 +42,11 @@ EXPOSE 5173
 CMD ["node", "server.js"]
 ```
 
-The advantage of this strategy is that you have a much leaner image that contains only `production` dependencies and the bundled files.
+This strategy produces a much leaner image that includes only production
+dependencies and the bundled files.
 
-If you're already using this strategy and add `layerfig`, probably you'll face an error like this:
+If you are already using this approach and add `layerfig`, you may encounter an
+error like this:
 
 ```
 Error: File "/app/config/base.json" does not exist
@@ -52,7 +57,8 @@ Error: File "/app/config/base.json" does not exist
     at async file:///app/server.js:51:17
 ```
 
-That's because now you also need to include the config files in the final production stage:
+This error occurs because you need to include the configuration files in the final
+production stage:
 
 ```diff lang="dockerfile"
 # Phase 1: Build the application
@@ -63,7 +69,6 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
-
 RUN npm run build
 
 # Phase 2: Prepare the production image
@@ -79,7 +84,8 @@ RUN npm ci --include=prod
 COPY --from=builder /app/dist ./dist
 ## Production server
 COPY server.js .
-+## Include config files
+
++## Include configuration files
 +COPY ./config ./config
 
 EXPOSE 5173
@@ -87,8 +93,8 @@ EXPOSE 5173
 CMD ["node", "server.js"]
 ```
 
-And now, your application will contain the configuration files and load it properly.
+Now your application will include the configuration files and load them correctly.
 
 <Aside>
-    See an entire example at [Docker Example](/examples/docker)
+    For a complete example, see [Docker Example](/examples/docker)
 </Aside>
