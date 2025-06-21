@@ -24,11 +24,11 @@ export default z.object({
 Run the CLI and pass the relative path to your schema file:
 
 ```bash
-pnpm app-config --schema ./path/to/schema.ts
+pnpm layerfig --schema ./path/to/schema.ts
 ```
 
 <Aside title="Important">
-    In case you have installed the package using `workspace:*` protocol and are building your app with `--ignore-scripts`, the `app-config` CLI won't work. That's because pnpm will skip the step of putting internal packages in the `node_modules/.bin` folder and the binary won't be there.
+    In case you have installed the package using `workspace:*` protocol and are building your app with `--ignore-scripts`, the `layerfig` CLI won't work. That's because pnpm will skip the step of putting internal packages in the `node_modules/.bin` folder and the binary won't be there.
 </Aside>
 
 ### Referencing the Schema in Your JSON Config
@@ -37,7 +37,7 @@ After running the command, update your JSON configuration file to reference the 
 
 ```json
 {
-  "$schema": "../node_modules/.app-config/schema.json"
+  "$schema": "../node_modules/.layerfig/schema.json"
 }
 ```
 
@@ -46,7 +46,7 @@ After running the command, update your JSON configuration file to reference the 
 Use the `--watch` flag to update the schema automatically:
 
 ```bash
-pnpm app-config --schema ./path/to/schema.ts --watch
+pnpm layerfig --schema ./path/to/schema.ts --watch
 ```
 
 <Aside>
