@@ -2,7 +2,7 @@
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 
 export function getStaticPaths() {
-  return [{ params: { name: "basic" } }, { params: { name: "json-schema" } }];
+  return [{ params: { name: "basic" } }, { params: { name: "json-schema" } },{ params: { name: "docker" } }];
 }
 
 interface ExampleOptions {
@@ -52,6 +52,14 @@ const examples = new Map<string, Example>([
       title: "JSON Schema Example",
       note:
         "Due to limitations on Stackblitz, you'll better see if you download this example and run it locally in your IDE.",
+    }),
+  ],
+  [
+    "docker",
+    new Example({
+      name: "docker",
+      startFile: "Dockerfile",
+      title: "Multi-staged Dockerfile"
     }),
   ],
 ]);
