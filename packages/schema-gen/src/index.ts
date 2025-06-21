@@ -39,7 +39,7 @@ const cli = meow(
 const PATHS = {
 	rootDir: process.cwd(),
 	get tempFolder() {
-		return path.join(PATHS.rootDir, "./node_modules/.app-config");
+		return path.join(PATHS.rootDir, "./node_modules/.layerfig");
 	},
 	output: {
 		fileName: "schema.json",
