@@ -1,0 +1,4 @@
+{
+	"$schema": "../node_modules/.app-config/schema.json",
+	"appURL": "https://my-app.com"
+}
