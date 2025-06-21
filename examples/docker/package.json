@@ -25,7 +25,7 @@
     "typescript": "5.8.3",
     "vite": "6.3.5"
   },
-  "resolutions": {
-    "rollup": "npm:@rollup/wasm-node"
+  "optionalDependencies": {
+    "@rollup/rollup-linux-arm64-musl": "^4.44.0"
   }
 }
