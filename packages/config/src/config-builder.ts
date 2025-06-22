@@ -20,7 +20,7 @@ interface ConfigBuilderOptions<T extends object = Record<string, unknown>> {
 	/**
 	 * A function to validate the configuration object.
 	 */
-	validate: (config:Record<string, unknown>) => T,
+	validate: (config: Record<string, unknown>) => T;
 	/**
 	 * The folder where the configuration files are located.
 	 * @default "./config"
@@ -33,11 +33,12 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#partialConfig: AnyObject = {};
 	#appConfigFolderAbsolutePath: string;
 
-	constructor(
-		options: ConfigBuilderOptions<T>,
-	) {
+	constructor(options: ConfigBuilderOptions<T>) {
 		this.#options = options;
-		this.#appConfigFolderAbsolutePath = path.join(APP_ROOT_PATH, this.#options.configFolder ?? "./config");
+		this.#appConfigFolderAbsolutePath = path.join(
+			APP_ROOT_PATH,
+			this.#options.configFolder ?? "./config",
+		);
 	}
 
 	static createEnvVarSource(options: PartialEnvVarSource = {}) {

@@ -4,7 +4,7 @@ import { z as z3 } from "zod";
 import { z as z4 } from "zod/v4";
 import Joi from "joi";
 import * as v from "valibot";
-import * as yup from 'yup';
+import * as yup from "yup";
 
 import { ConfigBuilder } from "./config-builder";
 
@@ -140,22 +140,30 @@ describe("Type-safe agnostic validate", () => {
 	it("yup", () => {
 		const schema = yup.object({
 			appURL: yup.string().url().required(),
-			api: yup.object({
-				port: yup.mixed().transform((value) => {
-					if (typeof value === 'string') {
-						return Number.parseInt(value, 10);
-					}
-					return value;
-				}).test('is-number', 'Must be a number', (value) => 
-					typeof value === 'number' && !Number.isNaN(value)
-				).required()
-			}).required()
+			api: yup
+				.object({
+					port: yup
+						.mixed()
+						.transform((value) => {
+							if (typeof value === "string") {
+								return Number.parseInt(value, 10);
+							}
+							return value;
+						})
+						.test(
+							"is-number",
+							"Must be a number",
+							(value) => typeof value === "number" && !Number.isNaN(value),
+						)
+						.required(),
+				})
+				.required(),
 		});
 
 		const config = new ConfigBuilder({
 			validate: (config) => {
-				console.log('CONFIG',config)
-				return schema.validateSync(config)
+				console.log("CONFIG", config);
+				return schema.validateSync(config);
 			},
 			configFolder: "./src/__fixtures__",
 		})
@@ -192,10 +200,7 @@ describe("ConfigBuilder", () => {
 	describe(".addSource", () => {
 		describe("from environment variable", () => {
 			it("loads source from process.env", () => {
-				const appUrlMockEnv = injectEnvVar(
-					"APP_appURL",
-					"https://my-site.com",
-				);
+				const appUrlMockEnv = injectEnvVar("APP_appURL", "https://my-site.com");
 				const apiPortMockEnv = injectEnvVar("APP_api__port", "3000");
 
 				const result = config
