@@ -1,6 +1,6 @@
 <p align="center">
  <img src="../../docs/src/assets/logo-no-text.svg" width="300" alt="layerfig logo">
-  <h1 align="center">layerfig</h1>
+  <h1 align="center"><code>@layerfig/config</code></h1>
   <br/>
   A simple way to implement configuration layering. It allows you to define multiple configuration sources, which are then merged into a single, type-safe configuration object.
 </p>
