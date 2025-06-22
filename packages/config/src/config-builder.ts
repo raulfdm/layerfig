@@ -16,7 +16,7 @@ import { readIfExist } from "./utils";
 
 const APP_ROOT_PATH = process.cwd();
 
-interface ConfigBuilderOptions<T extends Record<string, unknown> = Record<string, unknown>> {
+interface ConfigBuilderOptions<T extends object = Record<string, unknown>> {
 	/**
 	 * A function to validate the configuration object.
 	 */
@@ -28,7 +28,7 @@ interface ConfigBuilderOptions<T extends Record<string, unknown> = Record<string
 	configFolder?: string;
 }
 
-export class ConfigBuilder<T extends Record<string, unknown> = Record<string, unknown>> {
+export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#options: ConfigBuilderOptions<T>;
 	#partialConfig: AnyObject = {};
 	#appConfigFolderAbsolutePath: string;
