@@ -14,7 +14,8 @@ const schema = z.object({
 });
 
 describe("createAppConfig", () => {
-	const config = new ConfigBuilder(schema, {
+	const config = new ConfigBuilder({
+		validate: (config) => schema.parse(config),
 		configFolder: "./src/__fixtures__",
 	});
 
@@ -108,7 +109,8 @@ describe("createAppConfig", () => {
 		});
 
 		describe("from yaml", () => {
-			const config = new ConfigBuilder(schema, {
+			const config = new ConfigBuilder({
+				validate: (config) => schema.parse(config),
 				configFolder: "./src/__fixtures__",
 			});
 
@@ -159,7 +161,8 @@ describe("createAppConfig", () => {
 					bar: z.string(),
 				});
 
-				const config = new ConfigBuilder(schema, {
+				const config = new ConfigBuilder({
+					validate: (config) => schema.parse(config),
 					configFolder: "./src/__fixtures__",
 				});
 
@@ -168,7 +171,7 @@ describe("createAppConfig", () => {
 				} catch (error) {
 					const e = error as Error;
 					expect(e.message).toMatchInlineSnapshot(`
-            "Fail to parse config: [
+            "[
               {
                 "code": "invalid_type",
                 "expected": "string",
@@ -185,7 +188,8 @@ describe("createAppConfig", () => {
 		});
 
 		describe("from json", () => {
-			const config = new ConfigBuilder(schema, {
+			const config = new ConfigBuilder({
+				validate: (config) => schema.parse(config),
 				configFolder: "./src/__fixtures__",
 			});
 
@@ -252,7 +256,8 @@ describe("createAppConfig", () => {
 	});
 
 	it("should return the expected valued combining all addSource", () => {
-		const config = new ConfigBuilder(schema, {
+		const config = new ConfigBuilder({
+			validate: (config) => schema.parse(config),
 			configFolder: "./src/__fixtures__",
 		});
 

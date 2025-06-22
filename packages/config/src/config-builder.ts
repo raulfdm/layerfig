@@ -3,7 +3,6 @@ import path from "node:path";
 import json5 from "json5";
 import { merge, set } from "lodash-es";
 import yaml from "yaml";
-import type { z } from "zod";
 
 import {
 	type AcceptedFileType,
@@ -17,21 +16,28 @@ import { readIfExist } from "./utils";
 
 const APP_ROOT_PATH = process.cwd();
 
-interface ConfigBuilderOptions {
+interface ConfigBuilderOptions<T extends Record<string, unknown> = Record<string, unknown>> {
+	/**
+	 * A function to validate the configuration object.
+	 */
+	validate: (config:Record<string, unknown>) => T,
+	/**
+	 * The folder where the configuration files are located.
+	 * @default "./config"
+	 */
 	configFolder?: string;
 }
 
-export class ConfigBuilder<TSchema extends z.ZodType<object>> {
-	#schema: TSchema;
+export class ConfigBuilder<T extends Record<string, unknown> = Record<string, unknown>> {
+	#options: ConfigBuilderOptions<T>;
 	#partialConfig: AnyObject = {};
 	#appConfigFolderAbsolutePath: string;
 
 	constructor(
-		schema: TSchema,
-		{ configFolder = "./config" }: ConfigBuilderOptions = {},
+		options: ConfigBuilderOptions<T>,
 	) {
-		this.#schema = schema;
-		this.#appConfigFolderAbsolutePath = path.join(APP_ROOT_PATH, configFolder);
+		this.#options = options;
+		this.#appConfigFolderAbsolutePath = path.join(APP_ROOT_PATH, this.#options.configFolder ?? "./config");
 	}
 
 	static createEnvVarSource(options: PartialEnvVarSource = {}) {
@@ -39,14 +45,8 @@ export class ConfigBuilder<TSchema extends z.ZodType<object>> {
 		return new EnvVarConfig(parsedOptions);
 	}
 
-	public build(): z.infer<TSchema> {
-		const result = this.#schema.safeParse(this.#partialConfig);
-
-		if (result.success) {
-			return result.data;
-		}
-
-		throw new Error(`Fail to parse config: ${result.error.message}`);
+	public build(): T {
+		return this.#options.validate(this.#partialConfig);
 	}
 
 	public addSource(source: string | EnvVarConfig): this {
