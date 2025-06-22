@@ -1,4 +1,4 @@
-import cloudflare from "@astrojs/cloudflare";
+// import cloudflare from "@astrojs/cloudflare";
 import starlight from "@astrojs/starlight";
 // @ts-check
 import { defineConfig } from "astro/config";
@@ -75,7 +75,7 @@ export default defineConfig({
 		"/": "/introduction",
 	},
 
-	adapter: cloudflare({
-		imageService: "compile",
-	}),
+	// adapter: cloudflare({
+	// 	imageService: "compile",
+	// }),
 });
