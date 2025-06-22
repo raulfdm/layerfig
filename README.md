@@ -1,7 +1,7 @@
 # Layerfig
 
-<figure style="margin: 0 auto; max-width: 300px;">
-  <img src="./docs/src/assets/logo-bottom-text.svg" width="300" margin="0 auto">
+<p align="center">
+  <img src="./docs/src/assets/logo-bottom-text.svg" width="300">
 
   <nav style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
     <a href="https://www.npmjs.com/package/@layerfig/config" target="\_parent">
