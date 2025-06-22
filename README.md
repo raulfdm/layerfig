@@ -3,7 +3,7 @@
 <p align="center">
   <img src="./docs/src/assets/logo-bottom-text.svg" width="300">
 
-  <nav align="center">
+  <p align="center">
     <a href="https://www.npmjs.com/package/@layerfig/config" target="\_parent">
       <img alt="" src="https://img.shields.io/npm/dm/@layerfig/config.svg" />
     </a>
@@ -28,7 +28,7 @@
         src="https://img.shields.io/github/stars/raulfdm/layerfig.svg?style=social&label=Star"
       />
     </a>
-  </nav>
+  </p>
 </figure>
 
 A simple way to implement configuration layering. It allows you to define multiple configuration sources, which are then merged into a single, type-safe configuration object.
