@@ -1,5 +1,0 @@
-{
-	"$schema": "../node_modules/.app-config/schema.json",
-	"appURL": "http://localhost:5173",
-	"port": 3000
-}
