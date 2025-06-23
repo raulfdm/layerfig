@@ -16,7 +16,9 @@ To overcome JSON's limitations (e.g., lack of comments), the library supports `.
     <TabItem label="config.ts">
 
 ```ts
-const config = new ConfigBuilder(schema)
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
     .addSource("base.json")
     .addSource("local.jsonc")
     .addSource("prod.json5")
@@ -68,7 +70,9 @@ Both `.yaml` and `.yml` file extensions are supported.
     <TabItem label="config.ts">
 
 ```ts
-const config = new ConfigBuilder(schema)
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
   .addSource("base.yml")
   .addSource("prod.yaml")
   .build();

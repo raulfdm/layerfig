@@ -37,7 +37,6 @@ export default defineConfig({
 								"setup/sources/overview",
 								"setup/sources/files",
 								"setup/sources/env-var",
-								"setup/sources/json-schema",
 							],
 						},
 					],

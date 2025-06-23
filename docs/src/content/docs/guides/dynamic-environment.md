@@ -10,7 +10,9 @@ However, you can’t load them all at once:
 import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
-export const config = new ConfigBuilder(schema)
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
   .addSource("base.jsonc")
   .addSource("local.jsonc")
   .addSource("dev.jsonc")
@@ -27,7 +29,9 @@ A better solution is to use an environment variable (for example, `APP_ENV=local
 import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
-export const config = new ConfigBuilder(schema)
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
   .addSource("base.jsonc")
   .addSource(`${process.env.APP_ENV}.jsonc`)
   .build();
