@@ -57,10 +57,6 @@ export default defineConfig({
 							link: "examples/basic",
 						},
 						{
-							label: "JSON Schema",
-							link: "examples/json-schema",
-						},
-						{
 							label: "Docker",
 							link: "examples/docker",
 						},
