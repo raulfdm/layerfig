@@ -1,6 +1,5 @@
-import cloudflare from "@astrojs/cloudflare";
-import starlight from "@astrojs/starlight";
 // @ts-check
+import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
@@ -38,7 +37,6 @@ export default defineConfig({
 								"setup/sources/overview",
 								"setup/sources/files",
 								"setup/sources/env-var",
-								"setup/sources/json-schema",
 							],
 						},
 					],
@@ -74,8 +72,4 @@ export default defineConfig({
 	redirects: {
 		"/": "/introduction",
 	},
-
-	adapter: cloudflare({
-		imageService: "compile",
-	}),
 });

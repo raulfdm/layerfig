@@ -1,5 +1,5 @@
 {
-  appURL: "http://localhost:3000",
+  appURL: "https://my-site.com",
   /**
    * API CONFIGURATION
    */

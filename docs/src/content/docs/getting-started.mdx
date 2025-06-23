@@ -1,9 +1,8 @@
 ---
 title: Getting Started
-description: This is a page in my Starlight-powered site
 ---
 
-import { FileTree, Steps } from '@astrojs/starlight/components';
+import { Aside, FileTree, Steps } from '@astrojs/starlight/components';
 import Instalation from './getting-started/installation.astro';
 import BaseFiles from './getting-started/base-files.astro';
 
@@ -18,8 +17,8 @@ import BaseFiles from './getting-started/base-files.astro';
         <FileTree>
         - app
             - config
-                - base.jsonc
-                - live.jsonc
+                - base.json
+                - live.json
             - src
                 - ...
                 - config
@@ -27,6 +26,10 @@ import BaseFiles from './getting-started/base-files.astro';
                     - schema.ts
 
         </FileTree>
+
+        <Aside>
+          For this examle, we'll be using [`zod`](https://zod.dev) as the schema validator.
+        </Aside>
 
         <BaseFiles />
 

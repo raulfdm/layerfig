@@ -12,34 +12,31 @@ const tabs: Tab[] = [
 		label: "index.ts",
 		language: "ts",
 		code: `import { ConfigBuilder } from "@layerfig/config";
-import { schema } from "./schema";
+import {z} from 'zod/v4'
 
-export const config = new ConfigBuilder(schema)
-  .addSource("base.jsonc")
-  .addSource("live.jsonc")
+const schema = z.object({
+  appURL: z.url(),
+  port: z.number()
+})
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
+  .addSource("base.json")
+  .addSource("live.json")
   .build();`,
 	},
 	{
-		label: "schema.ts",
-		language: "ts",
-		code: `import {z} from 'zod/v4'
-
- export const schema = z.object({
-   appURL: z.url(),
-   port: z.number()
- })`,
-	},
-	{
-		label: "base.jsonc",
-		language: "jsonc",
+		label: "base.json",
+		language: "json",
 		code: `{
   "appURL": "http://localhost:3000",
   "port": 3000
 }`,
 	},
 	{
-		label: "live.jsonc",
-		language: "jsonc",
+		label: "live.json",
+		language: "json",
 		code: `{
   "appURL": "https://live.my-app.company"
 }`,

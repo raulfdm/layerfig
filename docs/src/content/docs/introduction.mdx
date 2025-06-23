@@ -41,6 +41,12 @@ hero:
     </a>
   </nav>
 
+## Features
+
+- Have declarative, isolated and per-environment configuration files (`.json`, `.yml`).
+- Use a type-safe and runtime checked configuration object across your app.
+- Validate your configuration with your prefered schema validation library.
+
 ## How It Works
 
 When you invoke `ConfigBuilder`, you can access your environment's configuration from two primary sources:
@@ -51,9 +57,21 @@ When you invoke `ConfigBuilder`, you can access your environment's configuration
 Since the configuration follows a cascading approach, the final result depends on the order in which sources are added.
 
 ```ts
-export const config = new ConfigBuilder(schema) // 0. Starts empty
-  .addSource("base.jsonc") // 1. Adds everything from `base.jsonc`
-  .addSource("live.jsonc") // 2. Merges with `base.jsonc`
-  .addSource(ConfigBuilder.createEnvVarSource()) // 3. Allows environment variables to overwrite previous values
-  .build(); // 4. Validates using the schema and returns the final configuration
+import { ConfigBuilder } from "@layerfig/config";
+
+export const config = new ConfigBuilder({
+  validate: (config) => {
+    // return the result of the config after validation
+    // e.g.
+    // return z.object({ appURL: z.string() }).parse(config)
+  },
+})
+  // 1. Starts with a base config
+  .addSource("base.json")
+  // 2. Merge with the previous source
+  .addSource("live.json")
+  // 3. Allows environment variables to overwrite previous values (optional)
+  .addSource(ConfigBuilder.createEnvVarSource())
+  // 4. Validates using the schema and returns the final configuration
+  .build();
 ```

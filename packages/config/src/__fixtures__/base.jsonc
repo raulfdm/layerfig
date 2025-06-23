@@ -1,5 +1,5 @@
 {
-	"appURL": "http://localhost:3000",
+	"appURL": "https://my-site.com",
 	"api": {
 		// The port will be used to start the API server
 		"port": 3000
