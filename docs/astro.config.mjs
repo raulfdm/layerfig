@@ -16,9 +16,12 @@ export default defineConfig({
 				{
 					icon: "github",
 					label: "GitHub",
-					href: "https://github.com/withastro/starlight",
+					href: "https://github.com/raulfdm/layerfig",
 				},
 			],
+			editLink: {
+				baseUrl: "https://github.com/raulfdm/layerfig/tree/main/docs",
+			},
 			sidebar: [
 				{
 					label: "Start Here",
