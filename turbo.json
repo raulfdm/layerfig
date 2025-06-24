@@ -6,12 +6,14 @@
 			"outputs": ["dist/**"]
 		},
 		"check-types": {
-			"dependsOn": ["^check-types"]
+			"dependsOn": ["^check-types", "^build"]
 		},
 		"check-exports": {
-			"dependsOn": ["build"]
+			"dependsOn": ["^build", "build"]
 		},
-		"test": {},
+		"test": {
+			"dependsOn": ["^build"]
+		},
 		"dev": {
 			"persistent": true,
 			"cache": false
