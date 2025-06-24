@@ -1,0 +1,62 @@
+{
+	"name": "@layerfig/parser-json5",
+	"description": "Source parser for .jsonc and .json5 config files",
+	"version": "0.0.1",
+	"keywords": [
+		"@layerfig/config",
+		"source",
+		"parser"
+	],
+	"license": "MIT",
+	"author": "Raul Melo <contact@raulmelo.me>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/raulfdm/layerfig.git",
+		"directory": "pacakges/config"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"LICENSE"
+	],
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"import": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		}
+	},
+	"scripts": {
+		"prepack": "bun turbo build --output-logs=errors-only",
+		"build": "tsdown",
+		"check-types": "tsc",
+		"test": "vitest --typecheck"
+	},
+	"peerDependencies": {
+		"@layerfig/config": "<1"
+	},
+	"dependencies": {
+		"json5": "^2.2.3"
+	},
+	"devDependencies": {
+		"@layerfig/config": "workspace:*",
+		"@types/bun": "1.2.15",
+		"@types/lodash-es": "4.17.12",
+		"tsdown": "0.12.8",
+		"typescript": "5.8.3",
+		"vitest": "3.2.4",
+		"zod": "3.25.67"
+	}
+}
