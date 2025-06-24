@@ -17,10 +17,6 @@ export type Result<TSuccess = undefined, TError = undefined> =
 export const AnyObject = z.object({}).passthrough();
 export type AnyObject = z.infer<typeof AnyObject>;
 
-export type AcceptedFileType = "json" | "yaml";
-export const jsonExtensions = ["json", "jsonc", "json5"] as const;
-export const yamlExtensions = ["yaml", "yml"] as const;
-
 export const EnvVarSourceOptions = z.object({
 	/**
 	 * The environment variable prefix to use

@@ -1,16 +1,12 @@
 import path from "node:path";
 
-import json5 from "json5";
 import { merge, set } from "lodash-es";
-import yaml from "yaml";
-
+import type { ConfigParser } from "./parser/define-config-parser";
+import { basicJsonParser } from "./parser/parser-json";
 import {
-	type AcceptedFileType,
 	AnyObject,
 	EnvVarSourceOptions,
-	jsonExtensions,
 	type PartialEnvVarSource,
-	yamlExtensions,
 } from "./types";
 import { readIfExist } from "./utils";
 
@@ -26,6 +22,10 @@ interface ConfigBuilderOptions<T extends object = Record<string, unknown>> {
 	 * @default "./config"
 	 */
 	configFolder?: string;
+	/**
+	 * Load source from different source types
+	 */
+	parser?: ConfigParser;
 }
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
@@ -59,10 +59,12 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 				this.#appConfigFolderAbsolutePath,
 				fileName,
 			);
-			const fileType = this.#getFileType(filePath);
+			const fileExtension = this.#getFileExtension(filePath);
 
-			if (fileType === null) {
-				throw new Error(`File type "${fileName}" not supported.`);
+			if (this.#parser.acceptsExtension(fileExtension) === false) {
+				throw new Error(
+					`".${fileExtension}" file is not supported by this parser. Accepted files are: "${this.#parser.acceptedFileExtensions.join(", ")}"`,
+				);
 			}
 
 			const fileContentResult = readIfExist(filePath);
@@ -71,11 +73,12 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 				throw new Error(fileContentResult.error);
 			}
 
-			if (fileType === "yaml") {
-				this.#addYamlSource(fileContentResult.data);
-			}
-			if (fileType === "json") {
-				this.#addJsonSource(fileContentResult.data);
+			const parserResult = this.#parser.load(fileContentResult.data);
+
+			if (parserResult.ok) {
+				this.#partialConfig = merge({}, this.#partialConfig, parserResult.data);
+			} else {
+				throw parserResult.error;
 			}
 		} else {
 			throw new Error("Invalid source. Please provide a valid one.");
@@ -84,36 +87,16 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		return this;
 	}
 
+	get #parser(): ConfigParser {
+		return this.#options.parser || basicJsonParser;
+	}
+
 	#addEnvironmentVariables(source: EnvVarConfig): void {
 		this.#partialConfig = merge({}, this.#partialConfig, source.getEnvVars());
 	}
 
-	#addJsonSource(source: string): void {
-		const parsedJson = json5.parse(source);
-		this.#partialConfig = AnyObject.parse(
-			merge({}, this.#partialConfig, parsedJson),
-		);
-	}
-
-	#addYamlSource(source: string): void {
-		const parsedYaml = yaml.parse(source);
-		this.#partialConfig = AnyObject.parse(
-			merge({}, this.#partialConfig, parsedYaml),
-		);
-	}
-
-	#getFileType(filePath: string): AcceptedFileType | null {
-		const fileExtension = path.extname(filePath).slice(1);
-
-		if (jsonExtensions.includes(fileExtension as never)) {
-			return "json";
-		}
-
-		if (yamlExtensions.includes(fileExtension as never)) {
-			return "yaml";
-		}
-
-		return null;
+	#getFileExtension(filePath: string): string {
+		return path.extname(filePath).slice(1);
 	}
 }
 

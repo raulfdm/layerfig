@@ -49,7 +49,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@layerfig/tsconfig": "workspace:*",
 		"@types/bun": "1.2.15",
-		"tsdown": "0.12.7",
+		"tsdown": "0.12.8",
 		"typescript": "5.8.3"
 	}
 }

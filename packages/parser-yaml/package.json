@@ -1,17 +1,11 @@
 {
-	"name": "@layerfig/config",
-	"description": "Layer and runtime-validate type-safe configs for JavaScript apps.",
-	"version": "0.1.0",
+	"name": "@layerfig/parser-yaml",
+	"description": "Source parser for .yaml and .yml config files",
+	"version": "0.0.1",
 	"keywords": [
-		"configuration",
-		"layered",
-		"config",
-		"javascript",
-		"typescript",
-		"schema",
-		"validation",
-		"runtime",
-		"env"
+		"@layerfig/config",
+		"source",
+		"parser"
 	],
 	"license": "MIT",
 	"author": "Raul Melo <contact@raulmelo.me>",
@@ -48,23 +42,21 @@
 		"prepack": "bun turbo build --output-logs=errors-only",
 		"build": "tsdown",
 		"check-types": "tsc",
-		"test": "vitest --typecheck",
-		"test:coverage": "bun run test --coverage --coverage.exclude src/__fixtures__ --coverage.include src"
+		"test": "vitest --typecheck"
+	},
+	"peerDependencies": {
+		"@layerfig/config": "<1"
 	},
 	"dependencies": {
-		"lodash-es": "4.17.21"
+		"yaml": "^2.8.0"
 	},
 	"devDependencies": {
-		"@arethetypeswrong/cli": "0.18.1",
+		"@layerfig/config": "workspace:*",
 		"@types/bun": "1.2.15",
 		"@types/lodash-es": "4.17.12",
-		"@vitest/coverage-v8": "3.2.4",
-		"joi": "17.13.3",
 		"tsdown": "0.12.8",
 		"typescript": "5.8.3",
-		"valibot": "1.1.0",
 		"vitest": "3.2.4",
-		"yup": "1.6.1",
 		"zod": "3.25.67"
 	}
 }

@@ -6,6 +6,197 @@ import { z as z3 } from "zod";
 import { z as z4 } from "zod/v4";
 
 import { ConfigBuilder } from "./config-builder";
+import { defineConfigParser } from "./parser/define-config-parser";
+
+describe("ConfigBuilder", () => {
+	const schema = z3.object({
+		appURL: z3.string(),
+		api: z3.object({
+			port: z3
+				.string()
+				.transform((val) => Number.parseInt(val, 10))
+				.or(z3.number()),
+		}),
+	});
+
+	const config = new ConfigBuilder({
+		validate: (config) => schema.parse(config),
+		configFolder: "./src/__fixtures__",
+	});
+
+	describe("from environment variable", () => {
+		it("loads source from process.env", () => {
+			const appUrlMockEnv = injectEnvVar("APP_appURL", "https://my-site.com");
+			const apiPortMockEnv = injectEnvVar("APP_api__port", "3000");
+
+			const result = config
+				.addSource(ConfigBuilder.createEnvVarSource())
+				.build();
+
+			expect(result).toEqual({
+				appURL: "https://my-site.com",
+				api: {
+					port: 3000,
+				},
+			});
+
+			appUrlMockEnv.clean();
+			apiPortMockEnv.clean();
+		});
+
+		it("loads source from a different runtime", () => {
+			const runtimeEnv = import.meta.env as Record<string, string | undefined>;
+
+			const appUrlMockEnv = injectEnvVar(
+				"APP_appURL",
+				"http://localhost:4422",
+				runtimeEnv,
+			);
+			const apiPortMockEnv = injectEnvVar("APP_api__port", "4422", runtimeEnv);
+
+			const result = config
+				.addSource(
+					ConfigBuilder.createEnvVarSource({
+						runtimeEnv,
+					}),
+				)
+				.build();
+
+			expect(result).toEqual({
+				appURL: "http://localhost:4422",
+				api: {
+					port: 4422,
+				},
+			});
+
+			appUrlMockEnv.clean();
+			apiPortMockEnv.clean();
+		});
+
+		it("should consider custom prefix prefixSeparator and prop separator", () => {
+			const appUrlMockEnv = injectEnvVar("TEST-appURL", "https://my-site.com");
+			const apiPortMockEnv = injectEnvVar("TEST-api_-_port", "5000");
+
+			const result = config
+				.addSource(
+					ConfigBuilder.createEnvVarSource({
+						prefix: "TEST",
+						prefixSeparator: "-",
+						separator: "_-_",
+					}),
+				)
+				.build();
+
+			expect(result).toEqual({
+				appURL: "https://my-site.com",
+				api: {
+					port: 5000,
+				},
+			});
+
+			appUrlMockEnv.clean();
+			apiPortMockEnv.clean();
+		});
+	});
+
+	describe("from json", () => {
+		it("should add configuration from json file", () => {
+			const result = config.addSource("base.json").build();
+
+			expect(result).toEqual({
+				appURL: "https://my-site.com",
+				api: {
+					port: 3000,
+				},
+			});
+		});
+
+		it("should add layer json files", () => {
+			expect(
+				config.addSource("base.json").addSource("dev.json").build(),
+			).toEqual({
+				appURL: "https://dev.company-app.com",
+				api: {
+					port: 3000,
+				},
+			});
+
+			expect(
+				config.addSource("dev.json").addSource("base.json").build(),
+			).toEqual({
+				appURL: "https://my-site.com",
+				api: {
+					port: 3000,
+				},
+			});
+		});
+
+		it("should throw an error if the file does not exist", () => {
+			try {
+				config.addSource("not-exist.json").build();
+			} catch (error) {
+				const e = error as Error;
+				expect(e.message).toEqual(
+					expect.stringMatching(/File "[^"]+.not-exist.json" does not exist/g),
+				);
+			}
+		});
+	});
+
+	it("should throw error if not valid source", () => {
+		expect(() =>
+			config
+				// @ts-expect-error - forcing error to test
+				.addSource()
+				.build(),
+		).toThrowErrorMatchingInlineSnapshot(
+			"[Error: Invalid source. Please provide a valid one.]",
+		);
+	});
+
+	it("should re-throw parser error", () => {
+		const errorMessage = "This file is not valid";
+
+		const config = new ConfigBuilder({
+			validate: (config) => schema.parse(config),
+			configFolder: "./src/__fixtures__",
+			parser: defineConfigParser({
+				acceptedFileExtensions: ["json"],
+				parse() {
+					return {
+						ok: false,
+						error: new Error(errorMessage),
+					};
+				},
+			}),
+		});
+
+		expect(() =>
+			config.addSource("base.json").build(),
+		).toThrowErrorMatchingInlineSnapshot("[Error: This file is not valid]");
+	});
+
+	it("should throw an error if file type is not accepted", () => {
+		expect(() =>
+			config.addSource("base.txt").build(),
+		).toThrowErrorMatchingInlineSnapshot(
+			`[Error: ".txt" file is not supported by this parser. Accepted files are: "json"]`,
+		);
+	});
+});
+
+function injectEnvVar(
+	varName: string,
+	value: unknown,
+	runtime: Record<string, string | boolean | number | undefined> = process.env,
+) {
+	runtime[varName] = value as string;
+	return {
+		clean() {
+			delete process.env[varName];
+		},
+	};
+}
 
 describe("Type-safe agnostic validate", () => {
 	it("zod 3", () => {
@@ -161,7 +352,6 @@ describe("Type-safe agnostic validate", () => {
 
 		const config = new ConfigBuilder({
 			validate: (config) => {
-				console.log("CONFIG", config);
 				return schema.validateSync(config);
 			},
 			configFolder: "./src/__fixtures__",
@@ -179,302 +369,3 @@ describe("Type-safe agnostic validate", () => {
 		});
 	});
 });
-
-describe("ConfigBuilder", () => {
-	const schema = z3.object({
-		appURL: z3.string(),
-		api: z3.object({
-			port: z3
-				.string()
-				.transform((val) => Number.parseInt(val, 10))
-				.or(z3.number()),
-		}),
-	});
-
-	const config = new ConfigBuilder({
-		validate: (config) => schema.parse(config),
-		configFolder: "./src/__fixtures__",
-	});
-
-	describe(".addSource", () => {
-		describe("from environment variable", () => {
-			it("loads source from process.env", () => {
-				const appUrlMockEnv = injectEnvVar("APP_appURL", "https://my-site.com");
-				const apiPortMockEnv = injectEnvVar("APP_api__port", "3000");
-
-				const result = config
-					.addSource(ConfigBuilder.createEnvVarSource())
-					.build();
-
-				expect(result).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 3000,
-					},
-				});
-
-				appUrlMockEnv.clean();
-				apiPortMockEnv.clean();
-			});
-
-			it("loads source from a different runtime", () => {
-				const runtimeEnv = import.meta.env as Record<
-					string,
-					string | undefined
-				>;
-
-				const appUrlMockEnv = injectEnvVar(
-					"APP_appURL",
-					"http://localhost:4422",
-					runtimeEnv,
-				);
-				const apiPortMockEnv = injectEnvVar(
-					"APP_api__port",
-					"4422",
-					runtimeEnv,
-				);
-
-				const result = config
-					.addSource(
-						ConfigBuilder.createEnvVarSource({
-							runtimeEnv,
-						}),
-					)
-					.build();
-
-				expect(result).toEqual({
-					appURL: "http://localhost:4422",
-					api: {
-						port: 4422,
-					},
-				});
-
-				appUrlMockEnv.clean();
-				apiPortMockEnv.clean();
-			});
-
-			it("should consider custom prefix prefixSeparator and prop separator", () => {
-				const appUrlMockEnv = injectEnvVar(
-					"TEST-appURL",
-					"https://my-site.com",
-				);
-				const apiPortMockEnv = injectEnvVar("TEST-api_-_port", "5000");
-
-				const result = config
-					.addSource(
-						ConfigBuilder.createEnvVarSource({
-							prefix: "TEST",
-							prefixSeparator: "-",
-							separator: "_-_",
-						}),
-					)
-					.build();
-
-				expect(result).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 5000,
-					},
-				});
-
-				appUrlMockEnv.clean();
-				apiPortMockEnv.clean();
-			});
-		});
-
-		describe("from yaml", () => {
-			const config = new ConfigBuilder({
-				validate: (config) => schema.parse(config),
-				configFolder: "./src/__fixtures__",
-			});
-
-			it("should add configuration from yaml file", () => {
-				expect(config.addSource("base.yaml").build()).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 3000,
-					},
-				});
-
-				expect(config.addSource("base.yml").build()).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 5959,
-					},
-				});
-			});
-
-			it("should throw an error if the file does not exist", () => {
-				try {
-					config.addSource("not-exist.yaml").build();
-				} catch (error) {
-					const e = error as Error;
-					expect(e.message).toEqual(
-						expect.stringMatching(
-							/File "[^"]+.not-exist.yaml" does not exist/g,
-						),
-					);
-				}
-			});
-
-			it("should throw an error if tries to load an invalid resource", () => {
-				try {
-					config.addSource([] as never).build();
-				} catch (error) {
-					const e = error as Error;
-					expect(e.message).toEqual(
-						expect.stringMatching(
-							/Invalid source. Please provide a valid one./g,
-						),
-					);
-				}
-			});
-
-			it("should throw if the config defined does not match the schema", () => {
-				const schema = z3.object({
-					bar: z3.string(),
-				});
-
-				const config = new ConfigBuilder({
-					validate: (config) => schema.parse(config),
-					configFolder: "./src/__fixtures__",
-				});
-
-				try {
-					config.addSource("invalid-config.json").build();
-				} catch (error) {
-					const e = error as Error;
-					expect(e.message).toMatchInlineSnapshot(`
-            "[
-              {
-                "code": "invalid_type",
-                "expected": "string",
-                "received": "undefined",
-                "path": [
-                  "bar"
-                ],
-                "message": "Required"
-              }
-            ]"
-          `);
-				}
-			});
-		});
-
-		describe("from json", () => {
-			const config = new ConfigBuilder({
-				validate: (config) => schema.parse(config),
-				configFolder: "./src/__fixtures__",
-			});
-
-			it("should add configuration from json file", () => {
-				const result = config.addSource("base.json").build();
-
-				expect(result).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 3000,
-					},
-				});
-			});
-
-			it("should add layer json files", () => {
-				expect(
-					config.addSource("base.json").addSource("dev.json").build(),
-				).toEqual({
-					appURL: "https://dev.company-app.com",
-					api: {
-						port: 3000,
-					},
-				});
-
-				expect(
-					config.addSource("dev.json").addSource("base.json").build(),
-				).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 3000,
-					},
-				});
-			});
-
-			it("load .jsonc and .json5 files", () => {
-				expect(config.addSource("base.jsonc").build()).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 3000,
-					},
-				});
-
-				expect(config.addSource("base.json5").build()).toEqual({
-					appURL: "https://my-site.com",
-					api: {
-						port: 3000,
-					},
-				});
-			});
-
-			it("should throw an error if the file does not exist", () => {
-				try {
-					config.addSource("not-exist.json").build();
-				} catch (error) {
-					const e = error as Error;
-					expect(e.message).toEqual(
-						expect.stringMatching(
-							/File "[^"]+.not-exist.json" does not exist/g,
-						),
-					);
-				}
-			});
-		});
-	});
-
-	it("should return the expected valued combining all addSource", () => {
-		const config = new ConfigBuilder({
-			validate: (config) => schema.parse(config),
-			configFolder: "./src/__fixtures__",
-		});
-
-		const appUrlMockEnv = injectEnvVar("APP_appURL", "http://127.0.0:8080");
-
-		const result = config
-			.addSource("base.jsonc")
-			.addSource("dev.json")
-			.addSource("base.yml")
-			.addSource(ConfigBuilder.createEnvVarSource())
-			.build();
-
-		expect(result).toEqual({
-			appURL: "http://127.0.0:8080",
-			api: {
-				port: 5959,
-			},
-		});
-
-		appUrlMockEnv.clean();
-	});
-
-	it("should throw an error if pass an unsupported file", () => {
-		try {
-			config.addSource("base.config").build();
-		} catch (error) {
-			const e = error as Error;
-			expect(e.message).toEqual(
-				expect.stringMatching(/File type "base.config" not supported./g),
-			);
-		}
-	});
-});
-
-function injectEnvVar(
-	varName: string,
-	value: unknown,
-	runtime: Record<string, string | boolean | number | undefined> = process.env,
-) {
-	runtime[varName] = value as string;
-	return {
-		clean() {
-			delete process.env[varName];
-		},
-	};
-}
