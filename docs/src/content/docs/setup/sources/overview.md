@@ -2,18 +2,10 @@
 title: Overview
 ---
 
-Sources are places where the library will read your configuration from.
+Sources are files or places where the library will read your configuration from.
 
-It can be from files with the following extensions:
+By default, the only source availabe is `.json` files or via environment variables using the `ConfigBuilder.createEnvVarSource()`.
 
-- `.json`
-- `.jsonc`
-- `.json5`
-- `.yml`
-- `.yaml`
+If you want to have other file tests, check the available parsers:
 
-Or, it can be from environment variables directly:
-
-```bash
-APP_appURL=http://localhost:3000 node start.js
-```
+- [YAML parser]()

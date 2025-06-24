@@ -45,6 +45,10 @@ export default defineConfig({
 					],
 				},
 				{
+					label: "Parsers",
+					items: ["parsers/yaml", "parsers/json5"],
+				},
+				{
 					label: "Guides & Best Practices",
 					items: [
 						"guides/docker",
