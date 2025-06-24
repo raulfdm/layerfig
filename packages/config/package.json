@@ -47,21 +47,20 @@
 	"scripts": {
 		"prepack": "bun turbo build --output-logs=errors-only",
 		"build": "tsdown",
-		"check-exports": "attw --pack . --profile node16",
 		"check-types": "tsc",
-		"test": "vitest --typecheck"
+		"test": "vitest --typecheck",
+		"test:coverage": "bun run test --coverage --coverage.exclude src/__fixtures__ --coverage.include src"
 	},
 	"dependencies": {
-		"json5": "2.2.3",
-		"lodash-es": "4.17.21",
-		"yaml": "2.8.0"
+		"lodash-es": "4.17.21"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.1",
 		"@types/bun": "1.2.15",
 		"@types/lodash-es": "4.17.12",
+		"@vitest/coverage-v8": "3.2.4",
 		"joi": "17.13.3",
-		"tsdown": "0.12.7",
+		"tsdown": "0.12.8",
 		"typescript": "5.8.3",
 		"valibot": "1.1.0",
 		"vitest": "3.2.4",

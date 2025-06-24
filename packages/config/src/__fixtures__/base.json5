@@ -1,9 +1,0 @@
-{
-  appURL: "https://my-site.com",
-  /**
-   * API CONFIGURATION
-   */
-  api: {
-    port: 3000,
-  },
-}
