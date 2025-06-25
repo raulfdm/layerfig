@@ -1,8 +1,52 @@
 ---
-title: Environment Variables
+title: Sources
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Sources are files or places where the library will read your configuration from.
+
+## JSON
+
+If you don't specificy any parser, by default, `@layerfig/config` will use an internal `json` parser (`.json` files only):
+
+<Tabs>
+    <TabItem label="config.ts">
+
++++ts
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
+    .addSource("base.json")
+    .addSource("prod.json")
+    .build();
++++
+
+    </TabItem>
+
+    <TabItem label="base.json">
+
++++json
+{
+  "appURL": "http://localhost:3000"
+}
++++
+
+    </TabItem>
+
+    <TabItem label="prod.json">
+
++++jsonc
+{
+  "appURL": "http://my-app.com"
+}
++++
+
+    </TabItem>
+</Tabs>
+
+
+## Environment variables
 
 Consider the following scenario:
 
@@ -10,7 +54,7 @@ Your application's configuration files are committed and used to build a Docker 
 
 To avoid this, use `ConfigBuilder.createEnvVarSource()` to override configuration values at runtime without touching your files:
 
-```ts
++++ts
 import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
@@ -20,7 +64,7 @@ export const config = new ConfigBuilder({
   .addSource("base.yaml")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();
-```
++++
 
 By default, the library expects environment variables with:
 
@@ -38,14 +82,14 @@ Configuration keys in environment variables must exactly match the keys defined 
 
 Suppose your `base.yaml` contains:
 
-```yaml
++++yaml
 appURL: http://localhost:4444
 port: 4444
-```
++++
 
 Define your schema and load the sources:
 
-```ts
++++ts
 const schema = z.object({
   appURL: z.string(),
   port: z.number(),
@@ -57,13 +101,13 @@ export const config = new ConfigBuilder({
   .addSource("base.yaml")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();
-```
++++
 
 Run the app with overrides:
 
-```bash
++++bash
 APP_appURL=http://localhost:3333 APP_port=3333 node index.js
-```
++++
 
 Since the env-var source is loaded last, its values take precedence.
 
@@ -71,7 +115,7 @@ Since the env-var source is loaded last, its values take precedence.
 
 Use `__` (double underscores) to target nested keys:
 
-```ts
++++ts
 const AppConfigSchema = z.object({
   api: z.object({
     vendor: z.object({
@@ -86,17 +130,17 @@ const config = new ConfigBuilder(AppConfigSchema)
   .addSource("base.yaml")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();
-```
++++
 
-```bash
++++bash
 APP_api__vendor__aws__apiToken=12345 node index.js
-```
++++
 
 ### Customizing Environment-Variable Settings
 
 You can customize the prefix, prefix separator, and nested-key separator:
 
-```ts
++++ts
 const config = new ConfigBuilder(AppConfigSchema)
   .addSource("base.yaml")
   .addSource(
@@ -107,8 +151,15 @@ const config = new ConfigBuilder(AppConfigSchema)
     })
   )
   .build();
-```
++++
 
-```bash
++++bash
 VULCAN--api----vendor----aws----apiToken=12345 node index.js
-```
++++
+
+## Other file extenions
+
+Each project has its own preference and needs. We provide parsers for common files:
+
+- [YAML support](/parsers/yaml/)
+- [JSONC or JSON5](/parsers/json5/)

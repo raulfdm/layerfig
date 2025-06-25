@@ -32,21 +32,11 @@ export default defineConfig({
 				},
 				{
 					label: "Setup",
-					items: [
-						"setup/configuration",
-						{
-							label: "Sources",
-							items: [
-								"setup/sources/overview",
-								"setup/sources/files",
-								"setup/sources/env-var",
-							],
-						},
-					],
+					items: ["setup/configuration", "setup/sources"],
 				},
 				{
 					label: "Parsers",
-					items: ["parsers/yaml", "parsers/json5"],
+					items: ["parsers/yaml", "parsers/json5", "parsers/custom"],
 				},
 				{
 					label: "Guides & Best Practices",
