@@ -1,5 +1,4 @@
 import { ConfigBuilder } from "@layerfig/config";
-import yamlParser from '@layerfig/parser-json5'
 import { configSchema } from "./schema";
 
 if(!process.env.APP_ENV){
@@ -8,7 +7,6 @@ if(!process.env.APP_ENV){
 
 export const config = new ConfigBuilder({
   validate: finalConfig => configSchema.parse(finalConfig),
-  parser: yamlParser
 })
 	.addSource("base.json")
 	.addSource(`${process.env.APP_ENV}.json`)

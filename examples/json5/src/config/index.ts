@@ -1,11 +1,11 @@
 import { ConfigBuilder } from "@layerfig/config";
-import yamlParser from '@layerfig/parser-json5'
+import json5Parser from '@layerfig/parser-json5'
 import { configSchema } from "./schema";
 
 
 export const config = new ConfigBuilder({
   validate: finalConfig => configSchema.parse(finalConfig),
-  parser: yamlParser
+  parser: json5Parser
 })
 	.addSource("base.jsonc")
 	.addSource("local.json")

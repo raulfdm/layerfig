@@ -6,6 +6,7 @@ export function getStaticPaths() {
     { params: { name: "basic" } },
     { params: { name: "json5" } },
     { params: { name: "yaml" } },
+    { params: { name: "dynamic-env" } },
     { params: { name: "docker" } },
   ];
 }
@@ -63,6 +64,14 @@ const examples = new Map<string, Example>([
       name: "yaml",
       startFile: "src/config/index.ts",
       title: "Yaml example",
+    }),
+  ],
+  [
+    "dynamic-env",
+    new Example({
+      name: "dynamic-env",
+      startFile: "src/config/index.ts",
+      title: "Dynamic Environment",
     }),
   ],
   [

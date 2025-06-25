@@ -62,6 +62,10 @@ export default defineConfig({
 							link: "examples/yaml",
 						},
 						{
+							label: "Dynamic Env",
+							link: "examples/dynamic-env",
+						},
+						{
 							label: "Docker",
 							link: "examples/docker",
 						},

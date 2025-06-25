@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@layerfig/config": "0.2.0",
-    "@layerfig/parser-json5": "1.0.0",
     "compression": "1.8.0",
     "express": "5.1.0",
     "sirv": "3.0.1",
