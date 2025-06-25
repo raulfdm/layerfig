@@ -2,4 +2,43 @@
 title: '@layerfig/parser-yaml'
 ---
 
-YAML
+import { Aside, FileTree, Steps } from '@astrojs/starlight/components';
+import PackageManagerCmd from '../../../components/PackageManagerCmd.astro';
+
+This parser allows you to load configuration from `.yaml` and `.yml` files.
+
+<Steps>
+    1. Install the dependency.
+
+        <PackageManagerCmd
+          npm='npm install @layerfig/parser-yaml'
+          pnpm='pnpm install @layerfig/parser-yaml'
+          yarn='yarn add @layerfig/parser-yaml'
+          bun='bun add @layerfig/parser-yaml'
+        />
+
+    2. Create your `.yaml` or `.yml` configuration files.
+
+    3. Add the parser to your `ConfigBuilder`.
+
+        ```ts {2,12}
+        import { ConfigBuilder } from "@layerfig/config";
+        import yamlParser from "@layerfig/parser-yaml";
+        import {z} from 'zod/v4'
+
+        const schema = z.object({
+          appURL: z.url(),
+          port: z.number()
+        })
+
+        export const config = new ConfigBuilder({
+          validate: (finalConfig) => schema.parse(finalConfig),
+          parser: yamlParser
+        })
+          .addSource("base.yaml")
+          .addSource("live.yml")
+          .build();
+        ```
+</Steps>
+
+Your application is now configured to parse these file formats.
