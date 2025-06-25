@@ -1,4 +1,3 @@
 {
-    // Some comments, no double quotes
-	appURL: "https://my-app.com"
+	"appURL": "https://my-app.com"
 }
