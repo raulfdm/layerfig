@@ -1,0 +1,168 @@
+---
+title: Sources
+---
+
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+Sources define where the library reads your configuration from, such as files or environment variables.
+
+## JSON
+
+By default, if no parser is specified, `@layerfig/config` uses its internal JSON parser for `.json` files.
+
+<Tabs>
+    <TabItem label="config.ts">
+
+```ts
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
+    .addSource("base.json")
+    .addSource("prod.json")
+    .build();
+```
+
+    </TabItem>
+
+    <TabItem label="base.json">
+
+```json
+{
+  "appURL": "http://localhost:3000"
+}
+```
+
+    </TabItem>
+
+    <TabItem label="prod.json">
+
+```jsonc
+{
+  "appURL": "http://my-app.com"
+}
+```
+
+    </TabItem>
+</Tabs>
+
+## Other File Extensions
+
+To support various project needs, we provide parsers for other common configuration file formats:
+
+- [YAML support](/parsers/yaml/)
+- [JSONC or JSON5](/parsers/json5/)
+
+
+
+## Environment Variables
+
+Consider the following scenario:
+
+Your application's configuration files are committed to version control and used to build a Docker image for production. When running this image locally for debugging, any change to a configuration value requires rebuilding the image. This process can be slow and results in testing a modified image rather than the actual production build.
+
+To avoid this, use `ConfigBuilder.createEnvVarSource()` to override configuration values at runtime without modifying the source files:
+
+```ts {8}
+import { ConfigBuilder } from "@layerfig/config";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
+  .addSource("base.json")
+  .addSource(ConfigBuilder.createEnvVarSource())
+  .build();
+```
+
+By default, the library expects environment variables with the following structure:
+
+- Prefix: `"APP"`
+- Prefix separator: `"_"`
+- Nested key separator: `"__"`
+
+For example, the environment variable `APP_port` overrides the `port` key in your configuration.
+
+<Aside title="Important">
+Configuration keys in environment variables must exactly match the keys defined in your schema.
+</Aside>
+
+### Example Usage
+
+Suppose your `base.json` contains:
+
+```json
+{
+  "appURL": "http://localhost:4444",
+  "port": 4444
+}
+```
+
+Define your schema and load the sources:
+
+```ts
+const schema = z.object({
+  appURL: z.string(),
+  port: z.number(),
+});
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig)
+})
+  .addSource("base.json")
+  .addSource(ConfigBuilder.createEnvVarSource())
+  .build();
+```
+
+Run the application with overrides:
+
+```bash
+APP_appURL=http://localhost:3333 APP_port=3333 node index.js
+```
+
+Since the environment variable source is added last, its values take precedence.
+
+### Overriding Nested Objects
+
+Use `__` (double underscores) as a separator to target nested keys:
+
+```ts
+const AppConfigSchema = z.object({
+  api: z.object({
+    vendor: z.object({
+      aws: z.object({
+        apiToken: z.string(),
+      }),
+    }),
+  }),
+});
+
+const config = new ConfigBuilder(AppConfigSchema)
+  .addSource("base.json")
+  .addSource(ConfigBuilder.createEnvVarSource())
+  .build();
+```
+
+```bash
+APP_api__vendor__aws__apiToken=12345 node index.js
+```
+
+### Customizing Environment Variable Settings
+
+You can customize the prefix, prefix separator, and nested-key separator:
+
+```ts
+const config = new ConfigBuilder(AppConfigSchema)
+  .addSource("base.json")
+  .addSource(
+    ConfigBuilder.createEnvVarSource({
+      prefix: "VULCAN",
+      prefixSeparator: "--",
+      separator: "----",
+    })
+  )
+  .build();
+```
+
+```bash
+VULCAN--api----vendor----aws----apiToken=12345 node index.js
+```

@@ -1,0 +1,44 @@
+---
+title: '@layerfig/parser-json5'
+---
+
+import { Aside, FileTree, Steps } from '@astrojs/starlight/components';
+import PackageManagerCmd from '../../../components/PackageManagerCmd.astro';
+
+This parser allows you to load configuration from `.json`, `.jsonc` (JSON with comments), and `.json5` files.
+
+<Steps>
+    1. Install the dependency.
+
+        <PackageManagerCmd
+          npm='npm install @layerfig/parser-json5'
+          pnpm='pnpm install @layerfig/parser-json5'
+          yarn='yarn add @layerfig/parser-json5'
+          bun='bun add @layerfig/parser-json5'
+        />
+
+    2. Create your `.jsonc` or `.json5` configuration files.
+
+    3. Add the parser to your `ConfigBuilder`.
+
+        ```ts {2,12}
+        import { ConfigBuilder } from "@layerfig/config";
+        import json5Parser from "@layerfig/parser-json5";
+        import {z} from 'zod/v4'
+
+        const schema = z.object({
+          appURL: z.url(),
+          port: z.number()
+        })
+
+        export const config = new ConfigBuilder({
+          validate: (finalConfig) => schema.parse(finalConfig),
+          parser: json5Parser
+        })
+          .addSource("base.jsonc")
+          .addSource("live.json5")
+          .build();
+          ```
+</Steps>
+
+Your application is now configured to parse these file formats.

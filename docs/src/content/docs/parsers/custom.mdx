@@ -1,0 +1,67 @@
+---
+title: Custom Parser
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The library provides abstractions to support common configuration file extensions. However, you may need to parse a file type that isn't supported out-of-the-box.
+
+To do so, you can write a custom parser using the `defineConfigParser` utility function.
+
+Its API is minimal and straightforward:
+
+```ts
+// ./path/to/custom-parser.ts
+import { defineConfigParser } from "@layerfig/config";
+
+export const customParser = defineConfigParser({
+  acceptedFileExtensions: ["ini"],
+  parse: (fileContent) => {
+    // Logic to fetch, read, and parse the content
+  },
+});
+```
+
+<Aside>
+    The extensions you have defined in `acceptedFileExtensions` will be the only allowed. Else it'll throw an error.    
+</Aside>
+
+The `parse` function must return an object that conforms to the `Result` type:
+
+```ts
+const successResult = {
+  ok: true,
+  data: {}, // The object containing your parsed configuration
+};
+
+const errorResult = {
+  ok: false,
+  error: new Error("Some error"), // The error that occurred
+};
+```
+
+Then, use your custom parser by passing it to the `ConfigBuilder`:
+
+```ts {2,12}
+import { ConfigBuilder } from "@layerfig/config";
+import { customParser } from "./path/to/custom-parser";
+import { z } from "zod/v4";
+
+const schema = z.object({
+  appURL: z.url(),
+  port: z.number(),
+});
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  parser: customParser,
+})
+  .addSource("base.ini")
+  .addSource("live.ini")
+  .build();
+```
+
+<Aside type="tip">
+  For more examples, you can review the implementation of the built-in parsers
+  in the repository.
+</Aside>
