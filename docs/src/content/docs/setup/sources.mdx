@@ -4,75 +4,83 @@ title: Sources
 
 import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
-Sources are files or places where the library will read your configuration from.
+Sources define where the library reads your configuration from, such as files or environment variables.
 
 ## JSON
 
-If you don't specificy any parser, by default, `@layerfig/config` will use an internal `json` parser (`.json` files only):
+By default, if no parser is specified, `@layerfig/config` uses its internal JSON parser for `.json` files.
 
 <Tabs>
     <TabItem label="config.ts">
 
-+++ts
+```ts
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig)
 })
     .addSource("base.json")
     .addSource("prod.json")
     .build();
-+++
+```
 
     </TabItem>
 
     <TabItem label="base.json">
 
-+++json
+```json
 {
   "appURL": "http://localhost:3000"
 }
-+++
+```
 
     </TabItem>
 
     <TabItem label="prod.json">
 
-+++jsonc
+```jsonc
 {
   "appURL": "http://my-app.com"
 }
-+++
+```
 
     </TabItem>
 </Tabs>
 
+## Other File Extensions
 
-## Environment variables
+To support various project needs, we provide parsers for other common configuration file formats:
+
+- [YAML support](/parsers/yaml/)
+- [JSONC or JSON5](/parsers/json5/)
+
+
+
+## Environment Variables
 
 Consider the following scenario:
 
-Your application's configuration files are committed and used to build a Docker image for production. When you run that image locally to debug or test, any change to hardcoded config values requires rebuilding the image—a slow process for large apps, and you end up testing a modified image rather than the real production build.
+Your application's configuration files are committed to version control and used to build a Docker image for production. When running this image locally for debugging, any change to a configuration value requires rebuilding the image. This process can be slow and results in testing a modified image rather than the actual production build.
 
-To avoid this, use `ConfigBuilder.createEnvVarSource()` to override configuration values at runtime without touching your files:
+To avoid this, use `ConfigBuilder.createEnvVarSource()` to override configuration values at runtime without modifying the source files:
 
-+++ts
+```ts {8}
 import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig)
 })
-  .addSource("base.yaml")
+  .addSource("base.json")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();
-+++
+```
 
-By default, the library expects environment variables with:
+By default, the library expects environment variables with the following structure:
 
 - Prefix: `"APP"`
 - Prefix separator: `"_"`
 - Nested key separator: `"__"`
 
-For example, `APP_port` overrides the `port` key.
+For example, the environment variable `APP_port` overrides the `port` key in your configuration.
 
 <Aside title="Important">
 Configuration keys in environment variables must exactly match the keys defined in your schema.
@@ -80,16 +88,18 @@ Configuration keys in environment variables must exactly match the keys defined 
 
 ### Example Usage
 
-Suppose your `base.yaml` contains:
+Suppose your `base.json` contains:
 
-+++yaml
-appURL: http://localhost:4444
-port: 4444
-+++
+```json
+{
+  "appURL": "http://localhost:4444",
+  "port": 4444
+}
+```
 
 Define your schema and load the sources:
 
-+++ts
+```ts
 const schema = z.object({
   appURL: z.string(),
   port: z.number(),
@@ -98,24 +108,24 @@ const schema = z.object({
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig)
 })
-  .addSource("base.yaml")
+  .addSource("base.json")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();
-+++
+```
 
-Run the app with overrides:
+Run the application with overrides:
 
-+++bash
+```bash
 APP_appURL=http://localhost:3333 APP_port=3333 node index.js
-+++
+```
 
-Since the env-var source is loaded last, its values take precedence.
+Since the environment variable source is added last, its values take precedence.
 
 ### Overriding Nested Objects
 
-Use `__` (double underscores) to target nested keys:
+Use `__` (double underscores) as a separator to target nested keys:
 
-+++ts
+```ts
 const AppConfigSchema = z.object({
   api: z.object({
     vendor: z.object({
@@ -127,22 +137,22 @@ const AppConfigSchema = z.object({
 });
 
 const config = new ConfigBuilder(AppConfigSchema)
-  .addSource("base.yaml")
+  .addSource("base.json")
   .addSource(ConfigBuilder.createEnvVarSource())
   .build();
-+++
+```
 
-+++bash
+```bash
 APP_api__vendor__aws__apiToken=12345 node index.js
-+++
+```
 
-### Customizing Environment-Variable Settings
+### Customizing Environment Variable Settings
 
 You can customize the prefix, prefix separator, and nested-key separator:
 
-+++ts
+```ts
 const config = new ConfigBuilder(AppConfigSchema)
-  .addSource("base.yaml")
+  .addSource("base.json")
   .addSource(
     ConfigBuilder.createEnvVarSource({
       prefix: "VULCAN",
@@ -151,15 +161,8 @@ const config = new ConfigBuilder(AppConfigSchema)
     })
   )
   .build();
-+++
+```
 
-+++bash
+```bash
 VULCAN--api----vendor----aws----apiToken=12345 node index.js
-+++
-
-## Other file extenions
-
-Each project has its own preference and needs. We provide parsers for common files:
-
-- [YAML support](/parsers/yaml/)
-- [JSONC or JSON5](/parsers/json5/)
+```
