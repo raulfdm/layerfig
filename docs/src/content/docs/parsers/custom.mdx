@@ -22,6 +22,10 @@ export const customParser = defineConfigParser({
 });
 ```
 
+<Aside>
+    The extensions you have defined in `acceptedFileExtensions` will be the only allowed. Else it'll throw an error.    
+</Aside>
+
 The `parse` function must return an object that conforms to the `Result` type:
 
 ```ts
@@ -52,8 +56,8 @@ export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
   parser: customParser,
 })
-  .addSource("base.jsonc")
-  .addSource("live.json5")
+  .addSource("base.ini")
+  .addSource("live.ini")
   .build();
 ```
 
