@@ -1,5 +1,5 @@
 import { ConfigBuilder } from "@layerfig/config";
-import yamlParser from '@layerfig/parser-yaml'
+import yamlParser from '@layerfig/parser-json5'
 import { configSchema } from "./schema";
 
 

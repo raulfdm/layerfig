@@ -4,7 +4,8 @@ import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
 export function getStaticPaths() {
   return [
     { params: { name: "basic" } },
-    { params: { name: "json-schema" } },
+    { params: { name: "json5" } },
+    { params: { name: "yaml" } },
     { params: { name: "docker" } },
   ];
 }
@@ -49,12 +50,19 @@ const examples = new Map<string, Example>([
     }),
   ],
   [
-    "json-schema",
+    "json5",
     new Example({
-      name: "json-schema",
-      startFile: "config/base.json",
-      title: "JSON Schema Example",
-      note: "Due to limitations on Stackblitz, you'll better see if you download this example and run it locally in your IDE.",
+      name: "json5",
+      startFile: "src/config/index.ts",
+      title: "JSONC-like example",
+    }),
+  ],
+  [
+    "yaml",
+    new Example({
+      name: "yaml",
+      startFile: "src/config/index.ts",
+      title: "Yaml example",
     }),
   ],
   [

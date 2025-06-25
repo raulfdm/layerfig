@@ -54,6 +54,14 @@ export default defineConfig({
 							link: "examples/basic",
 						},
 						{
+							label: "Json5",
+							link: "examples/json5",
+						},
+						{
+							label: "Yaml",
+							link: "examples/yaml",
+						},
+						{
 							label: "Docker",
 							link: "examples/docker",
 						},
