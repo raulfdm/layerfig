@@ -2,7 +2,7 @@
 	"name": "layerfig",
 	"version": "0.0.0-development",
 	"private": true,
-	"packageManager": "bun@1.2.15",
+	"packageManager": "bun@1.2.17",
 	"workspaces": [
 		"packages/*",
 		"docs"
@@ -17,10 +17,10 @@
 		"publish": "turbo publish --filter=\"./packages/*\" --env-mode=loose"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.0.0",
-		"@changesets/cli": "2.29.4",
+		"@biomejs/biome": "2.0.5",
+		"@changesets/cli": "2.29.5",
 		"husky": "9.1.7",
-		"lint-staged": "16.1.0",
+		"lint-staged": "16.1.2",
 		"turbo": "2.5.4"
 	}
 }

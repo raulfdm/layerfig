@@ -43,13 +43,13 @@
 		"chokidar": "4.0.3",
 		"esbuild": "0.25.5",
 		"meow": "13.2.0",
-		"zod": "3.25.56"
+		"zod": "3.25.67"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@layerfig/tsconfig": "workspace:*",
-		"@types/bun": "1.2.15",
-		"tsdown": "0.12.8",
+		"@types/bun": "1.2.17",
+		"tsdown": "0.12.9",
 		"typescript": "5.8.3"
 	}
 }
