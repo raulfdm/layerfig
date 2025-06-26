@@ -2,6 +2,8 @@
 title: Configuration
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 ## options.validate
 
 When invoking `ConfigBuilder`, you must provide a `validate` function. This function will receive the final merged object and must return with the result of your validation.
@@ -35,6 +37,29 @@ const config = new ConfigBuilder({
   configFolder: "./path/to/config-folder",
 })
   .addSource("base.json")
+  .build();
+```
+
+In this case, the library will look for `<root>/path/to/config-folder/base.json` and load it.
+
+## options.parser
+> Default: simple json parser
+
+This option allows you to add a custom parser for sources that are not `.json` (e.g., `yaml`, `jsonc` , `toml`, etc.).
+
+<Aside type="tip">
+    [Check the available parsers](/setup/sources/#other-file-extensions)
+</Aside>
+
+
+```ts
+import yarmlParser from '@layerfig/yaml'
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  parser: yarmlParser
+})
+  .addSource("base.yaml")
   .build();
 ```
 
