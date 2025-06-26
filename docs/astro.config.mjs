@@ -63,7 +63,7 @@ export default defineConfig({
 							link: "examples/docker",
 						},
 						{
-							label: "Toml",
+							label: "Json5",
 							link: "examples/json5",
 						},
 						{
