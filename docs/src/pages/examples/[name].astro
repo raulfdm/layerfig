@@ -6,6 +6,7 @@ export function getStaticPaths() {
     { params: { name: "basic" } },
     { params: { name: "json5" } },
     { params: { name: "yaml" } },
+    { params: { name: "toml" } },
     { params: { name: "dynamic-env" } },
     { params: { name: "docker" } },
     { params: { name: "valibot" } },
@@ -57,6 +58,14 @@ const examples = new Map<string, Example>([
       name: "json5",
       startFile: "src/config/index.ts",
       title: "JSONC-like example",
+    }),
+  ],
+  [
+    "toml",
+    new Example({
+      name: "toml",
+      startFile: "src/config/index.ts",
+      title: "Toml example",
     }),
   ],
   [

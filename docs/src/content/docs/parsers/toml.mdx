@@ -1,0 +1,44 @@
+---
+title: '@layerfig/parser-toml'
+---
+
+import { Aside, FileTree, Steps } from '@astrojs/starlight/components';
+import PackageManagerCmd from '../../../components/PackageManagerCmd.astro';
+
+This parser allows you to load configuration from `.toml` files.
+
+<Steps>
+    1. Install the dependency.
+
+        <PackageManagerCmd
+          npm='npm install @layerfig/parser-toml'
+          pnpm='pnpm install @layerfig/parser-toml'
+          yarn='yarn add @layerfig/parser-toml'
+          bun='bun add @layerfig/parser-toml'
+        />
+
+    2. Create your `.toml` configuration files.
+
+    3. Add the parser to your `ConfigBuilder`.
+
+        ```ts {2,12}
+        import { ConfigBuilder } from "@layerfig/config";
+        import tomlParser from "@layerfig/parser-toml";
+        import { z } from 'zod/v4'
+
+        const schema = z.object({
+          appURL: z.url(),
+          port: z.number()
+        })
+
+        export const config = new ConfigBuilder({
+          validate: (finalConfig) => schema.parse(finalConfig),
+          parser: tomlParser
+        })
+          .addSource("base.toml")
+          .addSource("live.toml")
+          .build();
+          ```
+</Steps>
+
+Your application is now configured to parse these file formats.
