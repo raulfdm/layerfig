@@ -1,5 +1,11 @@
 # @layerfig/config
 
+## 0.3.0
+
+### Minor Changes
+
+- e5cc87f: Remove lodash-es in favor of zero depedency
+
 ## 0.2.0
 
 ### Minor Changes
