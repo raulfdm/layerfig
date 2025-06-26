@@ -1,27 +1,27 @@
-# `@layerfig/parser-yaml`
+# `@layerfig/parser-toml`
 
-Load `.yaml` or `.yml` configuration within `@layerfig/config`.
+Load `.toml` configuration within `@layerfig/config`.
 
 ## Getting started
 
 Install the parser:
 
 ```bash
-npm add @layerfig/parser-yaml
+npm add @layerfig/parser-toml
 ```
 
 Define it in the layerfig config:
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
-import yamlParser from "@layerfig/parser-yaml";
+import tomlParser from "@layerfig/parser-toml";
 import { schema } from "./schema";
 
 const config = new ConfigBuilder({
   validate: (fullConfig) => schema.parse(fullConfig),
-  parser: yamlParser,
+  parser: tomlParser,
 })
-  .addSource("base.yaml")
-  .addSource("live.yml")
+  .addSource("base.toml")
+  .addSource("live.toml")
   .build();
 ```

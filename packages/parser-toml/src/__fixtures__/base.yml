@@ -1,0 +1,4 @@
+appURL: http://localhost:3000
+cache:
+  host: localhost
+  port: 6379

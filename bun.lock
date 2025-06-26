@@ -22,7 +22,7 @@
     },
     "packages/config": {
       "name": "@layerfig/config",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "devDependencies": {
         "@arethetypeswrong/cli": "0.18.2",
         "@types/bun": "1.2.17",
@@ -39,7 +39,7 @@
     },
     "packages/parser-json5": {
       "name": "@layerfig/parser-json5",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "json5": "^2.2.3",
       },
@@ -55,9 +55,27 @@
         "@layerfig/config": "0.2.0",
       },
     },
+    "packages/parser-toml": {
+      "name": "@layerfig/parser-toml",
+      "version": "2.0.0",
+      "dependencies": {
+        "smol-toml": "^1.3.4",
+      },
+      "devDependencies": {
+        "@layerfig/config": "workspace:*",
+        "@types/bun": "1.2.17",
+        "tsdown": "0.12.9",
+        "typescript": "5.8.3",
+        "vitest": "3.2.4",
+        "zod": "3.25.67",
+      },
+      "peerDependencies": {
+        "@layerfig/config": "0.3.0",
+      },
+    },
     "packages/parser-yaml": {
       "name": "@layerfig/parser-yaml",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "dependencies": {
         "yaml": "^2.8.0",
       },
@@ -330,6 +348,8 @@
     "@layerfig/config": ["@layerfig/config@workspace:packages/config"],
 
     "@layerfig/parser-json5": ["@layerfig/parser-json5@workspace:packages/parser-json5"],
+
+    "@layerfig/parser-toml": ["@layerfig/parser-toml@workspace:packages/parser-toml"],
 
     "@layerfig/parser-yaml": ["@layerfig/parser-yaml@workspace:packages/parser-yaml"],
 
