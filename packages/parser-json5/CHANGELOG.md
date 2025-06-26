@@ -1,5 +1,11 @@
 # @layerfig/parser-json5
 
+## 2.0.1
+
+### Patch Changes
+
+- c13520b: Add proper README
+
 ## 2.0.0
 
 ### Patch Changes
