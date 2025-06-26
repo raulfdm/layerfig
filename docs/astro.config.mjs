@@ -54,6 +54,10 @@ export default defineConfig({
 							link: "examples/basic",
 						},
 						{
+							label: "Docker",
+							link: "examples/docker",
+						},
+						{
 							label: "Json5",
 							link: "examples/json5",
 						},
@@ -62,12 +66,12 @@ export default defineConfig({
 							link: "examples/yaml",
 						},
 						{
-							label: "Dynamic Env",
+							label: "Dynamic Environment",
 							link: "examples/dynamic-env",
 						},
 						{
-							label: "Docker",
-							link: "examples/docker",
+							label: "Valibot",
+							link: "examples/valibot",
 						},
 					],
 				},
