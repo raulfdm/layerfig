@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/parser-json5",
 	"description": "Source parser for .jsonc and .json5 config files",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"keywords": [
 		"@layerfig/config",
 		"source",
@@ -45,7 +45,7 @@
 		"test": "vitest --typecheck"
 	},
 	"peerDependencies": {
-		"@layerfig/config": "0.2.0"
+		"@layerfig/config": "0.3.0"
 	},
 	"dependencies": {
 		"json5": "^2.2.3"
