@@ -143,6 +143,41 @@ describe("ConfigBuilder", () => {
 		});
 	});
 
+	it("should deep merge configuration", () => {
+		const schema = z3.object({
+			foo: z3.object({
+				bar: z3.object({
+					zz: z3.object({
+						test: z3.object({
+							should_remain: z3.string(),
+							another: z3.boolean(),
+						}),
+					}),
+				}),
+			}),
+		});
+
+		const config = new ConfigBuilder({
+			validate: (config) => schema.parse(config),
+			configFolder: "./src/__fixtures__",
+		});
+
+		expect(
+			config.addSource("base-deep.json").addSource("dev-deep.json").build(),
+		).toEqual({
+			foo: {
+				bar: {
+					zz: {
+						test: {
+							should_remain: "123",
+							another: false,
+						},
+					},
+				},
+			},
+		});
+	});
+
 	it("should throw error if not valid source", () => {
 		expect(() =>
 			config

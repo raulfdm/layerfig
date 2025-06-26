@@ -51,9 +51,6 @@
 		"test": "vitest --typecheck",
 		"test:coverage": "bun run test --coverage --coverage.exclude src/__fixtures__ --coverage.include src"
 	},
-	"dependencies": {
-		"lodash-es": "4.17.21"
-	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.2",
 		"@types/bun": "1.2.17",
