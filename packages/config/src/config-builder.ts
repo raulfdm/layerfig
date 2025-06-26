@@ -1,6 +1,6 @@
 import path from "node:path";
-
-import { merge, set } from "lodash-es";
+// import set from "just-safe-set";
+// import { merge } from "merge-anything";
 import type { ConfigParser } from "./parser/define-config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import {
@@ -8,7 +8,7 @@ import {
 	EnvVarSourceOptions,
 	type PartialEnvVarSource,
 } from "./types";
-import { readIfExist } from "./utils";
+import { merge, readIfExist, set } from "./utils";
 
 const APP_ROOT_PATH = process.cwd();
 

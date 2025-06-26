@@ -23,9 +23,6 @@
     "packages/config": {
       "name": "@layerfig/config",
       "version": "0.2.0",
-      "dependencies": {
-        "lodash-es": "4.17.21",
-      },
       "devDependencies": {
         "@arethetypeswrong/cli": "0.18.2",
         "@types/bun": "1.2.17",
@@ -49,7 +46,6 @@
       "devDependencies": {
         "@layerfig/config": "workspace:*",
         "@types/bun": "1.2.17",
-        "@types/lodash-es": "4.17.12",
         "tsdown": "0.12.9",
         "typescript": "5.8.3",
         "vitest": "3.2.4",
@@ -68,7 +64,6 @@
       "devDependencies": {
         "@layerfig/config": "workspace:*",
         "@types/bun": "1.2.17",
-        "@types/lodash-es": "4.17.12",
         "tsdown": "0.12.9",
         "typescript": "5.8.3",
         "vitest": "3.2.4",
@@ -955,8 +950,6 @@
     "listr2": ["listr2@8.3.3", "", { "dependencies": { "cli-truncate": "^4.0.0", "colorette": "^2.0.20", "eventemitter3": "^5.0.1", "log-update": "^6.1.0", "rfdc": "^1.4.1", "wrap-ansi": "^9.0.0" } }, "sha512-LWzX2KsqcB1wqQ4AHgYb4RsDXauQiqhjLk+6hjbaeHG4zpjjVAB6wC/gz6X0l+Du1cN3pUB5ZlrvTbhGSNnUQQ=="],
 
     "locate-path": ["locate-path@5.0.0", "", { "dependencies": { "p-locate": "^4.1.0" } }, "sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g=="],
-
-    "lodash-es": ["lodash-es@4.17.21", "", {}, "sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw=="],
 
     "lodash.startcase": ["lodash.startcase@4.4.0", "", {}, "sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg=="],
 

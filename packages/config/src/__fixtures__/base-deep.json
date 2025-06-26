@@ -1,0 +1,12 @@
+{
+	"foo": {
+		"bar": {
+			"zz": {
+				"test": {
+					"should_remain": "123",
+					"another": true
+				}
+			}
+		}
+	}
+}
