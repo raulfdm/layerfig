@@ -87,7 +87,4 @@ export default defineConfig({
 			],
 		}),
 	],
-	redirects: {
-		"/": "/introduction",
-	},
 });
