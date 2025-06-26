@@ -8,6 +8,7 @@ export function getStaticPaths() {
     { params: { name: "yaml" } },
     { params: { name: "dynamic-env" } },
     { params: { name: "docker" } },
+    { params: { name: "valibot" } },
   ];
 }
 
@@ -80,6 +81,14 @@ const examples = new Map<string, Example>([
       name: "docker",
       startFile: "Dockerfile",
       title: "Multi-staged Dockerfile",
+    }),
+  ],
+  [
+    "valibot",
+    new Example({
+      name: "valibot",
+      startFile: "src/config/index.ts",
+      title: "Valibot example",
     }),
   ],
 ]);
