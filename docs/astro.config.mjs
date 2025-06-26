@@ -36,7 +36,12 @@ export default defineConfig({
 				},
 				{
 					label: "Parsers",
-					items: ["parsers/yaml", "parsers/json5", "parsers/custom"],
+					items: [
+						"parsers/yaml",
+						"parsers/json5",
+						"parsers/toml",
+						"parsers/custom",
+					],
 				},
 				{
 					label: "Guides & Best Practices",
