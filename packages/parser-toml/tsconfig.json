@@ -1,0 +1,4 @@
+{
+	"extends": "@layerfig/tsconfig",
+	"include": ["src"]
+}

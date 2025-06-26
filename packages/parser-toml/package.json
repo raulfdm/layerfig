@@ -1,0 +1,61 @@
+{
+	"name": "@layerfig/parser-toml",
+	"description": "Source parser for .toml config files",
+	"version": "1.0.0",
+	"keywords": [
+		"@layerfig/config",
+		"source",
+		"parser"
+	],
+	"license": "MIT",
+	"author": "Raul Melo <contact@raulmelo.me>",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/raulfdm/layerfig.git",
+		"directory": "pacakges/config"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"LICENSE"
+	],
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"import": {
+				"types": "./dist/index.d.ts",
+				"default": "./dist/index.js"
+			},
+			"require": {
+				"types": "./dist/index.d.cts",
+				"default": "./dist/index.cjs"
+			}
+		}
+	},
+	"scripts": {
+		"prepack": "bun turbo build --output-logs=errors-only",
+		"build": "tsdown",
+		"check-types": "tsc",
+		"test": "vitest"
+	},
+	"peerDependencies": {
+		"@layerfig/config": "0.3.0"
+	},
+	"dependencies": {
+		"smol-toml": "^1.3.4"
+	},
+	"devDependencies": {
+		"@layerfig/config": "workspace:*",
+		"@types/bun": "1.2.17",
+		"tsdown": "0.12.9",
+		"typescript": "5.8.3",
+		"vitest": "3.2.4",
+		"zod": "3.25.67"
+	}
+}
