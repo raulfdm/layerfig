@@ -1,6 +1,4 @@
 import path from "node:path";
-// import set from "just-safe-set";
-// import { merge } from "merge-anything";
 import type { ConfigParser } from "./parser/define-config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import {

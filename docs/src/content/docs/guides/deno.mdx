@@ -1,0 +1,33 @@
+---
+title: 'Deno'
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Layerfig is compatible with Deno. According to the [official Deno documentation](https://docs.deno.com/runtime/reference/node_apis/), Deno provides polyfills for several built-in Node.js APIs, including those Layerfig uses for file loading ([`node:path`](https://docs.deno.com/runtime/reference/node_apis/#node%3Apath) and [`node:fs`](https://docs.deno.com/runtime/reference/node_apis/#node%3Afs)).
+
+The library is not yet published to [`jsr`](https://jsr.io) (the Deno package registry). However, since Deno supports [npm packages](https://docs.deno.com/runtime/fundamentals/node/), you can install Layerfig using the following command:
+
+```bash
+deno add npm:@layerfig/config
+```
+
+After installation, follow the setup process described in the [Getting Started](/getting-started) guide.
+
+The main difference when using Deno is its security model, which restricts file system access by default. Therefore, you must use the `--allow-read` flag when running your application.
+
+```bash
+deno run --allow-read --allow-net --watch server.ts
+```
+
+<Aside>
+  For enhanced security, you can restrict read access to the current directory by passing `--allow-read=$PWD`. Layerfig uses `process.cwd()` to determine the project's root directory, which requires read permissions for the current working directory.
+
+  > On Windows, use `--allow-read=%cd%` in the command prompt.
+</Aside>
+
+With this setup complete, you can load your configuration files and access the config object throughout your application.
+
+<Aside type="tip">
+  Check out the [Deno example](/examples/deno) to see a complete implementation.
+</Aside>

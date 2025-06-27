@@ -46,8 +46,9 @@ export default defineConfig({
 				{
 					label: "Guides & Best Practices",
 					items: [
-						"guides/docker",
 						"guides/12-factor-app",
+						"guides/deno",
+						"guides/docker",
 						"guides/dynamic-environment",
 					],
 				},
@@ -59,8 +60,16 @@ export default defineConfig({
 							link: "examples/basic",
 						},
 						{
+							label: "Deno",
+							link: "https://github.com/raulfdm/layerfig/tree/main/examples/deno",
+						},
+						{
 							label: "Docker",
 							link: "examples/docker",
+						},
+						{
+							label: "Dynamic Environment",
+							link: "examples/dynamic-env",
 						},
 						{
 							label: "Json5",
@@ -71,16 +80,12 @@ export default defineConfig({
 							link: "examples/toml",
 						},
 						{
-							label: "Yaml",
-							link: "examples/yaml",
-						},
-						{
-							label: "Dynamic Environment",
-							link: "examples/dynamic-env",
-						},
-						{
 							label: "Valibot",
 							link: "examples/valibot",
+						},
+						{
+							label: "Yaml",
+							link: "examples/yaml",
 						},
 					],
 				},
