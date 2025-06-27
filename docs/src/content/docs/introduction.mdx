@@ -44,20 +44,20 @@ hero:
 
 ## Features
 
-- Have declarative, isolated and per-environment configuration files (`.json`, `.yml`).
+- Have declarative, isolated and per-environment configuration files (`.json`, or other file extensions via [parsers](/setup/sources#other-file-extensions)).
+- Validate your configuration with your prefered schema validation library (zod, valibot, yup, etc.).
 - Use a type-safe and runtime checked configuration object across your app.
-- Validate your configuration with your prefered schema validation library.
 
 ## How It Works
 
 When you invoke `ConfigBuilder`, you can access your environment's configuration from two primary sources:
 
-1. **File-based** – Define your configuration in JSON/JSON5 or YAML files.
-2. **Environment variables** – Override configurations dynamically. This is useful for pre-built containers that require specific values at runtime.
+1. **File-based** – [Define your configuration files](/setup/sources).
+2. **Environment variables** – [Override configurations dynamically](/setup/sources/#environment-variables). This is useful for pre-built containers that require specific values at runtime.
 
 Since the configuration follows a cascading approach, the final result depends on the order in which sources are added.
 
-```ts
++++ts
 import { ConfigBuilder } from "@layerfig/config";
 
 export const config = new ConfigBuilder({
@@ -75,4 +75,4 @@ export const config = new ConfigBuilder({
   .addSource(ConfigBuilder.createEnvVarSource())
   // 4. Validates using the schema and returns the final configuration
   .build();
-```
++++
