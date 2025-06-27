@@ -1,12 +1,12 @@
 ---
 title: ''
-description: 'Type-safe layered config. Merge files & env vars, validate with any schema, and get a runtime-checked object with full TypeScript IntelliSense'
+description: 'Type-safe layered configuration. Merge files and environment variables, validate with any schema, and get a runtime-checked object with full TypeScript IntelliSense.'
 tableOfContents: false
 head:
   - tag: title
     content: Layerfig
 hero:
-  tagline: Type-safe layered config. Merge files & env vars, validate with any schema, and get a runtime-checked object with full TypeScript IntelliSense
+  tagline: Type-safe layered configuration. Merge files and environment variables, validate with any schema, and get a runtime-checked object with full TypeScript IntelliSense.
   image:
     alt: logo
     file: ../../assets/logo-bottom-text.svg
@@ -44,16 +44,16 @@ hero:
 
 ## Features
 
-- Have declarative, isolated and per-environment configuration files (`.json`, `.yml`).
-- Use a type-safe and runtime checked configuration object across your app.
-- Validate your configuration with your prefered schema validation library.
+- Define declarative, isolated, and per-environment configuration files (`.json`, or other file extensions via [parsers](/setup/sources#other-file-extensions)).
+- Validate your configuration with your preferred schema validation library (Zod, Valibot, Yup, etc.).
+- Use a type-safe and runtime-checked configuration object across your app.
 
 ## How It Works
 
-When you invoke `ConfigBuilder`, you can access your environment's configuration from two primary sources:
+When using `ConfigBuilder`, configuration is loaded from two primary sources:
 
-1. **File-based** – Define your configuration in JSON/JSON5 or YAML files.
-2. **Environment variables** – Override configurations dynamically. This is useful for pre-built containers that require specific values at runtime.
+1. **File-based** – [Define your configuration files](/setup/sources).
+2. **Environment variables** – [Override configurations dynamically](/setup/sources/#environment-variables). This is useful for pre-built containers that require specific values at runtime.
 
 Since the configuration follows a cascading approach, the final result depends on the order in which sources are added.
 
@@ -62,17 +62,17 @@ import { ConfigBuilder } from "@layerfig/config";
 
 export const config = new ConfigBuilder({
   validate: (config) => {
-    // return the result of the config after validation
-    // e.g.
+    // Return the validated configuration object.
+    // For example:
     // return z.object({ appURL: z.string() }).parse(config)
   },
 })
-  // 1. Starts with a base config
+  // 1. Starts with a base configuration.
   .addSource("base.json")
-  // 2. Merge with the previous source
+  // 2. Merges with the previous source.
   .addSource("live.json")
-  // 3. Allows environment variables to overwrite previous values (optional)
+  // 3. Allows environment variables to override previous values (optional).
   .addSource(ConfigBuilder.createEnvVarSource())
-  // 4. Validates using the schema and returns the final configuration
+  // 4. Validates the merged configuration and returns the final, type-safe object.
   .build();
 ```
