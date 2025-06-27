@@ -27,7 +27,11 @@ export default defineConfig({
 					label: "Start Here",
 					items: [
 						{ label: "Introduction", slug: "introduction", link: "intro" },
-						"getting-started",
+						{
+							label: "Getting Started",
+							slug: "getting-started",
+							link: "getting-started/index",
+						},
 					],
 				},
 				{
