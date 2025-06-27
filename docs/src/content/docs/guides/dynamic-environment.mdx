@@ -2,6 +2,8 @@
 title: Dynamic Environment
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 If you maintain multiple environments (e.g., `local`, `dev`, `staging`, `prod`), you’ll have a separate configuration file for each one.
 
 However, you can’t load them all at once:
@@ -38,3 +40,7 @@ export const config = new ConfigBuilder({
 ```
 
 Now, when you run your application with different `APP_ENV` values, it automatically loads the matching configuration file.
+
+<Aside type="tip">
+  Check the [Dynamic Environment example](/examples/dynamic-env) to see it in action.
+</Aside>
