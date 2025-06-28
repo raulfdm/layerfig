@@ -64,3 +64,44 @@ const config = new ConfigBuilder({
 ```
 
 In this case, the library will look for `<root>/path/to/config-folder/base.json` and load it.
+
+## options.slotPrefix
+
+> Default: "$"
+
+A string used to identify slots that should be replaced with environment variables.
+
+By default, Layerfig looks for placeholders prefixed with `$`. You can customize this prefix if it conflicts with other syntax or to match a team's convention.
+
+<Aside>
+    Read more about [slots](/setup/slots).
+</Aside>
+
+
+For example, to use a double underscore (`__`) as the prefix:
+
+```ts
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  slotPrefix: '__'
+})
+  .addSource("base.json")
+  .build();
+```
+
+Layerfig will now look for slots like `__PORT` in your configuration files.
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:__PORT",
+  "port": "__PORT"
+}
+```
+
+With the `PORT` environment variable set, the resolved configuration would be:
+
+```js
+config.appURL; // http://localhost:3000
+config.port; // 3000
+```
