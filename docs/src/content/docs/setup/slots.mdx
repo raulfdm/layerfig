@@ -2,9 +2,9 @@
 title: 'Slots'
 ---
 
-There are cases where we want to have our config file but derive values from environment variables.
+You may need to define your configuration in a file while also sourcing values from environment variables.
 
-Imagine the following config file:
+Consider the following configuration file:
 
 ```json
 // config/base.json
@@ -14,13 +14,13 @@ Imagine the following config file:
 }
 ```
 
-As you can see, `port` is the same in both places. Now, imagine we have `PORT` declared in our `.env` file on exported in the environment we are. We want to use this value and compose, right?
+Notice that the port number is used in two places. Instead of hardcoding this value, you can use a `PORT` variable defined in your environment, such as in a `.env` file:
 
 ```env
 PORT=3000
 ```
 
-To use this value, you can use slots:
+To reference this environment variable, you can use a "slot":
 
 ```json
 // config/base.json
@@ -30,7 +30,7 @@ To use this value, you can use slots:
 }
 ```
 
-When layerfig reads your file, it'll search for slots and attempts to replace with an environment variable value with the same name:
+When Layerfig processes your configuration, it searches for slots and replaces them with the corresponding environment variable's value:
 
 ```
 $PORT => PORT => 3000
@@ -38,13 +38,13 @@ $PORT => PORT => 3000
 
 ## Caveats
 
-Important to mention that if the value is not declared in the environment variable, layerfig will not replace with anything. That means your config variable will contain the value with the slot:
+If an environment variable for a slot is not defined, Layerfig will not perform a replacement. The configuration value will retain the original slot string:
 
 ```ts
-config.appURL; // http://localhost:$PORT
+config.appURL; // "http://localhost:$PORT"
 ```
 
-Also, keep in mind that all environment variables are typeof string. For example, let's say you want `port` to be typeof number. Using slots, your validate function will receive the following object:
+Additionally, all environment variables are treated as strings. If a slot is used for a value that should be a number, like `port`, the resulting configuration will have a string value:
 
 ```js
 const finalConfig = {
@@ -53,7 +53,7 @@ const finalConfig = {
 }
 ```
 
-So, in your schema, you might want to do something like this:
+To handle this, you can use a validation schema to coerce the string value into a number. For example, with Zod:
 
 ```ts {5}
 import { z } from 'zod/v4'
@@ -64,4 +64,4 @@ const schema = z.object({
 });
 ```
 
-By doing this, you'll get `"3000"` (string) and the schema will automatically coerce to `3000` (number).
+The `z.coerce.number()` function will parse the string `"3000"` and transform it into the number `3000`.
