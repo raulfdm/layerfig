@@ -71,7 +71,9 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 				throw new Error(fileContentResult.error);
 			}
 
-			const parserResult = this.#parser.load(fileContentResult.data);
+			const finalContent = this.#replaceSlots(fileContentResult.data);
+
+			const parserResult = this.#parser.load(finalContent);
 
 			if (parserResult.ok) {
 				this.#partialConfig = merge({}, this.#partialConfig, parserResult.data);
@@ -83,6 +85,32 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		}
 
 		return this;
+	}
+
+	#replaceSlots(fileContent: string) {
+		const regex = /\$\w+/g;
+
+		const matches = fileContent.match(regex);
+
+		if (matches === null) {
+			return fileContent;
+		}
+
+		const uniqueSlots = new Set(matches);
+
+		let copy = fileContent;
+
+		for (const slot of uniqueSlots) {
+			const slotWithoutPrefix = slot.replace("$", "");
+			const value = process.env[slotWithoutPrefix];
+
+			// Do not replace if the variable is not there
+			if (typeof value === "string" && value !== "undefined") {
+				copy = copy.replaceAll(slot, value);
+			}
+		}
+
+		return copy;
 	}
 
 	get #parser(): ConfigParser {
