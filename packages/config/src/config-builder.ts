@@ -24,6 +24,11 @@ interface ConfigBuilderOptions<T extends object = Record<string, unknown>> {
 	 * Load source from different source types
 	 */
 	parser?: ConfigParser;
+	/**
+	 * Prefix used to search for slotted values
+	 * @default "$"
+	 */
+	slotPrefix?: string;
 }
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
@@ -72,7 +77,6 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 			}
 
 			const finalContent = this.#replaceSlots(fileContentResult.data);
-
 			const parserResult = this.#parser.load(finalContent);
 
 			if (parserResult.ok) {
@@ -88,7 +92,8 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	}
 
 	#replaceSlots(fileContent: string) {
-		const regex = /\$\w+/g;
+		const slotPrefix = this.#options.slotPrefix || "$";
+		const regex = new RegExp(`\\${slotPrefix}\\w+`, "g");
 
 		const matches = fileContent.match(regex);
 
@@ -101,7 +106,7 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		let copy = fileContent;
 
 		for (const slot of uniqueSlots) {
-			const slotWithoutPrefix = slot.replace("$", "");
+			const slotWithoutPrefix = slot.replace(slotPrefix, "");
 			const value = process.env[slotWithoutPrefix];
 
 			// Do not replace if the variable is not there

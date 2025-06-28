@@ -198,6 +198,23 @@ describe("ConfigBuilder", () => {
 
 			process.env.PORT = undefined;
 		});
+
+		it("should accept custom slot prefix", () => {
+			const config = new ConfigBuilder({
+				validate: (config) => schema.parse(config),
+				configFolder: "./src/__fixtures__",
+				slotPrefix: "@",
+			});
+
+			process.env.PORT = "3000";
+
+			expect(config.addSource("slot-prefix.json").build()).toEqual({
+				appURL: "http://localhost:3000",
+				port: 3000,
+			});
+
+			process.env.PORT = undefined;
+		});
 	});
 
 	it("should deep merge configuration", () => {
