@@ -1,2 +1,3 @@
-appURL: http://localhost:$PORT
-port: $PORT
+appURL: https://my-site.com
+api:
+  port: 3000
