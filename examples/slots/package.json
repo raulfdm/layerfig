@@ -1,14 +1,14 @@
 {
-  "name": "dynamic-env",
+  "name": "slots",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env APP_ENV=local node server",
+    "dev": "cross-env PORT=3000 APP_ENV=prod node server",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.ts --outDir dist/server",
-    "preview": "cross-env NODE_ENV=production APP_ENV=prod node server"
+    "preview": "cross-env NODE_ENV=production PORT=8080 APP_ENV=prod node server"
   },
   "dependencies": {
     "@layerfig/config": "0.4.0",

@@ -2,6 +2,8 @@
 title: 'Slots'
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 You may need to define your configuration in a file while also sourcing values from environment variables.
 
 Consider the following configuration file:
@@ -35,6 +37,10 @@ When Layerfig processes your configuration, it searches for slots and replaces t
 ```
 $PORT => PORT => 3000
 ```
+
+<Aside>
+    Check the [slots example](/examples/slots).
+</Aside>
 
 ## Caveats
 

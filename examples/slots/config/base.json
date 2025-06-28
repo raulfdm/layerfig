@@ -1,0 +1,5 @@
+{
+	"baseURL": "http://localhost:$PORT",
+	"port": "$PORT",
+	"appEnv": "$APP_ENV"
+}
