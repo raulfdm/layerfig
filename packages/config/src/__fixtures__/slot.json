@@ -1,0 +1,4 @@
+{
+	"appURL": "http://localhost:$PORT",
+	"port": "$PORT"
+}

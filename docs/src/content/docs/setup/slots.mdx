@@ -1,0 +1,71 @@
+---
+title: 'Slots'
+---
+
+You may need to define your configuration in a file while also sourcing values from environment variables.
+
+Consider the following configuration file:
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:3000",
+  "port": 3000
+}
+```
+
+Notice that the port number is used in two places. Instead of hardcoding this value, you can use a `PORT` variable defined in your environment, such as in a `.env` file:
+
+```env
+PORT=3000
+```
+
+To reference this environment variable, you can use a "slot":
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:$PORT",
+  "port": "$PORT"
+}
+```
+
+When Layerfig processes your configuration, it searches for slots and replaces them with the corresponding environment variable's value:
+
+```
+$PORT => PORT => 3000
+```
+
+## Caveats
+
+If an environment variable for a slot is not defined, Layerfig will not perform a replacement. The configuration value will retain the original slot string:
+
+```ts
+config.appURL; // "http://localhost:$PORT"
+```
+
+Additionally, all environment variables are treated as strings. If a slot is used for a value that should be a number, like `port`, the resulting configuration will have a string value:
+
+```js
+const finalConfig = {
+  appURL: "http://localhost:3000",
+  port: "3000"
+}
+```
+
+To handle this, you can use a validation schema to coerce the string value into a number. For example, with Zod:
+
+```ts {5}
+import { z } from 'zod/v4'
+
+const schema = z.object({
+	appURL: z.string(),
+	port: z.coerce.number().positive().int(),
+});
+```
+
+The `z.coerce.number()` function will parse the string `"3000"` and transform it into the number `3000`.
+
+## Different Prefix
+
+By default Layerfig uses `$` as slot prefix, but you can change it by passing [`slotPrefix`](/setup/configuration/#optionsslotprefix) in the options.

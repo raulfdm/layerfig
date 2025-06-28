@@ -36,7 +36,7 @@ export default defineConfig({
 				},
 				{
 					label: "Setup",
-					items: ["setup/configuration", "setup/sources"],
+					items: ["setup/configuration", "setup/sources", "setup/slots"],
 				},
 				{
 					label: "Parsers",
