@@ -1,0 +1,67 @@
+---
+title: 'Slots'
+---
+
+There are cases where we want to have our config file but derive values from environment variables.
+
+Imagine the following config file:
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:3000",
+  "port": 3000
+}
+```
+
+As you can see, `port` is the same in both places. Now, imagine we have `PORT` declared in our `.env` file on exported in the environment we are. We want to use this value and compose, right?
+
+```env
+PORT=3000
+```
+
+To use this value, you can use slots:
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:$PORT",
+  "port": "$PORT"
+}
+```
+
+When layerfig reads your file, it'll search for slots and attempts to replace with an environment variable value with the same name:
+
+```
+$PORT => PORT => 3000
+```
+
+## Caveats
+
+Important to mention that if the value is not declared in the environment variable, layerfig will not replace with anything. That means your config variable will contain the value with the slot:
+
+```ts
+config.appURL; // http://localhost:$PORT
+```
+
+Also, keep in mind that all environment variables are typeof string. For example, let's say you want `port` to be typeof number. Using slots, your validate function will receive the following object:
+
+```js
+const finalConfig = {
+  appURL: "http://localhost:3000",
+  port: "3000"
+}
+```
+
+So, in your schema, you might want to do something like this:
+
+```ts {5}
+import { z } from 'zod/v4'
+
+const schema = z.object({
+	appURL: z.string(),
+	port: z.coerce.number().positive().int(),
+});
+```
+
+By doing this, you'll get `"3000"` (string) and the schema will automatically coerce to `3000` (number).
