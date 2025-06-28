@@ -143,6 +143,80 @@ describe("ConfigBuilder", () => {
 		});
 	});
 
+	describe("slots", () => {
+		const schema = z4.object({
+			appURL: z4.string(),
+			port: z4.coerce.number().positive().int(),
+		});
+
+		const config = new ConfigBuilder({
+			validate: (config) => schema.parse(config),
+			configFolder: "./src/__fixtures__",
+		});
+
+		it("should replace the slotted value with the value from env var", () => {
+			process.env.PORT = "3000";
+
+			expect(config.addSource("slot.json").build()).toEqual({
+				appURL: "http://localhost:3000",
+				port: 3000,
+			});
+
+			process.env.PORT = undefined;
+		});
+
+		it("should NOT replace the slotted value if env var is not defined", () => {
+			const config = new ConfigBuilder({
+				validate: (config) => config,
+				configFolder: "./src/__fixtures__",
+			});
+
+			expect(config.addSource("slot.json").build()).toEqual({
+				appURL: "http://localhost:$PORT",
+				port: "$PORT",
+			});
+		});
+
+		it("should handle multiple slots", () => {
+			process.env.PORT = "3000";
+
+			const schema = z4.object({
+				appURL: z4.string(),
+				port: z4.coerce.number().positive().int(),
+				host: z4.string(),
+			});
+			const config = new ConfigBuilder({
+				validate: (config) => schema.parse(config),
+				configFolder: "./src/__fixtures__",
+			});
+
+			expect(config.addSource("slot-multiple.json").build()).toEqual({
+				appURL: "http://localhost:3000",
+				port: 3000,
+				host: "$HOST",
+			});
+
+			process.env.PORT = undefined;
+		});
+
+		it("should accept custom slot prefix", () => {
+			const config = new ConfigBuilder({
+				validate: (config) => schema.parse(config),
+				configFolder: "./src/__fixtures__",
+				slotPrefix: "@",
+			});
+
+			process.env.PORT = "3000";
+
+			expect(config.addSource("slot-prefix.json").build()).toEqual({
+				appURL: "http://localhost:3000",
+				port: 3000,
+			});
+
+			process.env.PORT = undefined;
+		});
+	});
+
 	it("should deep merge configuration", () => {
 		const schema = z3.object({
 			foo: z3.object({
