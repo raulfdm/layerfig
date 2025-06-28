@@ -84,12 +84,16 @@ export default defineConfig({
 							link: "examples/toml",
 						},
 						{
+							label: "Yaml",
+							link: "examples/yaml",
+						},
+						{
 							label: "Valibot",
 							link: "examples/valibot",
 						},
 						{
-							label: "Yaml",
-							link: "examples/yaml",
+							label: "Slots",
+							link: "examples/slots",
 						},
 					],
 				},
