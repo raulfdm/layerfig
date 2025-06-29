@@ -1,11 +1,15 @@
 import { ConfigBuilder } from "@layerfig/config";
-import tomlParser from '@layerfig/parser-toml'
-import { configSchema } from "./schema";
-
+import tomlParser from "@layerfig/parser-toml";
 
 export const config = new ConfigBuilder({
-  validate: finalConfig => configSchema.parse(finalConfig),
-  parser: tomlParser
+	validate: (finalConfig, z) => {
+		const configSchema = z.object({
+			appURL: z.url(),
+		});
+
+		return configSchema.parse(finalConfig);
+	},
+	parser: tomlParser,
 })
 	.addSource("base.toml")
 	.addSource("local.toml")

@@ -1,11 +1,15 @@
 import { ConfigBuilder } from "@layerfig/config";
-import json5Parser from '@layerfig/parser-json5'
-import { configSchema } from "./schema";
-
+import json5Parser from "@layerfig/parser-json5";
 
 export const config = new ConfigBuilder({
-  validate: finalConfig => configSchema.parse(finalConfig),
-  parser: json5Parser
+	validate: (finalConfig, z) => {
+		const configSchema = z.object({
+			appURL: z.url(),
+		});
+
+		return configSchema.parse(finalConfig);
+	},
+	parser: json5Parser,
 })
 	.addSource("base.jsonc")
 	.addSource("local.json")

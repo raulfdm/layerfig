@@ -1,5 +1,4 @@
-import { ConfigBuilder } from "@layerfig/config";
-import { z } from "zod/v4";
+import { ConfigBuilder, z } from "@layerfig/config";
 
 const tenants = z.enum(["acme", "beta"]);
 

@@ -1,8 +1,13 @@
 import { ConfigBuilder } from "@layerfig/config";
-import { configSchema } from "./schema";
 
 export const config = new ConfigBuilder({
-  validate: finalConfig => configSchema.parse(finalConfig)
+	validate: (finalConfig, z) => {
+		const configSchema = z.object({
+			appURL: z.url(),
+		});
+
+		return configSchema.parse(finalConfig);
+	},
 })
 	.addSource("base.json")
 	.addSource("prod.json")
