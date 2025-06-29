@@ -2,10 +2,8 @@ import Joi from "joi";
 import * as v from "valibot";
 import { assertType, describe, expect, it } from "vitest";
 import * as yup from "yup";
-import { z } from "zod/v4";
 
-import { ConfigBuilder } from "./config-builder";
-import { defineConfigParser } from "./parser/define-config-parser";
+import { ConfigBuilder, defineConfigParser, z } from "./index";
 
 describe("ConfigBuilder", () => {
 	const schema = z.object({
