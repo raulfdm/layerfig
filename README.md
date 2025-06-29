@@ -1,8 +1,8 @@
 <p align="center">
-  <picture width="300" alt="layerfig logo">
-    <source media="(prefers-color-scheme: dark)" srcset="./docs/src/assets/logo-bottom-text-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="./docs/src/assets/logo-bottom-text.svg">
-    <img alt="Fallback image description" src="./docs/src/assets/logo-bottom-text.svg">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/src/assets/logo-bottom-text-dark.svg" width="300" alt="Layfig logo">
+    <source media="(prefers-color-scheme: light)" srcset="./docs/src/assets/logo-bottom-text.svg" width="300" alt="Layfig logo">
+    <img width="300" alt="Layfig logo" src="./docs/src/assets/logo-bottom-text.svg">
   </picture>
 
   <br/>
