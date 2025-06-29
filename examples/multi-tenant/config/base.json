@@ -1,0 +1,16 @@
+{
+  "port": 3000,
+
+  "tenants":{
+    "acme": {
+      "id": "acme",
+      "name": "Acme Corp",
+      "subdomain": "acme"
+    },
+    "beta": {
+      "id": "beta",
+      "name": "Beta Corp",
+      "subdomain": "beta"
+    }
+  }
+}
