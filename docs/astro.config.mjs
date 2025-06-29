@@ -58,7 +58,6 @@ export default defineConfig({
 				},
 				{
 					label: "Examples",
-					collapsed: true,
 					items: [
 						{
 							label: "Basic",
