@@ -2,25 +2,19 @@ import Joi from "joi";
 import * as v from "valibot";
 import { assertType, describe, expect, it } from "vitest";
 import * as yup from "yup";
-import { z as z3 } from "zod";
-import { z as z4 } from "zod/v4";
 
-import { ConfigBuilder } from "./config-builder";
-import { defineConfigParser } from "./parser/define-config-parser";
+import { ConfigBuilder, defineConfigParser, z } from "./index";
 
 describe("ConfigBuilder", () => {
-	const schema = z3.object({
-		appURL: z3.string(),
-		api: z3.object({
-			port: z3
-				.string()
-				.transform((val) => Number.parseInt(val, 10))
-				.or(z3.number()),
+	const schema = z.object({
+		appURL: z.url(),
+		api: z.object({
+			port: z.coerce.number().int().positive(),
 		}),
 	});
 
 	const config = new ConfigBuilder({
-		validate: (config) => schema.parse(config),
+		validate: (finalConfig) => schema.parse(finalConfig),
 		configFolder: "./src/__fixtures__",
 	});
 
@@ -144,9 +138,9 @@ describe("ConfigBuilder", () => {
 	});
 
 	describe("slots", () => {
-		const schema = z4.object({
-			appURL: z4.string(),
-			port: z4.coerce.number().positive().int(),
+		const schema = z.object({
+			appURL: z.url(),
+			port: z.coerce.number().positive().int(),
 		});
 
 		const config = new ConfigBuilder({
@@ -180,10 +174,10 @@ describe("ConfigBuilder", () => {
 		it("should handle multiple slots", () => {
 			process.env.PORT = "3000";
 
-			const schema = z4.object({
-				appURL: z4.string(),
-				port: z4.coerce.number().positive().int(),
-				host: z4.string(),
+			const schema = z.object({
+				appURL: z.url(),
+				port: z.coerce.number().positive().int(),
+				host: z.string(),
 			});
 			const config = new ConfigBuilder({
 				validate: (config) => schema.parse(config),
@@ -218,13 +212,13 @@ describe("ConfigBuilder", () => {
 	});
 
 	it("should deep merge configuration", () => {
-		const schema = z3.object({
-			foo: z3.object({
-				bar: z3.object({
-					zz: z3.object({
-						test: z3.object({
-							should_remain: z3.string(),
-							another: z3.boolean(),
+		const schema = z.object({
+			foo: z.object({
+				bar: z.object({
+					zz: z.object({
+						test: z.object({
+							should_remain: z.string(),
+							another: z.boolean(),
 						}),
 					}),
 				}),
@@ -292,6 +286,31 @@ describe("ConfigBuilder", () => {
 			`[Error: ".txt" file is not supported by this parser. Accepted files are: "json"]`,
 		);
 	});
+
+	it(`should provide a zod instance so I don't need to bring any external resource`, () => {
+		const config = new ConfigBuilder({
+			validate: (finalConfig, z) => {
+				const schemaInsideValidate = z.object({
+					appURL: z.url(),
+					api: z.object({
+						port: z.coerce.number().int().positive(),
+					}),
+				});
+
+				return schemaInsideValidate.parse(finalConfig);
+			},
+			configFolder: "./src/__fixtures__",
+		})
+			.addSource("base.json")
+			.build();
+
+		expect(config).toEqual({
+			appURL: "https://my-site.com",
+			api: {
+				port: 3000,
+			},
+		});
+	});
 });
 
 function injectEnvVar(
@@ -308,14 +327,11 @@ function injectEnvVar(
 }
 
 describe("Type-safe agnostic validate", () => {
-	it("zod 3", () => {
-		const schema = z3.object({
-			appURL: z3.string().url(),
-			api: z3.object({
-				port: z3
-					.string()
-					.transform((val) => Number.parseInt(val, 10))
-					.or(z3.number()),
+	it("zod", () => {
+		const schema = z.object({
+			appURL: z.url(),
+			api: z.object({
+				port: z.coerce.number().int().positive(),
 			}),
 		});
 
@@ -326,34 +342,7 @@ describe("Type-safe agnostic validate", () => {
 			.addSource("base.json")
 			.build();
 
-		assertType<z3.infer<typeof schema>>(config);
-		expect(config).toEqual({
-			appURL: "https://my-site.com",
-			api: {
-				port: 3000,
-			},
-		});
-	});
-
-	it("zod 4", () => {
-		const schema = z4.object({
-			appURL: z4.url(),
-			api: z4.object({
-				port: z4
-					.string()
-					.transform((val) => Number.parseInt(val, 10))
-					.or(z4.number()),
-			}),
-		});
-
-		const config = new ConfigBuilder({
-			validate: (config) => schema.parse(config),
-			configFolder: "./src/__fixtures__",
-		})
-			.addSource("base.json")
-			.build();
-
-		assertType<z4.infer<typeof schema>>(config);
+		assertType<z.infer<typeof schema>>(config);
 		expect(config).toEqual({
 			appURL: "https://my-site.com",
 			api: {
