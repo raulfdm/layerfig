@@ -1,6 +1,12 @@
 <p align="center">
- <img src="./docs/src/assets/logo-bottom-text.svg" width="300" alt="layerfig logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./docs/src/assets/logo-bottom-text-dark.svg" width="300" alt="Layfig logo">
+    <source media="(prefers-color-scheme: light)" srcset="./docs/src/assets/logo-bottom-text.svg" width="300" alt="Layfig logo">
+    <img width="300" alt="Layfig logo" src="./docs/src/assets/logo-bottom-text.svg">
+  </picture>
+
   <br/>
+  
   A simple way to implement configuration layering. It allows you to define multiple configuration sources, which are then merged into a single, type-safe configuration object.
 </p>
 
