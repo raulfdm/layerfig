@@ -65,10 +65,6 @@ export default defineConfig({
 							link: "examples/basic",
 						},
 						{
-							label: "Deno",
-							link: "https://github.com/raulfdm/layerfig/tree/main/examples/deno",
-						},
-						{
 							label: "Docker",
 							link: "examples/docker",
 						},
@@ -95,6 +91,14 @@ export default defineConfig({
 						{
 							label: "Slots",
 							link: "examples/slots",
+						},
+						{
+							label: "Multi-tenant App",
+							link: "https://github.com/raulfdm/layerfig/tree/main/examples/multi-tenant",
+						},
+						{
+							label: "Deno",
+							link: "https://github.com/raulfdm/layerfig/tree/main/examples/deno",
 						},
 					],
 				},
