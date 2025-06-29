@@ -1,4 +1,8 @@
-# multitenant-app
+# Layerfig: Multi Tenant App Example
+
+## Getting started
+
+> This project uses bun to not having to transpile. Make sure you have bun 1.27 or higher.
 
 To install dependencies:
 
@@ -9,7 +13,5 @@ bun install
 To run:
 
 ```bash
-bun run index.ts
+bun run dev
 ```
-
-This project was created using `bun init` in bun v1.2.17. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
