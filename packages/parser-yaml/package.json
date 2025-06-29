@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/parser-yaml",
 	"description": "Source parser for .yaml and .yml config files",
-	"version": "3.0.0",
+	"version": "4.0.0",
 	"keywords": [
 		"@layerfig/config",
 		"source",
@@ -45,7 +45,7 @@
 		"test": "vitest --typecheck"
 	},
 	"peerDependencies": {
-		"@layerfig/config": "0.4.0"
+		"@layerfig/config": "1.0.0"
 	},
 	"dependencies": {
 		"yaml": "^2.8.0"

@@ -1,5 +1,12 @@
 # @layerfig/parser-yaml
 
+## 4.0.0
+
+### Patch Changes
+
+- Updated dependencies [522badb]
+  - @layerfig/config@1.0.0
+
 ## 3.0.0
 
 ### Patch Changes
