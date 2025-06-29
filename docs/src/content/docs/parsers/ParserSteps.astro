@@ -1,0 +1,71 @@
+---
+import { Code, Steps } from "@astrojs/starlight/components";
+import PackageManagerCmd from "../../../components/PackageManagerCmd.astro";
+
+interface Props {
+	packageName: string;
+  parserName: string;
+	supportedFiles: string[];
+  source: string
+}
+
+const formatter = new Intl.ListFormat("en", {
+	style: "long",
+	type: "disjunction",
+});
+
+const files = formatter.format(Astro.props.supportedFiles);
+
+const code = `
+import { ConfigBuilder } from "@layerfig/config";
+import ${Astro.props.parserName} from "${Astro.props.packageName}";
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      appURL: z.url(),
+      port: z.number()
+    })
+
+    return schema.parse(finalConfig)
+  },
+  parser: ${Astro.props.parserName}
+})
+  .addSource("${Astro.props.source}")
+  .build();
+`;
+---
+
+<p>
+  This parser allows you to load configuration from <code>{files}</code> files.
+</p>
+
+<Steps>
+   <ol>
+    <li>
+      <p>Install the dependency.</p>
+
+      <PackageManagerCmd
+        npm={`npm install ${Astro.props.packageName}`}
+        pnpm={`pnpm install ${Astro.props.packageName}`}
+        yarn={`yarn add ${Astro.props.packageName}`}
+        bun={`bun add ${Astro.props.packageName}`}
+      />
+    </li>
+
+    <li>
+      <p>Create your configuration files.</p>
+    </li>
+
+    <li>
+      <p>
+        Add the parser to your <code>ConfigBuilder</code>.
+      </p>
+      <Code code={code} lang='typescript' wrap meta="{2,13}"/>
+    </li>
+   </ol>
+</Steps>
+
+<p>
+  Your application is now configured to parse these file formats.
+</p>

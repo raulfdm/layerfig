@@ -45,7 +45,7 @@ hero:
 ## Features
 
 - Define declarative, isolated, and per-environment configuration files (`.json`, or other file extensions via [parsers](/setup/sources#other-file-extensions)).
-- Validate your configuration with your preferred schema validation library (Zod, Valibot, Yup, etc.).
+- Validate your configuration with [*zod*](https://zod.dev), or bring your preferred schema validation library.
 - Use a type-safe and runtime-checked configuration object across your app.
 
 ## How It Works
@@ -61,10 +61,12 @@ Since the configuration follows a cascading approach, the final result depends o
 import { ConfigBuilder } from "@layerfig/config";
 
 export const config = new ConfigBuilder({
-  validate: (config) => {
-    // Return the validated configuration object.
-    // For example:
-    // return z.object({ appURL: z.string() }).parse(config)
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      baseURL: z.url()
+    })
+
+    return schema.parse(finalConfig)
   },
 })
   // 1. Starts with a base configuration.

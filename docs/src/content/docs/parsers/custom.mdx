@@ -23,7 +23,7 @@ export const customParser = defineConfigParser({
 ```
 
 <Aside>
-    The extensions you have defined in `acceptedFileExtensions` will be the only allowed. Else it'll throw an error.    
+    The extensions you have defined in `acceptedFileExtensions` will be the only allowed. Else it'll throw an error.
 </Aside>
 
 The `parse` function must return an object that conforms to the `Result` type:
@@ -42,18 +42,19 @@ const errorResult = {
 
 Then, use your custom parser by passing it to the `ConfigBuilder`:
 
-```ts {2,12}
+```ts {2,13}
 import { ConfigBuilder } from "@layerfig/config";
 import { customParser } from "./path/to/custom-parser";
-import { z } from "zod/v4";
-
-const schema = z.object({
-  appURL: z.url(),
-  port: z.number(),
-});
 
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig),
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      appURL: z.url(),
+      port: z.number(),
+    });
+
+    return schema.parse(finalConfig)
+  },
   parser: customParser,
 })
   .addSource("base.ini")

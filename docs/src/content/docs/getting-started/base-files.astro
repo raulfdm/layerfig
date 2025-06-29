@@ -12,19 +12,20 @@ const tabs: Tab[] = [
 		label: "index.ts",
 		language: "ts",
 		code: `import { ConfigBuilder } from "@layerfig/config";
-import {z} from 'zod/v4'
-
-const schema = z.object({
-  appURL: z.url(),
-  port: z.number()
-})
 
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig)
+  validate: (finalConfig, z) =>
+    z.object({
+        appURL: z.url(),
+        port: z.coerce.number().int().int().positive(),
+      })
+      .parse(finalConfig),
 })
   .addSource("base.json")
   .addSource("live.json")
-  .build();`,
+  .build();
+
+`,
 	},
 	{
 		label: "base.json",
