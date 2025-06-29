@@ -136,7 +136,8 @@ describe("merge function", () => {
 
 		it("should handle null and undefined sources", () => {
 			const target = { a: 1 };
-			const result = merge(target, null as any, undefined as any);
+			// @ts-expect-error - Testing behavior with null and undefined
+			const result = merge(target, null, undefined);
 
 			expect(result).toEqual({ a: 1 });
 		});

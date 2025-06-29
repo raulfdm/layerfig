@@ -96,20 +96,24 @@ Suppose your `base.json` contains:
 ```json
 {
   "appURL": "http://localhost:4444",
-  "port": 4444
+  "port": 4444,
+  "appEnv": "local"
 }
 ```
 
 Define your schema and load the sources:
 
 ```ts
-const schema = z.object({
-  appURL: z.string(),
-  port: z.number(),
-});
-
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig)
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      appURL: z.url(),
+      port: z.coerce.number().int().positive(),
+      appEnv: z.enum(["local", "dev", "prod"])
+    });
+
+    return schema.parse(finalConfig)
+  }
 })
   .addSource("base.json")
   .addSource(ConfigBuilder.createEnvVarSource())
@@ -119,7 +123,7 @@ export const config = new ConfigBuilder({
 Run the application with overrides:
 
 ```bash
-APP_appURL=http://localhost:3333 APP_port=3333 node index.js
+APP_appEnv=prod node index.js
 ```
 
 Since the environment variable source is added last, its values take precedence.
