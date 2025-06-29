@@ -11,8 +11,8 @@
     "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
-    "@layerfig/config": "0.4.0",
-    "@layerfig/parser-toml": "2.0.0",
+    "@layerfig/config": "1.0.0",
+    "@layerfig/parser-toml": "3.0.0",
     "compression": "1.8.0",
     "express": "5.1.0",
     "sirv": "3.0.1",
