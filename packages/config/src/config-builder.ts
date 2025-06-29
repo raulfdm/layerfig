@@ -1,4 +1,5 @@
 import path from "node:path";
+import { z as zod } from "zod/v4";
 import type { ConfigParser } from "./parser/define-config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import {
@@ -10,11 +11,15 @@ import { merge, readIfExist, set } from "./utils";
 
 const APP_ROOT_PATH = process.cwd();
 
-interface ConfigBuilderOptions<T extends object = Record<string, unknown>> {
+export interface ConfigBuilderOptions<
+	T extends object = Record<string, unknown>,
+> {
 	/**
 	 * A function to validate the configuration object.
+	 * @param config - The configuration object to be validated
+	 * @param z - The zod 4 instance
 	 */
-	validate: (config: Record<string, unknown>) => T;
+	validate: (config: Record<string, unknown>, z: typeof zod) => T;
 	/**
 	 * The folder where the configuration files are located.
 	 * @default "./config"
@@ -50,7 +55,7 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	}
 
 	public build(): T {
-		return this.#options.validate(this.#partialConfig);
+		return this.#options.validate(this.#partialConfig, zod);
 	}
 
 	public addSource(source: string | EnvVarConfig): this {
