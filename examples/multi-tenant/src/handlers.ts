@@ -1,108 +1,149 @@
 import type { Request, Response } from 'express';
-import type { CreateTaskRequest, UpdateTaskRequest } from './types';
+import type { CreateTaskRequest, UpdateTaskRequest } from './types.js';
 import {
   getTasksByTenant,
   getTaskById,
   createTask,
   updateTask,
   deleteTask,
-} from './data-store';
+} from './data-store.js';
+import {
+  renderTaskList,
+  renderTask,
+  renderNewTask,
+  renderEditTask,
+  renderError,
+} from './templates.js';
 
-export const getTasks = (req: Request, res: Response): void => {
+export const getHomePage = (req: Request, res: Response): void => {
   const { tenantContext } = req;
 
   if (!tenantContext) {
-    res.status(400).json({ error: 'Tenant context not found' });
+    res.status(400).send(renderError('Tenant context not found'));
     return;
   }
 
   const tasks = getTasksByTenant(tenantContext.tenantId);
-
-  res.json({
-    tenant: tenantContext.tenant.name,
-    tasks,
-    count: tasks.length,
-  });
+  res.send(renderTaskList(tasks, tenantContext.tenant));
 };
 
-export const getTask = (req: Request, res: Response): void => {
+export const getTaskPage = (req: Request, res: Response): void => {
   const { tenantContext } = req;
   const { taskId } = req.params;
 
   if (!tenantContext) {
-    res.status(400).json({ error: 'Tenant context not found' });
-    return;
-  }
-
-  if(!taskId){
-    res.status(400).json({ error: 'Task ID not found' });
+    res.status(400).send(renderError('Tenant context not found'));
     return;
   }
 
   const task = getTaskById(tenantContext.tenantId, taskId);
 
   if (!task) {
-    res.status(404).json({ error: 'Task not found' });
+    res.status(404).send(renderError('Task not found', tenantContext.tenant));
     return;
   }
 
-  res.json({
-    tenant: tenantContext.tenant.name,
-    task,
-  });
+  res.send(renderTask(task, tenantContext.tenant));
+};
+
+export const getNewTaskPage = (req: Request, res: Response): void => {
+  const { tenantContext } = req;
+
+  if (!tenantContext) {
+    res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  res.send(renderNewTask(tenantContext.tenant));
 };
 
 export const createTaskHandler = (req: Request, res: Response): void => {
   const { tenantContext } = req;
-  const taskData: CreateTaskRequest = req.body;
+  const { title, description }: CreateTaskRequest = req.body;
 
   if (!tenantContext) {
-    res.status(400).json({ error: 'Tenant context not found' });
+    res.status(400).send(renderError('Tenant context not found'));
     return;
   }
 
-  if (!taskData.title || !taskData.description) {
-    res.status(400).json({
-      error: 'Missing required fields',
-      required: ['title', 'description']
-    });
+  if (!title || !description) {
+    res.status(400).send(renderError('Title and description are required', tenantContext.tenant));
     return;
   }
 
-  const task = createTask(tenantContext.tenantId, taskData);
+  createTask(tenantContext.tenantId, { title, description });
+  res.redirect('/');
+};
 
-  res.status(201).json({
-    tenant: tenantContext.tenant.name,
-    task,
-  });
+export const getEditTaskPage = (req: Request, res: Response): void => {
+  const { tenantContext } = req;
+  const { taskId } = req.params;
+
+  if (!tenantContext) {
+    res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  const task = getTaskById(tenantContext.tenantId, taskId);
+
+  if (!task) {
+    res.status(404).send(renderError('Task not found', tenantContext.tenant));
+    return;
+  }
+
+  res.send(renderEditTask(task, tenantContext.tenant));
 };
 
 export const updateTaskHandler = (req: Request, res: Response): void => {
   const { tenantContext } = req;
   const { taskId } = req.params;
-  const updates: UpdateTaskRequest = req.body;
+  const { title, description, completed }: UpdateTaskRequest & { completed?: string } = req.body;
 
   if (!tenantContext) {
-    res.status(400).json({ error: 'Tenant context not found' });
+    res.status(400).send(renderError('Tenant context not found'));
     return;
   }
 
-  if(!taskId){
-    res.status(400).json({ error: 'Task ID not found' });
-    return;
-  }
+  const updates: UpdateTaskRequest = {
+    title,
+    description,
+    completed: completed === 'on', // HTML checkboxes send 'on' when checked
+  };
 
   const task = updateTask(tenantContext.tenantId, taskId, updates);
 
   if (!task) {
-    res.status(404).json({ error: 'Task not found' });
+    res.status(404).send(renderError('Task not found', tenantContext.tenant));
     return;
   }
 
-  res.json({
-    tenant: tenantContext.tenant.name,
-    task,
-  });
+  res.redirect(`/tasks/${taskId}`);
+};
+
+export const completeTaskHandler = (req: Request, res: Response): void => {
+  const { tenantContext } = req;
+  const { taskId } = req.params;
+
+  if (!tenantContext) {
+    res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  updateTask(tenantContext.tenantId, taskId, { completed: true });
+  res.redirect('/');
+};
+
+export const uncompleteTaskHandler = (req: Request, res: Response): void => {
+  const { tenantContext } = req;
+  const { taskId } = req.params;
+
+  if (!tenantContext) {
+    res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  updateTask(tenantContext.tenantId, taskId, { completed: false });
+  res.redirect('/');
 };
 
 export const deleteTaskHandler = (req: Request, res: Response): void => {
@@ -110,35 +151,16 @@ export const deleteTaskHandler = (req: Request, res: Response): void => {
   const { taskId } = req.params;
 
   if (!tenantContext) {
-    res.status(400).json({ error: 'Tenant context not found' });
-    return;
-  }
-
-  if(!taskId){
-    res.status(400).json({ error: 'Task ID not found' });
+    res.status(400).send(renderError('Tenant context not found'));
     return;
   }
 
   const deleted = deleteTask(tenantContext.tenantId, taskId);
 
   if (!deleted) {
-    res.status(404).json({ error: 'Task not found' });
+    res.status(404).send(renderError('Task not found', tenantContext.tenant));
     return;
   }
 
-  res.status(204).send();
-};
-
-export const getTenantInfo = (req: Request, res: Response): void => {
-  const { tenantContext } = req;
-
-  if (!tenantContext) {
-    res.status(400).json({ error: 'Tenant context not found' });
-    return;
-  }
-
-  res.json({
-    tenant: tenantContext.tenant,
-    taskCount: getTasksByTenant(tenantContext.tenantId).length,
-  });
+  res.redirect('/');
 };

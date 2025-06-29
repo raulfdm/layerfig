@@ -1,8 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { TenantContext } from './types';
-import { getTenantById, getTenantBySubdomain } from './data-store';
+import type { TenantContext } from './types.js';
+import { getTenantBySubdomain } from './data-store.js';
 
-// Extend Express Request type
 declare global {
   namespace Express {
     interface Request {
@@ -16,36 +15,40 @@ export const tenantMiddleware = (
   res: Response,
   next: NextFunction
 ): void => {
-  // Try to get tenant from header first
-  const tenantIdHeader = req.headers['x-tenant-id'] as string;
+  const host = req.headers.host;
 
+  if (!host) {
+    res.status(400).send(`
+      <h1>Invalid Request</h1>
+      <p>No host header found. Please access via subdomain:</p>
+      <ul>
+        <li><a href="http://acme.localhost:3000">acme.localhost:3000</a></li>
+        <li><a href="http://beta.localhost:3000">beta.localhost:3000</a></li>
+      </ul>
+    `);
+    return;
+  }
+
+  // Extract subdomain (everything before the first dot, or the whole host if no dots)
+  const subdomain = host.split('.')[0];
+
+  // For localhost development, handle both localhost:3000 and subdomain.localhost:3000
   let tenant;
-
-  if (tenantIdHeader) {
-    tenant = getTenantById(tenantIdHeader);
-  } else {
-    // Try to get tenant from subdomain
-    const host = req.headers.host;
-    if (host) {
-      const subdomain = host.split('.')[0];
-
-      if(!subdomain){
-        res.status(400).json({
-          error: 'Tenant not found',
-          message: 'Please provide a valid tenant ID in X-Tenant-ID header or use a valid subdomain',
-        });
-        return;
-      }
-
-      tenant = getTenantBySubdomain(subdomain);
-    }
+  if (host.includes('localhost')) {
+    tenant = getTenantBySubdomain(subdomain!);
   }
 
   if (!tenant) {
-    res.status(400).json({
-      error: 'Tenant not found',
-      message: 'Please provide a valid tenant ID in X-Tenant-ID header or use a valid subdomain',
-    });
+    res.status(404).send(`
+      <h1>Tenant Not Found</h1>
+      <p>No tenant found for subdomain: <strong>${subdomain}</strong></p>
+      <p>Available tenants:</p>
+      <ul>
+        <li><a href="http://acme.localhost:3000">acme.localhost:3000</a> (Acme Corp)</li>
+        <li><a href="http://beta.localhost:3000">beta.localhost:3000</a> (Beta Industries)</li>
+      </ul>
+      <p><small>Make sure to add these entries to your /etc/hosts file for local development</small></p>
+    `);
     return;
   }
 
@@ -65,8 +68,9 @@ export const errorHandler = (
 ): void => {
   console.error('Error:', err);
 
-  res.status(500).json({
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
-  });
+  res.status(500).send(`
+    <h1>Server Error</h1>
+    <p>Something went wrong: ${err.message}</p>
+    <a href="/">← Go Back</a>
+  `);
 };
