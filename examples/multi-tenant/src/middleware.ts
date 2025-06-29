@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { TenantContext } from './types.js';
-import { getTenantBySubdomain } from './data-store.js';
+import type { TenantContext } from './types';
+import { getTenantBySubdomain } from './data-store';
+import { getTentantSettings } from './utils';
 
 declare global {
   namespace Express {
@@ -9,6 +10,8 @@ declare global {
     }
   }
 }
+
+const tentantsSettings = getTentantSettings()
 
 export const tenantMiddleware = (
   req: Request,
@@ -22,8 +25,7 @@ export const tenantMiddleware = (
       <h1>Invalid Request</h1>
       <p>No host header found. Please access via subdomain:</p>
       <ul>
-        <li><a href="http://acme.localhost:3000">acme.localhost:3000</a></li>
-        <li><a href="http://beta.localhost:3000">beta.localhost:3000</a></li>
+        ${tentantsSettings.map(t => `<li><a href="${t.url}">${t.url}</a></li>`).join('\n')}
       </ul>
     `);
     return;
@@ -44,8 +46,7 @@ export const tenantMiddleware = (
       <p>No tenant found for subdomain: <strong>${subdomain}</strong></p>
       <p>Available tenants:</p>
       <ul>
-        <li><a href="http://acme.localhost:3000">acme.localhost:3000</a> (Acme Corp)</li>
-        <li><a href="http://beta.localhost:3000">beta.localhost:3000</a> (Beta Industries)</li>
+        ${tentantsSettings.map(t => `<li><a href="${t.url}">${t.url}</a> (${t.name})</li>`).join('\n')}
       </ul>
       <p><small>Make sure to add these entries to your /etc/hosts file for local development</small></p>
     `);
@@ -62,9 +63,8 @@ export const tenantMiddleware = (
 
 export const errorHandler = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
 ): void => {
   console.error('Error:', err);
 

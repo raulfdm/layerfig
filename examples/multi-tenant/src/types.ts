@@ -1,3 +1,5 @@
+import type { TenantConfig } from "./config";
+
 export interface Task {
   id: string;
   title: string;
@@ -7,15 +9,12 @@ export interface Task {
   updatedAt: Date;
 }
 
-export interface Tenant {
-  id: string;
-  name: string;
-  subdomain: string;
+export interface Tenant extends TenantConfig {
   createdAt: Date;
 }
 
 export interface TenantContext {
-  tenantId: string;
+  tenantId: TenantConfig['id'];
   tenant: Tenant;
 }
 

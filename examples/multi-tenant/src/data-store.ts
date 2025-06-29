@@ -1,4 +1,5 @@
-import type { Task, Tenant } from './types';
+import { config } from "./config";
+import type { Task, Tenant } from "./types";
 
 // In-memory data store (in production, use a proper database)
 const tenants = new Map<string, Tenant>();
@@ -6,20 +7,10 @@ const tenantTasks = new Map<string, Map<string, Task>>();
 
 // Initialize sample tenants
 export const initializeSampleData = (): void => {
-  const sampleTenants: Tenant[] = [
-    {
-      id: 'tenant-1',
-      name: 'Acme Corp',
-      subdomain: 'acme',
-      createdAt: new Date(),
-    },
-    {
-      id: 'tenant-2',
-      name: 'Beta Industries',
-      subdomain: 'beta',
-      createdAt: new Date(),
-    },
-  ];
+  const sampleTenants: Tenant[] = Object.values(config.tenants).map((t) => ({
+    ...t,
+    createdAt: new Date(),
+  }));
 
   sampleTenants.forEach((tenant) => {
     tenants.set(tenant.id, tenant);
@@ -34,7 +25,7 @@ export const getTenantById = (tenantId: string): Tenant | undefined => {
 
 export const getTenantBySubdomain = (subdomain: string): Tenant | undefined => {
   return Array.from(tenants.values()).find(
-    (tenant) => tenant.subdomain === subdomain
+    (tenant) => tenant.subdomain === subdomain,
   );
 };
 
@@ -46,7 +37,7 @@ export const getTasksByTenant = (tenantId: string): Task[] => {
 
 export const getTaskById = (
   tenantId: string,
-  taskId: string
+  taskId: string,
 ): Task | undefined => {
   const tasks = tenantTasks.get(tenantId);
   return tasks?.get(taskId);
@@ -78,7 +69,7 @@ export const createTask = (tenantId: string, taskData: {
 export const updateTask = (
   tenantId: string,
   taskId: string,
-  updates: Partial<Pick<Task, 'title' | 'description' | 'completed'>>
+  updates: Partial<Pick<Task, "title" | "description" | "completed">>,
 ): Task | undefined => {
   const tasks = tenantTasks.get(tenantId);
   const task = tasks?.get(taskId);

@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { tenantMiddleware, errorHandler } from './middleware.js';
+import { tenantMiddleware, errorHandler } from './middleware';
 import {
   getHomePage,
   getTaskPage,
@@ -12,11 +12,15 @@ import {
   completeTaskHandler,
   uncompleteTaskHandler,
   deleteTaskHandler,
-} from './handlers.js';
-import { initializeSampleData } from './data-store.js';
+} from './handlers';
+import { initializeSampleData } from './data-store';
+import { config } from './config';
+import { getTentantSettings } from './utils';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+const tentantsSettings = getTentantSettings()
+
 
 // Initialize sample data
 initializeSampleData();
@@ -37,21 +41,19 @@ app.get('/health', (req, res) => {
 // Root redirect for main domain
 app.get('/', (req, res, next) => {
   const host = req.headers.host;
-  if (host === `localhost:${PORT}` || host === '127.0.0.1:3000') {
+  if (host === `localhost:${config.port}` || host === `127.0.0.1:${config.port}`) {
     res.send(`
       <h1>🏢 Multi-Tenant Task Manager</h1>
       <p>Welcome! Please select a tenant:</p>
       <ul style="list-style: none; padding: 20px;">
-        <li style="margin: 10px 0;"><a href="http://acme.localhost:${PORT}" style="display: inline-block; padding: 10px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">🏢 Acme Corp</a></li>
-        <li style="margin: 10px 0;"><a href="http://beta.localhost:${PORT}" style="display: inline-block; padding: 10px 15px; background: #28a745; color: white; text-decoration: none; border-radius: 4px;">🏭 Beta Industries</a></li>
+        ${tentantsSettings.map(t => `<li style="margin: 10px 0;"><a href="${t.url}" style="display: inline-block; padding: 10px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">${t.name} Corp</a></li>`).join(' ')}
       </ul>
       <hr style="margin: 30px 0;">
       <h3>🛠️ Setup for Local Development:</h3>
       <p>Add these lines to your <code>/etc/hosts</code> file (or <code>C:\\Windows\\System32\\drivers\\etc\\hosts</code> on Windows):</p>
-      <pre style="background: #f5f5f5; padding: 15px; border-radius: 4px;">127.0.0.1 acme.localhost
-127.0.0.1 beta.localhost</pre>
+      <pre style="background: #f5f5f5; padding: 15px; border-radius: 4px;">${tentantsSettings.map(t => t.hostConfig).join('\n')}</pre>
       <p><small>Then restart your browser and visit the links above.</small></p>
-    `);
+    `.trim());
     return;
   }
   next();
@@ -83,16 +85,20 @@ app.use('*', (req, res) => {
   `);
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Multi-tenant HTML app running on port ${PORT}`);
+app.listen(config.port, () => {
+  console.log(`🚀 Multi-tenant HTML app running on port ${config.port}`);
   console.log(`\n🌍 Access your tenants at:`);
-  console.log(`   📋 Acme Corp: http://acme.localhost:${PORT}`);
-  console.log(`   📋 Beta Industries: http://beta.localhost:${PORT}`);
+  for (const tentantSetting of tentantsSettings){
+    console.log(`   📋 ${tentantSetting.name}: ${tentantSetting.url}`);
+  }
+
   console.log(`\n⚙️  Setup Instructions:`);
   console.log(`   1. Add to /etc/hosts (or Windows hosts file):`);
-  console.log(`      127.0.0.1 acme.localhost`);
-  console.log(`      127.0.0.1 beta.localhost`);
+  for (const tentantSetting of tentantsSettings){
+    console.log(`      ${tentantSetting.hostConfig}`);
+  }
+
   console.log(`   2. Restart your browser`);
   console.log(`   3. Visit the URLs above`);
-  console.log(`\n   Or visit http://localhost:${PORT} for setup instructions`);
+  console.log(`\n   Or visit http://localhost:${config.port} for setup instructions`);
 });

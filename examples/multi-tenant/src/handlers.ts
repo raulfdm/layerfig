@@ -1,19 +1,19 @@
 import type { Request, Response } from 'express';
-import type { CreateTaskRequest, UpdateTaskRequest } from './types.js';
+import type { CreateTaskRequest, UpdateTaskRequest } from './types';
 import {
   getTasksByTenant,
   getTaskById,
   createTask,
   updateTask,
   deleteTask,
-} from './data-store.js';
+} from './data-store';
 import {
   renderTaskList,
   renderTask,
   renderNewTask,
   renderEditTask,
   renderError,
-} from './templates.js';
+} from './templates';
 
 export const getHomePage = (req: Request, res: Response): void => {
   const { tenantContext } = req;
@@ -33,6 +33,11 @@ export const getTaskPage = (req: Request, res: Response): void => {
 
   if (!tenantContext) {
     res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  if(!taskId){
+    res.status(400).send(renderError('Task ID is required'));
     return;
   }
 
@@ -84,6 +89,11 @@ export const getEditTaskPage = (req: Request, res: Response): void => {
     return;
   }
 
+  if(!taskId){
+    res.status(400).send(renderError('Task ID is required'));
+    return;
+  }
+
   const task = getTaskById(tenantContext.tenantId, taskId);
 
   if (!task) {
@@ -101,6 +111,11 @@ export const updateTaskHandler = (req: Request, res: Response): void => {
 
   if (!tenantContext) {
     res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  if(!taskId){
+    res.status(400).send(renderError('Task ID is required'));
     return;
   }
 
@@ -129,6 +144,11 @@ export const completeTaskHandler = (req: Request, res: Response): void => {
     return;
   }
 
+  if(!taskId){
+    res.status(400).send(renderError('Task ID is required'));
+    return;
+  }
+
   updateTask(tenantContext.tenantId, taskId, { completed: true });
   res.redirect('/');
 };
@@ -142,6 +162,11 @@ export const uncompleteTaskHandler = (req: Request, res: Response): void => {
     return;
   }
 
+  if(!taskId){
+    res.status(400).send(renderError('Task ID is required'));
+    return;
+  }
+
   updateTask(tenantContext.tenantId, taskId, { completed: false });
   res.redirect('/');
 };
@@ -152,6 +177,11 @@ export const deleteTaskHandler = (req: Request, res: Response): void => {
 
   if (!tenantContext) {
     res.status(400).send(renderError('Tenant context not found'));
+    return;
+  }
+
+  if(!taskId){
+    res.status(400).send(renderError('Task ID is required'));
     return;
   }
 
