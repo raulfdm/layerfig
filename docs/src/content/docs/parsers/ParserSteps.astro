@@ -4,9 +4,9 @@ import PackageManagerCmd from "../../../components/PackageManagerCmd.astro";
 
 interface Props {
 	packageName: string;
-  parserName: string;
+	parserName: string;
 	supportedFiles: string[];
-  source: string
+	source: string;
 }
 
 const formatter = new Intl.ListFormat("en", {
