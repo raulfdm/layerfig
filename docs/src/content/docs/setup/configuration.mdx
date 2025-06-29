@@ -2,34 +2,52 @@
 title: Configuration
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside } from "@astrojs/starlight/components";
 
 ## options.validate
 
-When invoking `ConfigBuilder`, you must provide a `validate` function. This function will receive the final merged object and must return with the result of your validation.
-
-You can use any schema validation to check this object (e.g., zod, valibot, yup) or run your own manual validation. The most important thing is the returned type of this function will be the value of your `config` object.
-
+The `ConfigBuilder` constructor requires a `validate` function. This function receives two arguments: the final merged configuration and a Zod instance (v4). It must return the validated configuration.
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
-import { z } from "zod/v4";
-
-const schema = z.object({
-  appURL: z.url(),
-  port: z.number(),
-});
 
 // config will be type `z.infer<typeof schema>` (the actual object type)
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig),
-}).build();
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      appURL: z.url(),
+      port: z.number(),
+    });
+
+    return schema.parse(finalConfig);
+  },
+})
+  .addSource("base.json")
+  .build();
+```
+
+You can also use other validation libraries. Return the result of the schema validation from the `validate` function, and the `config` object will be typed accordingly:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config";
+import * as v from "valibot";
+
+export const configSchema = v.object({
+  appURL: v.pipe(v.string(), v.url()),
+});
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => v.parse(configSchema, finalConfig),
+})
+  .addSource("base.json")
+  .build();
 ```
 
 ## options.configFolder
+
 > Default: `'./config'`
 
-By default, when using `addSource` for file-based configurations, the library expects a `config` folder in the project's root. However, you can customize this path:
+By default, file-based sources added via `addSource` are loaded from a `config` folder in the project's root. You can customize this path using the `configFolder` option:
 
 ```ts
 const config = new ConfigBuilder({
@@ -40,56 +58,53 @@ const config = new ConfigBuilder({
   .build();
 ```
 
-In this case, the library will look for `<root>/path/to/config-folder/base.json` and load it.
+In this example, the library will look for `<root>/path/to/config-folder/base.json`.
 
 ## options.parser
+
 > Default: simple json parser
 
-This option allows you to add a custom parser for sources that are not `.json` (e.g., `yaml`, `jsonc` , `toml`, etc.).
+This option allows you to define a custom parser for non-JSON file types, such as `.yaml`, `.jsonc`, or `.toml`.
 
 <Aside type="tip">
-    [Check the available parsers](/setup/sources/#other-file-extensions)
+  [Check the available parsers](/setup/sources/#other-file-extensions)
 </Aside>
 
-
 ```ts
-import yarmlParser from '@layerfig/yaml'
+import yarmlParser from "@layerfig/yaml";
 
 const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
-  parser: yarmlParser
+  parser: yarmlParser,
 })
   .addSource("base.yaml")
   .build();
 ```
 
-In this case, the library will look for `<root>/path/to/config-folder/base.json` and load it.
+In this case, the library will look for `<root>/config/base.yaml` and load it.
 
 ## options.slotPrefix
 
-> Default: "$"
+> Default: `"$"`
 
-A string used to identify slots that should be replaced with environment variables.
+A string that identifies placeholders to be replaced with environment variables.
 
-By default, Layerfig looks for placeholders prefixed with `$`. You can customize this prefix if it conflicts with other syntax or to match a team's convention.
+By default, Layerfig looks for placeholders prefixed with `$`. You can customize this prefix to avoid conflicts or to match a team's convention.
 
-<Aside>
-    Read more about [slots](/setup/slots).
-</Aside>
-
+<Aside>Read more about [slots](/setup/slots).</Aside>
 
 For example, to use a double underscore (`__`) as the prefix:
 
 ```ts
 const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
-  slotPrefix: '__'
+  slotPrefix: "__",
 })
   .addSource("base.json")
   .build();
 ```
 
-Layerfig will now look for slots like `__PORT` in your configuration files.
+Layerfig will now look for placeholders like `__PORT` in your configuration files.
 
 ```json
 // config/base.json
@@ -99,7 +114,7 @@ Layerfig will now look for slots like `__PORT` in your configuration files.
 }
 ```
 
-With the `PORT` environment variable set, the resolved configuration would be:
+Assuming the `PORT` environment variable is set, the resolved configuration will be:
 
 ```js
 config.appURL; // http://localhost:3000

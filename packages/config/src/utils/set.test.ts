@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { set } from "./set";
 
 describe("set function", () => {
-	let testObject: Record<string, any>;
+	let testObject: Record<string, unknown>;
 
 	beforeEach(() => {
 		testObject = {};
