@@ -15,11 +15,11 @@ import {
 } from './handlers';
 import { initializeSampleData } from './data-store';
 import { config } from './config';
-import { getTentantSettings } from './utils';
+import { getTenantSettings } from './utils';
 
 const app = express();
 
-const tentantsSettings = getTentantSettings()
+const tentantsSettings = getTenantSettings()
 
 
 // Initialize sample data

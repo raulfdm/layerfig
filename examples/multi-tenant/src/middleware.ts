@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { TenantContext } from './types';
 import { getTenantBySubdomain } from './data-store';
-import { getTentantSettings } from './utils';
+import { getTenantSettings } from './utils';
 
 declare global {
   namespace Express {
@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-const tentantsSettings = getTentantSettings()
+const tentantsSettings = getTenantSettings()
 
 export const tenantMiddleware = (
   req: Request,
@@ -46,7 +46,7 @@ export const tenantMiddleware = (
       <p>No tenant found for subdomain: <strong>${subdomain}</strong></p>
       <p>Available tenants:</p>
       <ul>
-        ${tentantsSettings.map(t => `<li><a href="${t.url}">${t.url}</a> (${t.name})</li>`).join('\n')}
+        ${tentantsSettings.map(t => `<li><a href="${t.url}">${t.url.host}</a> (${t.name})</li>`).join('\n')}
       </ul>
       <p><small>Make sure to add these entries to your /etc/hosts file for local development</small></p>
     `);

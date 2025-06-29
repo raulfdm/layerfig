@@ -1,11 +1,15 @@
-import { config } from "./config"
+import { config } from "./config";
 
-export function getTentantSettings(): {hostConfig: string, url: string,name:string}[] {
-  return Object.values(config.tenants).map(tenantConfig => {
+export function getTenantSettings(): {
+  hostConfig: string;
+  url: URL;
+  name: string;
+}[] {
+  return Object.values(config.tenants).map((tenantConfig) => {
     return {
       hostConfig: `127.0.0.1 ${tenantConfig.id}.localhost`,
-      url: `http://${tenantConfig.subdomain}.localhost:${config.port}`,
-      name: tenantConfig.name
-    }
-  })
+      url: new URL(`http://${tenantConfig.subdomain}.localhost:${config.port}`),
+      name: tenantConfig.name,
+    };
+  });
 }
