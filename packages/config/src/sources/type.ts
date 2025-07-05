@@ -15,6 +15,14 @@ export interface LoadSourceOptions {
 	slotPrefix: string;
 }
 
-export interface Source {
-	loadSource(loadSourceOptions: LoadSourceOptions): Record<string, unknown>;
+export abstract class Source {
+	/**
+	 * An abstract method that must be implemented by any subclass.
+	 * It defines the contract for loading a source.
+	 * @param loadSourceOptions - The options for loading the source.
+	 * @returns A record representing the loaded source data.
+	 */
+	abstract loadSource(
+		loadSourceOptions: LoadSourceOptions,
+	): Record<string, unknown>;
 }

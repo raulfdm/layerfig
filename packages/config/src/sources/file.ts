@@ -1,11 +1,12 @@
 import path from "node:path";
 import { readIfExist } from "../utils";
-import type { LoadSourceOptions, Source } from "./type";
+import { type LoadSourceOptions, Source } from "./type";
 
-export class FileSource implements Source {
+export class FileSource extends Source {
 	#fileName: string;
 
 	constructor(fileName: string) {
+		super();
 		this.#fileName = fileName;
 	}
 
