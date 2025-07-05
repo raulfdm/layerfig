@@ -1,26 +1,27 @@
 {
-  "name": "layerfig",
-  "version": "0.0.0-development",
-  "private": true,
-  "packageManager": "bun@1.2.18",
-  "workspaces": [
-    "packages/*",
-    "docs"
-  ],
-  "scripts": {
-    "build": "turbo build",
-    "check-exports": "turbo check-exports",
-    "check-types": "turbo check-types",
-    "ci": "biome ci .",
-    "format": "biome format --write",
-    "lint": "biome lint --fix",
-    "publish": "turbo publish --filter=\"./packages/*\" --env-mode=loose"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.0.6",
-    "@changesets/cli": "2.29.5",
-    "husky": "9.1.7",
-    "lint-staged": "16.1.2",
-    "turbo": "2.5.4"
-  }
+	"name": "layerfig",
+	"version": "0.0.0-development",
+	"private": true,
+	"packageManager": "bun@1.2.18",
+	"workspaces": [
+		"packages/*",
+		"docs"
+	],
+	"scripts": {
+		"build": "turbo build",
+		"check-exports": "turbo check-exports",
+		"check-types": "turbo check-types",
+		"ci": "biome ci .",
+		"format": "biome format --write",
+		"lint": "biome lint --fix",
+		"publish": "turbo publish --filter=\"./packages/*\" --env-mode=loose",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.0.6",
+		"@changesets/cli": "2.29.5",
+		"husky": "9.1.7",
+		"lint-staged": "16.1.2",
+		"turbo": "2.5.4"
+	}
 }
