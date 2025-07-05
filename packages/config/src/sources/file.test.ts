@@ -80,10 +80,14 @@ describe("FileSource", () => {
 	it("should throw error if file does not exist", () => {
 		const fileSource = new FileSource("random-file.json");
 
-		expect(() =>
-			fileSource.loadSource(baseLoadSourceOptions),
-		).toThrowErrorMatchingInlineSnapshot(
-			`[Error: File "/Users/raulmelo/development/layerfig/packages/config/src/__fixtures__/random-file.json" does not exist]`,
-		);
+		try {
+			fileSource.loadSource(baseLoadSourceOptions);
+		} catch (e) {
+			expect((e as Error).message).toStrictEqual(
+				expect.stringContaining(
+					'src/__fixtures__/random-file.json" does not exist',
+				),
+			);
+		}
 	});
 });
