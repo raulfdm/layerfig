@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 import { set } from "../utils/set";
-import type { LoadSourceOptions, Source } from "./type";
+import { type LoadSourceOptions, Source } from "./type";
 
 const EnvironmentVariableSourceOptions = z.object({
 	/**
@@ -23,12 +23,18 @@ const EnvironmentVariableSourceOptions = z.object({
 type EnvironmentVariableSourceOptions = z.Infer<
 	typeof EnvironmentVariableSourceOptions
 >;
+const PartialEnvironmentVariableSourceOptions =
+	EnvironmentVariableSourceOptions.partial();
+export type PartialEnvironmentVariableSourceOptions = z.Infer<
+	typeof PartialEnvironmentVariableSourceOptions
+>;
 
-export class EnvironmentVariableSource implements Source {
+export class EnvironmentVariableSource extends Source {
 	#options: EnvironmentVariableSourceOptions;
 	#prefixWithSeparator: string;
 
-	constructor(options: Partial<EnvironmentVariableSourceOptions> = {}) {
+	constructor(options: PartialEnvironmentVariableSourceOptions = {}) {
+		super();
 		this.#options = EnvironmentVariableSourceOptions.parse(options);
 
 		this.#prefixWithSeparator = `${this.#options.prefix}${this.#options.prefixSeparator}`;
