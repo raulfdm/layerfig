@@ -49,4 +49,27 @@ describe("EnvironmentVariableSource", () => {
 			}),
 		).toEqual({});
 	});
+
+	it("should consider custom prefix, prefixSeparator and prop separator", () => {
+		const envVarSource = new EnvironmentVariableSource({
+			prefix: "TEST",
+			prefixSeparator: "-",
+			separator: "_-_",
+		});
+
+		expect(
+			envVarSource.loadSource({
+				...baseLoadSourceOptions,
+				runtimeEnv: {
+					"TEST-appURL": "https://my-site.com",
+					"TEST-api_-_port": "5000",
+				},
+			}),
+		).toEqual({
+			appURL: "https://my-site.com",
+			api: {
+				port: "5000",
+			},
+		});
+	});
 });
