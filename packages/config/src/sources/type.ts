@@ -1,5 +1,8 @@
 import type { ConfigParser } from "../parser/define-config-parser";
-import type { RuntimeEnv } from "../types";
+
+interface RuntimeEnv {
+	[key: string]: string | undefined;
+}
 
 export interface LoadSourceOptions {
 	configFolderPath: string;
