@@ -45,7 +45,7 @@
 		"test": "vitest"
 	},
 	"peerDependencies": {
-		"@layerfig/config": "1.0.0"
+		"@layerfig/config": "^1.0.0 | ^2.0.0"
 	},
 	"dependencies": {
 		"smol-toml": "^1.3.4"
