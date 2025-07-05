@@ -7,6 +7,10 @@ interface RuntimeEnv {
 export interface LoadSourceOptions {
 	configFolderPath: string;
 	parser: ConfigParser;
+	/**
+	 * The runtime environment variables to use (e.g., process.env or import.env)
+	 * @default process.env
+	 */
 	runtimeEnv: RuntimeEnv;
 	slotPrefix: string;
 }
