@@ -40,5 +40,4 @@ jobs:
         with:
           version: bun changeset version
           publish: bun changeset publish --tag next
-          title: Version Packages (Next)
           createGithubReleases: true
