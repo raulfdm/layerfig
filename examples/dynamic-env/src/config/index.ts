@@ -13,6 +13,6 @@ export const config = new ConfigBuilder({
 		return configSchema.parse(finalConfig);
 	},
 })
-	.addSource("base.json")
-	.addSource(`${process.env.APP_ENV}.json`)
+	.addSource(ConfigBuilder.fileSource("base.json"))
+	.addSource(ConfigBuilder.fileSource(`${process.env.APP_ENV}.json`))
 	.build();
