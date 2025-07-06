@@ -9,6 +9,6 @@ export const config = new ConfigBuilder({
 		return schema.parse(finalConfig);
 	},
 })
-	.addSource("base.json")
-	.addSource("prod.json")
+	.addSource(ConfigBuilder.fileSource("base.json"))
+	.addSource(ConfigBuilder.fileSource("prod.json"))
 	.build();
