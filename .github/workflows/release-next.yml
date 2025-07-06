@@ -40,5 +40,5 @@ jobs:
         with:
           # We need to update versions and update lockfile
           version: bun run scripts/version-next.ts
-          publish: bun changeset publish --tag next
+          publish: bun changeset publish
           createGithubReleases: true
