@@ -6,10 +6,10 @@ const nextVersionBranch = "changeset-release/next" as const;
 await $`bun changeset version`;
 
 // ... now, we need to update the lock file so the pipelines and docs preview are deployable
-await $`git checkout -b temp`;
-await $`git branch -D ${nextVersionBranch}`;
-await $`git pull origin ${nextVersionBranch}`;
+await $`git fetch origin`;
 await $`git checkout ${nextVersionBranch}`;
+await $`git pull origin ${nextVersionBranch} --rebase`;
+
 await $`bun install --lockfile-only`;
 await $`git add bun.lock`;
 await $`git commit -m "chore: update lock file"`;
