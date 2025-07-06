@@ -7,7 +7,7 @@ import {
 	type PartialEnvironmentVariableSourceOptions,
 } from "./sources/env-var";
 import { FileSource } from "./sources/file";
-import { Source } from "./sources/type";
+import { Source } from "./sources/source";
 import { merge } from "./utils";
 
 const APP_ROOT_PATH = process.cwd();

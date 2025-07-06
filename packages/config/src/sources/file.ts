@@ -1,6 +1,6 @@
 import path from "node:path";
 import { readIfExist } from "../utils";
-import { type LoadSourceOptions, Source } from "./type";
+import { type LoadSourceOptions, Source } from "./source";
 
 export class FileSource extends Source {
 	#fileName: string;
