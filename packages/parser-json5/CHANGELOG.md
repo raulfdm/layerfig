@@ -1,5 +1,11 @@
 # @layerfig/parser-json5
 
+## 4.0.1-next.0
+
+### Patch Changes
+
+- b4c3eb5: Add support for `@layerfig/config` v2, expanding the allowed version range.
+
 ## 4.0.0
 
 ### Patch Changes
