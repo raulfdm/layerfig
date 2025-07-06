@@ -4,7 +4,7 @@ import url from "node:url";
 import { describe, expect, it } from "vitest";
 import { basicJsonParser } from "../parser/parser-json";
 import { EnvironmentVariableSource } from "./env-var";
-import type { LoadSourceOptions } from "./type";
+import type { LoadSourceOptions } from "./source";
 
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 

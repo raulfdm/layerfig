@@ -3,7 +3,7 @@ import url from "node:url";
 import { describe, expect, it } from "vitest";
 import { basicJsonParser } from "../parser/parser-json";
 import { FileSource } from "./file";
-import type { LoadSourceOptions } from "./type";
+import type { LoadSourceOptions } from "./source";
 
 const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
 
