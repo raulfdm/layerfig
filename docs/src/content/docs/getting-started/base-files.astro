@@ -21,8 +21,8 @@ export const config = new ConfigBuilder({
       })
       .parse(finalConfig),
 })
-  .addSource("base.json")
-  .addSource("live.json")
+  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(ConfigBuilder.fileSource("live.json"))
   .build();
 
 `,

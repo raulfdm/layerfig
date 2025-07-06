@@ -31,7 +31,7 @@ export const config = new ConfigBuilder({
   },
   parser: ${Astro.props.parserName}
 })
-  .addSource("${Astro.props.source}")
+  .addSource(ConfigBuilder.fileSource("${Astro.props.source}"))
   .build();
 `;
 ---

@@ -2,7 +2,7 @@
 title: Dynamic Environment
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside } from "@astrojs/starlight/components";
 
 If you maintain multiple environments (e.g., `local`, `dev`, `staging`, `prod`), you’ll have a separate configuration file for each one.
 
@@ -13,13 +13,13 @@ import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig)
+  validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource("base.jsonc")
-  .addSource("local.jsonc")
-  .addSource("dev.jsonc")
-  .addSource("staging.jsonc")
-  .addSource("prod.jsonc")
+  .addSource(ConfigBuilder.fileSource("base.jsonc"))
+  .addSource(ConfigBuilder.fileSource("local.jsonc"))
+  .addSource(ConfigBuilder.fileSource("dev.jsonc"))
+  .addSource(ConfigBuilder.fileSource("staging.jsonc"))
+  .addSource(ConfigBuilder.fileSource("prod.jsonc"))
   .build();
 ```
 
@@ -32,15 +32,16 @@ import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig)
+  validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource("base.jsonc")
-  .addSource(`${process.env.APP_ENV}.jsonc`)
+  .addSource(ConfigBuilder.fileSource("base.jsonc"))
+  .addSource(ConfigBuilder.fileSource(`${process.env.APP_ENV}.jsonc`))
   .build();
 ```
 
 Now, when you run your application with different `APP_ENV` values, it automatically loads the matching configuration file.
 
 <Aside type="tip">
-  Check the [Dynamic Environment example](/examples/dynamic-env) to see it in action.
+  Check the [Dynamic Environment example](/examples/dynamic-env) to see it in
+  action.
 </Aside>
