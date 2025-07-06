@@ -11,5 +11,5 @@ export const config = new ConfigBuilder({
 		return configSchema.parse(finalConfig);
 	},
 })
-	.addSource("base.json")
+	.addSource(ConfigBuilder.fileSource("base.json"))
 	.build();
