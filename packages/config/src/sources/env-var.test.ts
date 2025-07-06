@@ -72,4 +72,47 @@ describe("EnvironmentVariableSource", () => {
 			},
 		});
 	});
+
+	describe("slots", () => {
+		it("should replace slot value", () => {
+			const envVarSource = new EnvironmentVariableSource();
+
+			expect(
+				envVarSource.loadSource({
+					...baseLoadSourceOptions,
+					runtimeEnv: {
+						PORT: "3000",
+						APP_appURL: "http://localhost:$PORT",
+						APP_api__port: "$PORT",
+					},
+				}),
+			).toEqual({
+				api: {
+					port: "3000",
+				},
+				appURL: "http://localhost:3000",
+			});
+		});
+
+		it("should replace values with multiple values", () => {
+			const envVarSource = new EnvironmentVariableSource();
+
+			expect(
+				envVarSource.loadSource({
+					...baseLoadSourceOptions,
+					runtimeEnv: {
+						PORT: "3000",
+						HOST: "127.0.1",
+						APP_appURL: "http://$HOST:$PORT",
+						APP_api__port: "$PORT",
+					},
+				}),
+			).toEqual({
+				api: {
+					port: "3000",
+				},
+				appURL: "http://127.0.1:3000",
+			});
+		});
+	});
 });

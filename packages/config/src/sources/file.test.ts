@@ -60,7 +60,7 @@ describe("FileSource", () => {
 			});
 
 			expect(result).toEqual({
-				appURL: "http://localhost:3000",
+				appURL: "http://$HOST:3000",
 				port: "3000",
 				host: "$HOST",
 			});
