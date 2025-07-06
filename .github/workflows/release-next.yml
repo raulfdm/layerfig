@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - next
+      - 'changeset-release/next'
   workflow_dispatch:
     
 
@@ -38,6 +39,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
-          version: bun changeset version
+          version: bun run scripts/version-next.ts
           publish: bun changeset publish --tag next
           createGithubReleases: true
