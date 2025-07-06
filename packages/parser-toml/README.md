@@ -21,7 +21,7 @@ const config = new ConfigBuilder({
   validate: (fullConfig) => schema.parse(fullConfig),
   parser: tomlParser,
 })
-  .addSource("base.toml")
-  .addSource("live.toml")
+  .addSource(ConfigBuilder.fileSource("base.toml"))
+  .addSource(ConfigBuilder.fileSource("live.toml"))
   .build();
 ```

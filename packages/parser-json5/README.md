@@ -21,7 +21,7 @@ const config = new ConfigBuilder({
   validate: (fullConfig) => schema.parse(fullConfig),
   parser: json5Parser,
 })
-  .addSource("base.json5")
-  .addSource("live.json5")
+  .addSource(ConfigBuilder.fileSource("base.json5"))
+  .addSource(ConfigBuilder.fileSource("live.json5"))
   .build();
 ```
