@@ -264,6 +264,32 @@ describe("ConfigBuilder", () => {
 			delete process.env["TEST-appURL"];
 			delete process.env["TEST-api_-_port"];
 		});
+
+		it("should replace slots", () => {
+			const result = new ConfigBuilder({
+				validate: (finalConfig, z) => {
+					const schema = z.object({
+						appURL: z.url(),
+						port: z.coerce.number().int().positive(),
+					});
+
+					return schema.parse(finalConfig);
+				},
+				runtimeEnv: {
+					APP_port: "$PORT",
+					APP_appURL: "http://$HOST:$PORT",
+					PORT: "3000",
+					HOST: "localhost",
+				},
+			})
+				.addSource(ConfigBuilder.envVarSource())
+				.build();
+
+			expect(result).toEqual({
+				appURL: "http://localhost:3000",
+				port: 3000,
+			});
+		});
 	});
 
 	describe("slots", () => {
