@@ -39,6 +39,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         with:
           # We need to update versions and update lockfile
-          version: bun changeset version && bun install --lockfile-only
+          version: bun run scripts/version-next.ts
           publish: bun changeset publish --tag next
           createGithubReleases: true
