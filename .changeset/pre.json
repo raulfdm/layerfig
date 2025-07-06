@@ -1,0 +1,13 @@
+{
+	"mode": "pre",
+	"tag": "next",
+	"initialVersions": {
+		"docs": "0.0.1",
+		"@layerfig/config": "1.0.0",
+		"@layerfig/parser-json5": "4.0.0",
+		"@layerfig/parser-toml": "3.0.0",
+		"@layerfig/parser-yaml": "4.0.0",
+		"@layerfig/tsconfig": "0.0.1"
+	},
+	"changesets": []
+}
