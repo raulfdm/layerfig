@@ -21,7 +21,7 @@ const config = new ConfigBuilder({
   validate: (fullConfig) => schema.parse(fullConfig),
   parser: yamlParser,
 })
-  .addSource("base.yaml")
-  .addSource("live.yml")
+  .addSource(ConfigBuilder.fileSource("base.yaml"))
+  .addSource(ConfigBuilder.fileSource("live.yml"))
   .build();
 ```

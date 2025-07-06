@@ -11,7 +11,7 @@ export const config = new ConfigBuilder({
 	},
 	parser: tomlParser,
 })
-	.addSource("base.toml")
-	.addSource("local.toml")
-	.addSource("prod.toml")
+	.addSource(ConfigBuilder.fileSource("base.toml"))
+	.addSource(ConfigBuilder.fileSource("local.toml"))
+	.addSource(ConfigBuilder.fileSource("prod.toml"))
 	.build();

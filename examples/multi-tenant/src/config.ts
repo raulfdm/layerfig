@@ -16,4 +16,6 @@ const schema = z.object({
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
-}).addSource("base.json").build();
+})
+  .addSource(ConfigBuilder.fileSource("base.json"))
+  .build();

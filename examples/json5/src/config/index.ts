@@ -11,7 +11,7 @@ export const config = new ConfigBuilder({
 	},
 	parser: json5Parser,
 })
-	.addSource("base.jsonc")
-	.addSource("local.json")
-	.addSource("prod.json5")
+	.addSource(ConfigBuilder.fileSource("base.jsonc"))
+	.addSource(ConfigBuilder.fileSource("local.json"))
+	.addSource(ConfigBuilder.fileSource("prod.json5"))
 	.build();

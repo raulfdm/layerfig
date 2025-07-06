@@ -1,0 +1,8 @@
+{
+  "name": "deno-example",
+  "version": "1.0.0",
+  "description": "A Deno example project using LayerFig",
+  "dependencies": {
+    "@layerfig/config": "2.0.0-next.0"
+  }
+}
