@@ -13,7 +13,7 @@ export interface LoadSourceOptions {
 
 interface MaybeReplaceSlotFromValueOptions
 	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {
-	value: string | undefined;
+	value: string;
 }
 
 interface ExtractedSlot {
@@ -37,7 +37,7 @@ export abstract class Source {
 		value,
 		slotPrefix,
 		runtimeEnv,
-	}: MaybeReplaceSlotFromValueOptions): string | undefined {
+	}: MaybeReplaceSlotFromValueOptions): string {
 		if (!value) {
 			return value;
 		}
@@ -99,6 +99,6 @@ export abstract class Source {
 		 * This ensures that the regex will match the slot name exactly as it appears in the string.
 		 */
 		const safe = slot.replace(/^./, (m) => `\\${m}`);
-		return new RegExp(safe, "g");
+		return new RegExp(safe, "gm");
 	}
 }

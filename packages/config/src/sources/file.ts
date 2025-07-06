@@ -33,10 +33,10 @@ export class FileSource extends Source {
 			throw new Error(fileContentResult.error);
 		}
 
-		const finalContent = this.#replaceSlots({
-			fileContent: fileContentResult.data,
-			runtimeEnv,
+		const finalContent = this.maybeReplaceSlotFromValue({
+			value: fileContentResult.data,
 			slotPrefix,
+			runtimeEnv,
 		});
 
 		const parserResult = parser.load(finalContent);
@@ -50,39 +50,5 @@ export class FileSource extends Source {
 
 	#getFileExtension(filePath: string): string {
 		return path.extname(filePath).slice(1);
-	}
-
-	#replaceSlots({
-		fileContent,
-		runtimeEnv,
-		slotPrefix,
-	}: {
-		fileContent: string;
-		slotPrefix: LoadSourceOptions["slotPrefix"];
-		runtimeEnv: LoadSourceOptions["runtimeEnv"];
-	}) {
-		const regex = new RegExp(`\\${slotPrefix}\\w+`, "g");
-
-		const matches = fileContent.match(regex);
-
-		if (matches === null) {
-			return fileContent;
-		}
-
-		const uniqueSlots = new Set(matches);
-
-		let copy = fileContent;
-
-		for (const slot of uniqueSlots) {
-			const slotWithoutPrefix = slot.replace(slotPrefix, "");
-			const value = runtimeEnv[slotWithoutPrefix];
-
-			// Do not replace if the variable is not there
-			if (typeof value === "string" && value !== "undefined") {
-				copy = copy.replaceAll(slot, value);
-			}
-		}
-
-		return copy;
 	}
 }

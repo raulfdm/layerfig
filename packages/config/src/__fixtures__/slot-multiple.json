@@ -1,5 +1,5 @@
 {
-	"appURL": "http://localhost:$PORT",
+	"appURL": "http://$HOST:$PORT",
 	"port": "$PORT",
 	"host": "$HOST"
 }

@@ -51,6 +51,12 @@ export class EnvironmentVariableSource extends Source {
 		const tempObject = {} as Record<string, unknown>;
 
 		for (const envKey of envKeys) {
+			const envVarValue = runtimeEnv[envKey];
+
+			if (envVarValue === undefined) {
+				continue;
+			}
+
 			const keyWithoutPrefix = envKey.replace(this.#prefixWithSeparator, "");
 			const keyParts = keyWithoutPrefix
 				.split(this.#options.separator)
@@ -60,7 +66,7 @@ export class EnvironmentVariableSource extends Source {
 				tempObject,
 				keyParts,
 				this.maybeReplaceSlotFromValue({
-					value: runtimeEnv[envKey],
+					value: envVarValue,
 					runtimeEnv,
 					slotPrefix,
 				}),

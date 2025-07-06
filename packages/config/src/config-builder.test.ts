@@ -290,7 +290,7 @@ describe("ConfigBuilder", () => {
 				port: 3000,
 			});
 
-			process.env.PORT = undefined;
+			delete process.env.PORT;
 		});
 
 		it("should NOT replace the slotted value if env var is not defined", () => {
@@ -308,6 +308,7 @@ describe("ConfigBuilder", () => {
 
 		it("should handle multiple slots", () => {
 			process.env.PORT = "3000";
+			process.env.HOST = "localhost";
 
 			const schema = z.object({
 				appURL: z.url(),
@@ -324,10 +325,11 @@ describe("ConfigBuilder", () => {
 			).toEqual({
 				appURL: "http://localhost:3000",
 				port: 3000,
-				host: "$HOST",
+				host: "localhost",
 			});
 
-			process.env.PORT = undefined;
+			delete process.env.PORT;
+			delete process.env.HOST;
 		});
 
 		it("should accept custom slot prefix", () => {
@@ -344,7 +346,7 @@ describe("ConfigBuilder", () => {
 				port: 3000,
 			});
 
-			process.env.PORT = undefined;
+			delete process.env.PORT;
 		});
 	});
 });
