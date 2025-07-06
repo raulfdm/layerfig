@@ -40,7 +40,10 @@ export class EnvironmentVariableSource extends Source {
 		this.#prefixWithSeparator = `${this.#options.prefix}${this.#options.prefixSeparator}`;
 	}
 
-	loadSource({ runtimeEnv }: LoadSourceOptions): Record<string, unknown> {
+	loadSource({
+		runtimeEnv,
+		slotPrefix,
+	}: LoadSourceOptions): Record<string, unknown> {
 		const envKeys = Object.keys(runtimeEnv).filter((key) =>
 			key.startsWith(this.#prefixWithSeparator),
 		);
@@ -53,7 +56,15 @@ export class EnvironmentVariableSource extends Source {
 				.split(this.#options.separator)
 				.join(".");
 
-			set(tempObject, keyParts, runtimeEnv[envKey]);
+			set(
+				tempObject,
+				keyParts,
+				this.maybeReplaceSlotFromValue({
+					value: runtimeEnv[envKey],
+					runtimeEnv,
+					slotPrefix,
+				}),
+			);
 		}
 
 		return tempObject;
