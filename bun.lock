@@ -22,7 +22,7 @@
     },
     "packages/config": {
       "name": "@layerfig/config",
-      "version": "2.0.0-next.0",
+      "version": "2.0.0-next.1",
       "dependencies": {
         "zod": "^3.25.67",
       },
@@ -37,7 +37,7 @@
     },
     "packages/parser-json5": {
       "name": "@layerfig/parser-json5",
-      "version": "4.0.1-next.0",
+      "version": "4.0.1-next.1",
       "dependencies": {
         "json5": "^2.2.3",
       },
@@ -54,7 +54,7 @@
     },
     "packages/parser-toml": {
       "name": "@layerfig/parser-toml",
-      "version": "3.0.1-next.0",
+      "version": "3.0.1-next.1",
       "dependencies": {
         "smol-toml": "^1.3.4",
       },
@@ -71,7 +71,7 @@
     },
     "packages/parser-yaml": {
       "name": "@layerfig/parser-yaml",
-      "version": "4.0.1-next.0",
+      "version": "4.0.1-next.1",
       "dependencies": {
         "yaml": "^2.8.0",
       },

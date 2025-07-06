@@ -1,5 +1,11 @@
 # @layerfig/parser-toml
 
+## 3.0.1-next.1
+
+### Patch Changes
+
+- 46dfe83: Update readme
+
 ## 3.0.1-next.0
 
 ### Patch Changes

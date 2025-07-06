@@ -9,5 +9,10 @@
 		"@layerfig/parser-yaml": "4.0.0",
 		"@layerfig/tsconfig": "0.0.1"
 	},
-	"changesets": ["empty-waves-smile", "puny-tigers-sort"]
+	"changesets": [
+		"chatty-parks-happen",
+		"empty-waves-smile",
+		"honest-bees-sink",
+		"puny-tigers-sort"
+	]
 }

@@ -1,5 +1,11 @@
 # @layerfig/parser-yaml
 
+## 4.0.1-next.1
+
+### Patch Changes
+
+- 46dfe83: Update readme
+
 ## 4.0.1-next.0
 
 ### Patch Changes
