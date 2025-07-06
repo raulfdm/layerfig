@@ -8,19 +8,21 @@ Sources define where the library reads your configuration from, such as files or
 
 ## File
 
-For loading files, you must use `ConfigBuilder.fileSource('[file-name].[ext]')`:
+For loading source from files, use `ConfigBuilder.fileSource('[file-name].[ext]')`:
 
-+++ts {4}
+```ts {4}
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
   .addSource(ConfigBuilder.fileSource("base.json"))
   .build();
-+++
+```
 
-If you don't specify any parser, you only can load `.json` files but always using `.fileSource()` method.
+In this case, `base.json` is a file located in the `<root-project-dir>/config` directory (or the one specified via `configFolder`).
 
-In this case, `base.json` is a file present in the `<root-project-dir>/config` (or the one specified via `configFolder`) folder.
+<Aside>
+  Without a specified parser, you can only load `.json`.
+</Aside>
 
 ### Other File Extensions
 
@@ -28,7 +30,7 @@ To support various project needs and preferences, we provide parsers for other c
 
 - [YAML](/parsers/yaml/)
 - [JSONC or JSON5](/parsers/json5/)
-- [Toml](/parsers/toml/)
+- [TOML](/parsers/toml/)
 
 ... or [you can create your own parser](/parsers/custom).
 
@@ -40,7 +42,7 @@ Your application's configuration files are committed to version control and used
 
 To avoid this, use `ConfigBuilder.envVarSource()` to override configuration values at runtime without modifying the source files:
 
-+++ts {8}
+```ts {8}
 import { ConfigBuilder } from "@layerfig/config";
 import { schema } from "./schema";
 
@@ -50,7 +52,7 @@ export const config = new ConfigBuilder({
   .addSource(ConfigBuilder.fileSource("base.json"))
   .addSource(ConfigBuilder.envVarSource())
   .build();
-+++
+```
 
 By default, the library expects environment variables with the following structure:
 
@@ -69,17 +71,17 @@ For example, the environment variable `APP_port` overrides the `port` key in you
 
 Suppose your `base.json` contains:
 
-+++json
+```json
 {
   "appURL": "http://localhost:4444",
   "port": 4444,
   "appEnv": "local"
 }
-+++
+```
 
 Define your schema and load the sources:
 
-+++ts
+```ts
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
@@ -94,13 +96,13 @@ export const config = new ConfigBuilder({
   .addSource(ConfigBuilder.fileSource("base.json"))
   .addSource(ConfigBuilder.envVarSource())
   .build();
-+++
+```
 
 Run the application with overrides:
 
-+++bash
+```bash
 APP_appEnv=prod node index.js
-+++
+```
 
 Since the environment variable source is added last, its values take precedence.
 
@@ -108,7 +110,7 @@ Since the environment variable source is added last, its values take precedence.
 
 Use `__` (double underscores) as a separator to target nested keys:
 
-+++ts
+```ts
 const AppConfigSchema = z.object({
   api: z.object({
     vendor: z.object({
@@ -123,17 +125,17 @@ const config = new ConfigBuilder(AppConfigSchema)
   .addSource(ConfigBuilder.fileSource("base.json"))
   .addSource(ConfigBuilder.envVarSource())
   .build();
-+++
+```
 
-+++bash
+```bash
 APP_api__vendor__aws__apiToken=12345 node index.js
-+++
+```
 
 ### Customizing Environment Variable Settings
 
 You can customize the prefix, prefix separator, and nested-key separator:
 
-+++ts
+```ts
 const config = new ConfigBuilder(AppConfigSchema)
   .addSource(ConfigBuilder.fileSource("base.json"))
   .addSource(
@@ -144,8 +146,8 @@ const config = new ConfigBuilder(AppConfigSchema)
     })
   )
   .build();
-+++
+```
 
-+++bash
+```bash
 VULCAN--api----vendor----aws----apiToken=12345 node index.js
-+++
+```
