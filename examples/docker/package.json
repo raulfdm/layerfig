@@ -12,7 +12,7 @@
     "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
-    "@layerfig/config": "1.0.0",
+    "@layerfig/config": "2.0.0-next.0",
     "compression": "1.8.0",
     "express": "5.1.0",
     "sirv": "3.0.1"
@@ -22,9 +22,9 @@
     "@types/node": "22.13.4",
     "cross-env": "7.0.3",
     "typescript": "5.8.3",
-    "vite": "7.0.0"
+    "vite": "7.0.2"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-arm64-musl": "^4.44.1"
+    "@rollup/rollup-linux-arm64-musl": "^4.44.2"
   }
 }
