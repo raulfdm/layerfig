@@ -38,10 +38,6 @@ export abstract class Source {
 		slotPrefix,
 		runtimeEnv,
 	}: MaybeReplaceSlotFromValueOptions): string {
-		if (!value) {
-			return value;
-		}
-
 		const slots = this.#extractSlotName({
 			slotPrefix,
 			value,
@@ -58,6 +54,11 @@ export abstract class Source {
 
 			if (envVarValue) {
 				newValue = newValue.replace(slot.slotPattern, envVarValue);
+			} else {
+				console.warn(
+					"[SLOT_REPLACEMENT]",
+					`The value for the slot "${slot.envVarName}" is not defined in the runtime environment. The slot will not be replaced.`,
+				);
 			}
 		}
 
@@ -70,15 +71,11 @@ export abstract class Source {
 	}: Pick<MaybeReplaceSlotFromValueOptions, "value" | "slotPrefix">):
 		| ExtractedSlot[]
 		| null {
-		if (!value) {
-			return null;
-		}
-
 		const regex = new RegExp(`\\${slotPrefix}\\w+`, "g");
 		const matches = value.match(regex);
 
 		if (matches === null) {
-			return [];
+			return null;
 		}
 
 		const uniqueSlots = new Set(matches);
