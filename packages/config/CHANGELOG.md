@@ -1,5 +1,13 @@
 # @layerfig/config
 
+## 2.0.0-next.2
+
+### Minor Changes
+
+- e1a15a4: Log if slot was defined but no env var with the slot name was found.
+
+  This intend to help developers easily understand if an environment variable is missing.
+
 ## 2.0.0-next.1
 
 ### Minor Changes
