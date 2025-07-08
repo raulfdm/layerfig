@@ -1,5 +1,5 @@
 import { ConfigBuilder } from "@layerfig/config";
-import yamlParser from "@layerfig/parser-yaml";
+import { FileSource } from "@layerfig/config/sources/file";
 
 export const config = new ConfigBuilder({
 	validate: (finalConfig, z) => {
@@ -9,8 +9,7 @@ export const config = new ConfigBuilder({
 
 		return configSchema.parse(finalConfig);
 	},
-	parser: yamlParser,
 })
-	.addSource(ConfigBuilder.fileSource("base.yaml"))
-	.addSource(ConfigBuilder.fileSource("prod.yaml"))
+	.addSource(new FileSource("base.json"))
+	.addSource(new FileSource("prod.json"))
 	.build();

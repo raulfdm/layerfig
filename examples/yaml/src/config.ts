@@ -1,5 +1,6 @@
 import { ConfigBuilder } from "@layerfig/config";
-import json5Parser from "@layerfig/parser-json5";
+import { FileSource } from "@layerfig/config/sources/file";
+import yamlParser from "@layerfig/parser-yaml";
 
 export const config = new ConfigBuilder({
 	validate: (finalConfig, z) => {
@@ -9,9 +10,8 @@ export const config = new ConfigBuilder({
 
 		return configSchema.parse(finalConfig);
 	},
-	parser: json5Parser,
+	parser: yamlParser,
 })
-	.addSource(ConfigBuilder.fileSource("base.jsonc"))
-	.addSource(ConfigBuilder.fileSource("local.json"))
-	.addSource(ConfigBuilder.fileSource("prod.json5"))
+	.addSource(new FileSource("base.yaml"))
+	.addSource(new FileSource("prod.yaml"))
 	.build();
