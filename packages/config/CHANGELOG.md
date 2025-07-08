@@ -52,37 +52,32 @@
 
 - b4c3eb5: BREAKING CHANGE:
 
-  ## .addSource(<file-name>)
+  ## .addSource() API Change
 
-  The API for loading a file source has changed. Instead of passing a string, you now pass `ConfigBuilder.fileSource(<file-name>)`:
-
-  ```diff
-  const config = new ConfigBuilder({
-  	validate: (finalConfig) => finalConfig,
-  })
-  -.addSource("config.json")
-  +.addSource(ConfigBuilder.fileSource("config.json"))
-  .build()
-  ```
-
-  Under the hood, both the environment source and the file source now extend from a base class. This greatly eases maintenance and the implementation of possible extensions.
-
-  ## Rename `ConfigBuilder.createEnvVarSource` to `ConfigBuilder.envVarSource`
-
-  The name was changed to align with the pattern used for `.fileSource`:
+  The API for loading a file source has changed. Instead of passing a file path as a string, you now import a source from the new `/sources/*` sub-modules and define it:
 
   ```diff
+  import { ConfigBuilder } from "@layerfig/config"
+  +import { FileSource } from "@layerfig/config/sources/file"
+  +import { EnvironmentVariableSource } from "@layerfig/config/sources/env"
+
   const config = new ConfigBuilder({
-  	validate: (finalConfig) => finalConfig,
+    validate: (finalConfig) => finalConfig,
   })
-  -.addSource(ConfigBuilder.createEnvVarSource(options))
-  +.addSource(ConfigBuilder.envVarSource(options))
-  .build()
+  -  .addSource("config.json")
+  +  .addSource(new FileSource("config.json"))
+  -  .addSource(ConfigBuilder.createEnvVarSource(options))
+  +  .addSource(new EnvironmentVariableSource(options))
+    .build()
   ```
 
-  ## `ConfigBuilder.envVarSource` no longer accepts `runtimeEnv`
+  Under the hood, both the file source and the environment source now extend from a common base class. This change simplifies maintenance and makes it easier to implement future extensions.
 
-  Previously, you could pass a runtime environment:
+  ## `runtimeEnv` Moved to `ConfigBuilder`
+
+  The `EnvironmentVariableSource` no longer accepts the `runtimeEnv` option.
+
+  Previously, you could pass a runtime environment directly to the source:
 
   ```ts
   const config = new ConfigBuilder({
@@ -96,18 +91,18 @@
     .build();
   ```
 
-  This option has been moved to the `ConfigBuilder` constructor:
+  This option has been moved to the `ConfigBuilder` constructor to centralize environment variable handling:
 
   ```ts
   const config = new ConfigBuilder({
     validate: (finalConfig) => finalConfig,
     runtimeEnv: import.meta.env, // ... to here
   })
-    .addSource(ConfigBuilder.envVarSource())
+    .addSource(new EnvironmentVariableSource())
     .build();
   ```
 
-  This change aligns the internal usage of `process.env` within `ConfigBuilder` into a single strategy.
+  This change ensures a single, consistent strategy for managing environment variables within the `ConfigBuilder`.
 
 ## 1.0.0
 
