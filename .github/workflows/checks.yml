@@ -14,13 +14,9 @@ jobs:
         uses: oven-sh/setup-bun@v2.0.2
         with:
           bun-version-file: "./package.json"
-          no-cache: true
 
       - name: Install dependencies
         run: bun i
-
-      - name: Install Global Dependencies
-        run: bun install turbo --dev
 
       - name: Check format and lint checks
         run: bun run ci
