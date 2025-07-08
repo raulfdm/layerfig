@@ -45,6 +45,7 @@ Then, use your custom parser by passing it to the `ConfigBuilder`:
 
 ```ts {2,13}
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { customParser } from "./path/to/custom-parser";
 
 export const config = new ConfigBuilder({
@@ -58,8 +59,8 @@ export const config = new ConfigBuilder({
   },
   parser: customParser,
 })
-  .addSource(ConfigBuilder.fileSource("base.ini"))
-  .addSource(ConfigBuilder.fileSource("live.ini"))
+  .addSource(new FileSource("base.ini"))
+  .addSource(new FileSource("live.ini"))
   .build();
 ```
 

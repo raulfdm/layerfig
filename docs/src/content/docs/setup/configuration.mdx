@@ -10,6 +10,7 @@ The `ConfigBuilder` constructor requires a `validate` function. This function re
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 
 // config will be type `z.infer<typeof schema>` (the actual object type)
 export const config = new ConfigBuilder({
@@ -22,7 +23,7 @@ export const config = new ConfigBuilder({
     return schema.parse(finalConfig);
   },
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   .build();
 ```
 
@@ -30,6 +31,7 @@ You can also use other validation libraries. Return the result of the schema val
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import * as v from "valibot";
 
 export const configSchema = v.object({
@@ -39,7 +41,7 @@ export const configSchema = v.object({
 export const config = new ConfigBuilder({
   validate: (finalConfig) => v.parse(configSchema, finalConfig),
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   .build();
 ```
 
@@ -54,7 +56,7 @@ const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
   configFolder: "./path/to/config-folder",
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   .build();
 ```
 
@@ -77,7 +79,7 @@ const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
   parser: yamlParser,
 })
-  .addSource(ConfigBuilder.fileSource("base.yaml"))
+  .addSource(new FileSource("base.yaml"))
   .build();
 ```
 
@@ -100,7 +102,7 @@ const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
   slotPrefix: "__",
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   .build();
 ```
 

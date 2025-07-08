@@ -60,6 +60,8 @@ Since the configuration follows a cascading approach, the final result depends o
 
 ```ts
 import { ConfigBuilder, z } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
 
 const schema = z.object({
   baseURL: z.url(),
@@ -69,12 +71,12 @@ export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
   /* 1. Starts with a base configuration. */
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   /* 2. Merges with the previous source. */
-  .addSource(ConfigBuilder.fileSource("live.json"))
+  .addSource(new FileSource("live.json"))
   /* 3. Allows environment variables to 
         override previous values (optional). */
-  .addSource(ConfigBuilder.envVarSource())
+  .addSource(new EnvironmentVariableSource())
   /* 4. Validates the merged configuration and returns 
         the final, type-safe object. */
   .build();

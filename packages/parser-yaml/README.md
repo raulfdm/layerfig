@@ -14,14 +14,16 @@ Define it in the layerfig config:
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import yamlParser from "@layerfig/parser-yaml";
+
 import { schema } from "./schema";
 
 const config = new ConfigBuilder({
   validate: (fullConfig) => schema.parse(fullConfig),
   parser: yamlParser,
 })
-  .addSource(ConfigBuilder.fileSource("base.yaml"))
-  .addSource(ConfigBuilder.fileSource("live.yml"))
+  .addSource(new FileSource("base.yaml"))
+  .addSource(new FileSource("live.yml"))
   .build();
 ```

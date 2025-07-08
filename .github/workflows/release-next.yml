@@ -28,9 +28,6 @@ jobs:
       - name: Install Dependencies
         run: bun i
 
-      - name: Install Global Dependencies
-        run: bun install turbo --dev
-
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1.5.3

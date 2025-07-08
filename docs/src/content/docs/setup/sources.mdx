@@ -8,13 +8,17 @@ Sources define where the library reads your configuration from, such as files or
 
 ## File
 
-For loading source from files, use `ConfigBuilder.fileSource('[file-name].[ext]')`:
+For loading source from files, use `new FileSource('[file-name].[ext]')`:
 
 ```ts {4}
+import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { schema } from "./schema";
+
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   .build();
 ```
 
@@ -40,17 +44,19 @@ Consider the following scenario:
 
 Your application's configuration files are committed to version control and used to build a Docker image for production. When running this image locally for debugging, any change to a configuration value requires rebuilding the image. This process can be slow and results in testing a modified image rather than the actual production build.
 
-To avoid this, use `ConfigBuilder.envVarSource()` to override configuration values at runtime without modifying the source files:
+To avoid this, use `EnvironmentVariableSource` to override configuration values at runtime without modifying the source files:
 
 ```ts {8}
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
-  .addSource(ConfigBuilder.envVarSource())
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
@@ -82,6 +88,9 @@ Suppose your `base.json` contains:
 Define your schema and load the sources:
 
 ```ts
+import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
@@ -93,8 +102,8 @@ export const config = new ConfigBuilder({
     return schema.parse(finalConfig);
   },
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
-  .addSource(ConfigBuilder.envVarSource())
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
@@ -111,7 +120,11 @@ Since the environment variable source is added last, its values take precedence.
 Use `__` (double underscores) as a separator to target nested keys:
 
 ```ts
-const AppConfigSchema = z.object({
+import { ConfigBuilder, z } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+
+const schema = z.object({
   api: z.object({
     vendor: z.object({
       aws: z.object({
@@ -121,9 +134,11 @@ const AppConfigSchema = z.object({
   }),
 });
 
-const config = new ConfigBuilder(AppConfigSchema)
-  .addSource(ConfigBuilder.fileSource("base.json"))
-  .addSource(ConfigBuilder.envVarSource())
+const config = new ConfigBuilder({
+  validate: finalConfig => schema.parse(finalConfig)
+})
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
@@ -136,10 +151,16 @@ APP_api__vendor__aws__apiToken=12345 node index.js
 You can customize the prefix, prefix separator, and nested-key separator:
 
 ```ts
-const config = new ConfigBuilder(AppConfigSchema)
-  .addSource(ConfigBuilder.fileSource("base.json"))
+import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { schema } from "./schema";
+
+const config = new ConfigBuilder({
+  validate: finalConfig => schema.parse(finalConfig)
+})
+  .addSource(new FileSource("base.json"))
   .addSource(
-    ConfigBuilder.envVarSource({
+    new EnvironmentVariableSource({
       prefix: "VULCAN",
       prefixSeparator: "--",
       separator: "----",

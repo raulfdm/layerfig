@@ -2,6 +2,8 @@ import path from "node:path";
 import { readIfExist } from "../utils";
 import { type LoadSourceOptions, Source } from "./source";
 
+const APP_ROOT_PATH = process.cwd();
+
 export class FileSource extends Source {
 	#fileName: string;
 
@@ -11,13 +13,21 @@ export class FileSource extends Source {
 	}
 
 	loadSource({
-		configFolderPath,
+		relativeConfigFolderPath,
 		parser,
 		slotPrefix,
 		runtimeEnv,
 	}: LoadSourceOptions): Record<string, unknown> {
-		const filePath = path.resolve(configFolderPath, this.#fileName);
-		const fileExtension = this.#getFileExtension(filePath);
+		const absoluteConfigFolderPath = path.join(
+			APP_ROOT_PATH,
+			relativeConfigFolderPath,
+		);
+
+		const absoluteFilePath = path.resolve(
+			absoluteConfigFolderPath,
+			this.#fileName,
+		);
+		const fileExtension = this.#getFileExtension(absoluteFilePath);
 
 		if (parser.acceptsExtension(fileExtension) === false) {
 			throw new Error(
@@ -27,7 +37,7 @@ export class FileSource extends Source {
 			);
 		}
 
-		const fileContentResult = readIfExist(filePath);
+		const fileContentResult = readIfExist(absoluteFilePath);
 
 		if (fileContentResult.ok === false) {
 			throw new Error(fileContentResult.error);
