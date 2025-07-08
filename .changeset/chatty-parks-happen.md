@@ -7,6 +7,9 @@ Expanded the `slot` feature to support environment variables.
 You can now use environment variables with slots. For example, given the following setup:
 
 ```ts
+import { ConfigBuilder } from "@layerfig/config";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+
 const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
@@ -17,7 +20,7 @@ const config = new ConfigBuilder({
     return schema.parse(finalConfig);
   },
 })
-  .addSource(ConfigBuilder.envVarSource())
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
