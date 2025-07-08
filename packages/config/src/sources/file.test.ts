@@ -1,16 +1,10 @@
-import path from "node:path";
-import url from "node:url";
 import { describe, expect, it } from "vitest";
 import { basicJsonParser } from "../parser/parser-json";
 import { FileSource } from "./file";
 import type { LoadSourceOptions } from "./source";
 
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
-
-const fixturePaths = path.resolve(__dirname, "../__fixtures__");
-
 const baseLoadSourceOptions: LoadSourceOptions = {
-	configFolderPath: fixturePaths,
+	relativeConfigFolderPath: "src/__fixtures__",
 	parser: basicJsonParser,
 	runtimeEnv: process.env,
 	slotPrefix: "$",
