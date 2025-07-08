@@ -59,6 +59,16 @@
 				"types": "./dist/sources/file/index.d.cts",
 				"default": "./dist/sources/file/index.cjs"
 			}
+		},
+		"./sources/object": {
+			"import": {
+				"types": "./dist/sources/object/index.d.ts",
+				"default": "./dist/sources/object/index.js"
+			},
+			"require": {
+				"types": "./dist/sources/object/index.d.cts",
+				"default": "./dist/sources/object/index.cjs"
+			}
 		}
 	},
 	"scripts": {

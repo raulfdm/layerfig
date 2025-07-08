@@ -5,6 +5,7 @@ export default defineConfig({
 		index: "./src/index.ts",
 		"sources/env/index": "./src/sources/env-var.ts",
 		"sources/file/index": "./src/sources/file.ts",
+		"sources/object/index": "./src/sources/object.ts",
 	},
 	dts: true,
 	sourcemap: true,
