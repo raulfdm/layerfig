@@ -10,9 +10,9 @@
 		"@layerfig/tsconfig": "0.0.1"
 	},
 	"changesets": [
+		"anohter-random-changeset",
 		"bitter-jokes-relate",
 		"chatty-parks-happen",
-		"empty-waves-smile",
 		"honest-bees-sink",
 		"puny-tigers-sort",
 		"salty-pianos-rescue"
