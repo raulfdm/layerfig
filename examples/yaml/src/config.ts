@@ -1,4 +1,5 @@
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import yamlParser from "@layerfig/parser-yaml";
 
 export const config = new ConfigBuilder({
@@ -11,6 +12,6 @@ export const config = new ConfigBuilder({
 	},
 	parser: yamlParser,
 })
-	.addSource(ConfigBuilder.fileSource("base.yaml"))
-	.addSource(ConfigBuilder.fileSource("prod.yaml"))
+	.addSource(new FileSource("base.yaml"))
+	.addSource(new FileSource("prod.yaml"))
 	.build();
