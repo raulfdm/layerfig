@@ -1,4 +1,5 @@
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 
 export const config = new ConfigBuilder({
   validate: (fullConfig, z) => {
@@ -9,6 +10,6 @@ export const config = new ConfigBuilder({
     return schema.parse(fullConfig);
   },
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
-  .addSource(ConfigBuilder.fileSource("live.json"))
+  .addSource(new FileSource("base.json"))
+  .addSource(new FileSource("live.json"))
   .build();

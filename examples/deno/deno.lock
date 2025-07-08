@@ -14,7 +14,7 @@
     "jsr:@std/net@^1.0.4": "1.0.4",
     "jsr:@std/path@^1.1.1": "1.1.1",
     "jsr:@std/streams@^1.0.10": "1.0.10",
-    "npm:@layerfig/config@2.0.0-next.0": "2.0.0-next.0"
+    "npm:@layerfig/config@2.0.0-next.3": "2.0.0-next.3"
   },
   "jsr": {
     "@std/assert@1.0.13": {
@@ -75,14 +75,14 @@
     }
   },
   "npm": {
-    "@layerfig/config@2.0.0-next.0": {
-      "integrity": "sha512-pwdJ8FVsme5UFsSBmQpq5kZCyg3bxP0VUslZyNWnrBiSGU1ORmrbX3KFq/U65d6HtD5FlJs5cwh+PfQ2UOeLuQ==",
+    "@layerfig/config@2.0.0-next.3": {
+      "integrity": "sha512-L6+AlCJSCREWOYJ9UtrgngqoD4Ktnv9EdoYtmB832c4CKhaUIvFMP8jP2PLI/fUBmSx6B+5/TzhE3JP1TBkoww==",
       "dependencies": [
         "zod"
       ]
     },
-    "zod@3.25.74": {
-      "integrity": "sha512-J8poo92VuhKjNknViHRAIuuN6li/EwFbAC8OedzI8uxpEPGiXHGQu9wemIAioIpqgfB4SySaJhdk0mH5Y4ICBg=="
+    "zod@3.25.76": {
+      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     }
   },
   "workspace": {
@@ -92,7 +92,7 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@layerfig/config@2.0.0-next.0"
+        "npm:@layerfig/config@2.0.0-next.3"
       ]
     }
   }
