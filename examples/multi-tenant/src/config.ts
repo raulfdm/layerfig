@@ -1,4 +1,5 @@
 import { ConfigBuilder, z } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 
 const tenants = z.enum(["acme", "beta"]);
 
@@ -17,5 +18,5 @@ const schema = z.object({
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource(ConfigBuilder.fileSource("base.json"))
+  .addSource(new FileSource("base.json"))
   .build();
