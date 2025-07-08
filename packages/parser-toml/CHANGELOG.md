@@ -1,5 +1,46 @@
 # @layerfig/parser-toml
 
+## 4.0.0-next.2
+
+### Major Changes
+
+- cc53929: Remove v1 API support from `@layerfig/config`.
+
+  This major version separates source modules from the core package. Consequently, static helpers like `ConfigBuilder.fileSource` have been removed. You must now import and instantiate sources directly from their own modules.
+
+  For example:
+
+  Before:
+
+  ```ts
+  import { ConfigBuilder } from "@layerfig/config";
+
+  import { schema } from "./schema";
+
+  const config = new ConfigBuilder({
+    validate: (fullConfig) => schema.parse(fullConfig),
+  })
+    .addSource(ConfigBuilder.fileSource("base.toml"))
+    .addSource(ConfigBuilder.fileSource("live.toml"))
+    .build();
+  ```
+
+  After:
+
+  ```ts
+  import { ConfigBuilder } from "@layerfig/config";
+  import { FileSource } from "@layerfig/config/sources/file";
+
+  import { schema } from "./schema";
+
+  const config = new ConfigBuilder({
+    validate: (fullConfig) => schema.parse(fullConfig),
+  })
+    .addSource(new FileSource("base.toml"))
+    .addSource(new FileSource("live.toml"))
+    .build();
+  ```
+
 ## 3.0.1-next.1
 
 ### Patch Changes
