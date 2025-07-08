@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import { ConfigBuilder, type ConfigBuilderOptions } from "./config-builder";
 import { defineConfigParser } from "./parser/define-config-parser";
+import { EnvironmentVariableSource } from "./sources/env-var";
+import { FileSource } from "./sources/file";
 
 const baseConfigBuilderOptions: ConfigBuilderOptions = {
 	validate: (finalConfig, z) => {
@@ -35,8 +37,8 @@ describe("ConfigBuilder", () => {
 			getConfig({
 				validate: (config) => schema.parse(config),
 			})
-				.addSource(ConfigBuilder.fileSource("base-deep.json"))
-				.addSource(ConfigBuilder.fileSource("dev-deep.json"))
+				.addSource(new FileSource("base-deep.json"))
+				.addSource(new FileSource("dev-deep.json"))
 				.build(),
 		).toEqual({
 			foo: {
@@ -62,7 +64,7 @@ describe("ConfigBuilder", () => {
 
 	it("should throw an error if the file does not exist", () => {
 		try {
-			getConfig().addSource(ConfigBuilder.fileSource("not-exist.json")).build();
+			getConfig().addSource(new FileSource("not-exist.json")).build();
 		} catch (error) {
 			const e = error as Error;
 			expect(e.message).toEqual(
@@ -124,14 +126,14 @@ describe("ConfigBuilder", () => {
 					},
 				}),
 			})
-				.addSource(ConfigBuilder.fileSource("base.json"))
+				.addSource(new FileSource("base.json"))
 				.build(),
 		).toThrowErrorMatchingInlineSnapshot("[Error: This file is not valid]");
 	});
 
 	it("should throw an error if file type is not accepted", () => {
 		expect(() =>
-			getConfig().addSource(ConfigBuilder.fileSource("base.txt")).build(),
+			getConfig().addSource(new FileSource("base.txt")).build(),
 		).toThrowErrorMatchingInlineSnapshot(
 			`[Error: ".txt" file is not supported by this parser. Accepted files are: "json"]`,
 		);
@@ -150,7 +152,7 @@ describe("ConfigBuilder", () => {
 				return schemaInsideValidate.parse(finalConfig);
 			},
 		})
-			.addSource(ConfigBuilder.fileSource("base.json"))
+			.addSource(new FileSource("base.json"))
 			.build();
 
 		expect(config).toEqual({
@@ -163,9 +165,7 @@ describe("ConfigBuilder", () => {
 
 	describe("from json", () => {
 		it("should load .json files by default", () => {
-			const result = getConfig()
-				.addSource(ConfigBuilder.fileSource("base.json"))
-				.build();
+			const result = getConfig().addSource(new FileSource("base.json")).build();
 
 			expect(result).toEqual({
 				appURL: "https://my-site.com",
@@ -178,8 +178,8 @@ describe("ConfigBuilder", () => {
 		it("should add layer json files", () => {
 			expect(
 				getConfig()
-					.addSource(ConfigBuilder.fileSource("base.json"))
-					.addSource(ConfigBuilder.fileSource("dev.json"))
+					.addSource(new FileSource("base.json"))
+					.addSource(new FileSource("dev.json"))
 					.build(),
 			).toEqual({
 				appURL: "https://dev.company-app.com",
@@ -190,8 +190,8 @@ describe("ConfigBuilder", () => {
 
 			expect(
 				getConfig()
-					.addSource(ConfigBuilder.fileSource("dev.json"))
-					.addSource(ConfigBuilder.fileSource("base.json"))
+					.addSource(new FileSource("dev.json"))
+					.addSource(new FileSource("base.json"))
 					.build(),
 			).toEqual({
 				appURL: "https://my-site.com",
@@ -208,7 +208,7 @@ describe("ConfigBuilder", () => {
 			process.env.APP_api__port = "3000";
 
 			const result = getConfig()
-				.addSource(ConfigBuilder.envVarSource())
+				.addSource(new EnvironmentVariableSource())
 				.build();
 
 			expect(result).toEqual({
@@ -229,7 +229,7 @@ describe("ConfigBuilder", () => {
 					APP_api__port: "4422",
 				},
 			})
-				.addSource(ConfigBuilder.envVarSource())
+				.addSource(new EnvironmentVariableSource())
 				.build();
 
 			expect(result).toEqual({
@@ -246,7 +246,7 @@ describe("ConfigBuilder", () => {
 
 			const result = getConfig()
 				.addSource(
-					ConfigBuilder.envVarSource({
+					new EnvironmentVariableSource({
 						prefix: "TEST",
 						prefixSeparator: "-",
 						separator: "_-_",
@@ -282,7 +282,7 @@ describe("ConfigBuilder", () => {
 					HOST: "localhost",
 				},
 			})
-				.addSource(ConfigBuilder.envVarSource())
+				.addSource(new EnvironmentVariableSource())
 				.build();
 
 			expect(result).toEqual({
@@ -310,7 +310,7 @@ describe("ConfigBuilder", () => {
 			process.env.PORT = "3000";
 
 			expect(
-				getConfig().addSource(ConfigBuilder.fileSource("slot.json")).build(),
+				getConfig().addSource(new FileSource("slot.json")).build(),
 			).toEqual({
 				appURL: "http://localhost:3000",
 				port: 3000,
@@ -324,7 +324,7 @@ describe("ConfigBuilder", () => {
 				getConfig({
 					validate: (finalConfig) => finalConfig,
 				})
-					.addSource(ConfigBuilder.fileSource("slot.json"))
+					.addSource(new FileSource("slot.json"))
 					.build(),
 			).toEqual({
 				appURL: "http://localhost:$PORT",
@@ -346,7 +346,7 @@ describe("ConfigBuilder", () => {
 				getConfig({
 					validate: (config) => schema.parse(config),
 				})
-					.addSource(ConfigBuilder.fileSource("slot-multiple.json"))
+					.addSource(new FileSource("slot-multiple.json"))
 					.build(),
 			).toEqual({
 				appURL: "http://localhost:3000",
@@ -365,7 +365,7 @@ describe("ConfigBuilder", () => {
 				getConfig({
 					slotPrefix: "@",
 				})
-					.addSource(ConfigBuilder.fileSource("slot-prefix.json"))
+					.addSource(new FileSource("slot-prefix.json"))
 					.build(),
 			).toEqual({
 				appURL: "http://localhost:3000",
