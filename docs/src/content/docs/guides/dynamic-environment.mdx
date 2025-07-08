@@ -10,16 +10,17 @@ However, you can’t load them all at once:
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource(ConfigBuilder.fileSource("base.jsonc"))
-  .addSource(ConfigBuilder.fileSource("local.jsonc"))
-  .addSource(ConfigBuilder.fileSource("dev.jsonc"))
-  .addSource(ConfigBuilder.fileSource("staging.jsonc"))
-  .addSource(ConfigBuilder.fileSource("prod.jsonc"))
+  .addSource(new FileSource("base.jsonc"))
+  .addSource(new FileSource("local.jsonc"))
+  .addSource(new FileSource("dev.jsonc"))
+  .addSource(new FileSource("staging.jsonc"))
+  .addSource(new FileSource("prod.jsonc"))
   .build();
 ```
 
@@ -29,13 +30,14 @@ A better solution is to use an environment variable (for example, `APP_ENV=local
 
 ```ts
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource(ConfigBuilder.fileSource("base.jsonc"))
-  .addSource(ConfigBuilder.fileSource(`${process.env.APP_ENV}.jsonc`))
+  .addSource(new FileSource("base.jsonc"))
+  .addSource(new FileSource(`${process.env.APP_ENV}.jsonc`))
   .build();
 ```
 
