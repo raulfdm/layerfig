@@ -5,8 +5,8 @@ interface RuntimeEnv {
 }
 
 export interface LoadSourceOptions {
-	configFolderPath: string;
 	parser: ConfigParser;
+	relativeConfigFolderPath: string;
 	runtimeEnv: RuntimeEnv;
 	slotPrefix: string;
 }

@@ -1,16 +1,8 @@
-import path from "node:path";
 import { z as zod } from "zod/v4";
 import type { ConfigParser } from "./parser/define-config-parser";
 import { basicJsonParser } from "./parser/parser-json";
-import {
-	EnvironmentVariableSource,
-	type PartialEnvironmentVariableSourceOptions,
-} from "./sources/env-var";
-import { FileSource } from "./sources/file";
 import { Source } from "./sources/source";
 import { merge } from "./utils";
-
-const APP_ROOT_PATH = process.cwd();
 
 export interface ConfigBuilderOptions<
 	T extends object = Record<string, unknown>,
@@ -46,24 +38,11 @@ export interface ConfigBuilderOptions<
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#options: ConfigBuilderOptions<T>;
-	#appConfigFolderAbsolutePath: string;
+
 	#sources: Source[] = [];
 
 	constructor(options: ConfigBuilderOptions<T>) {
 		this.#options = options;
-		this.#appConfigFolderAbsolutePath = path.join(
-			APP_ROOT_PATH,
-			this.#configFolder,
-		);
-	}
-
-	/* Sources */
-	static envVarSource(options?: PartialEnvironmentVariableSourceOptions) {
-		return new EnvironmentVariableSource(options);
-	}
-
-	static fileSource(fileName: string) {
-		return new FileSource(fileName);
 	}
 
 	/* Public */
@@ -79,9 +58,9 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		for (const source of this.#sources) {
 			const data = source.loadSource({
 				parser: this.#parser,
-				configFolderPath: this.#appConfigFolderAbsolutePath,
 				runtimeEnv: this.#runtime,
 				slotPrefix: this.#slotPrefix,
+				relativeConfigFolderPath: this.#configFolder,
 			});
 
 			partialConfig = merge({}, partialConfig, data);
@@ -101,12 +80,13 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	}
 
 	/* Private */
-	get #parser(): ConfigParser {
-		return this.#options.parser || basicJsonParser;
-	}
 
 	get #configFolder() {
 		return this.#options.configFolder || "./config";
+	}
+
+	get #parser(): ConfigParser {
+		return this.#options.parser || basicJsonParser;
 	}
 
 	get #runtime() {
