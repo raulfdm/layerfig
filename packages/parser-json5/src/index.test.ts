@@ -1,13 +1,12 @@
 import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import json5Parser from "./index";
 
 describe("json5Parser", () => {
 	it("should load config from .json file", () => {
-		const result = getConfig()
-			.addSource(ConfigBuilder.fileSource("base.json"))
-			.build();
+		const result = getConfig().addSource(new FileSource("base.json")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -18,9 +17,7 @@ describe("json5Parser", () => {
 	});
 
 	it("should load config from .jsonc file", () => {
-		const result = getConfig()
-			.addSource(ConfigBuilder.fileSource("base.jsonc"))
-			.build();
+		const result = getConfig().addSource(new FileSource("base.jsonc")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -31,9 +28,7 @@ describe("json5Parser", () => {
 	});
 
 	it("should load config from .json5 file", () => {
-		const result = getConfig()
-			.addSource(ConfigBuilder.fileSource("base.json5"))
-			.build();
+		const result = getConfig().addSource(new FileSource("base.json5")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -46,8 +41,8 @@ describe("json5Parser", () => {
 	it("should add layer json files", () => {
 		expect(
 			getConfig()
-				.addSource(ConfigBuilder.fileSource("base.jsonc"))
-				.addSource(ConfigBuilder.fileSource("dev.jsonc"))
+				.addSource(new FileSource("base.jsonc"))
+				.addSource(new FileSource("dev.jsonc"))
 				.build(),
 		).toEqual({
 			appURL: "https://dev.company-app.com",
@@ -58,8 +53,8 @@ describe("json5Parser", () => {
 
 		expect(
 			getConfig()
-				.addSource(ConfigBuilder.fileSource("dev.jsonc"))
-				.addSource(ConfigBuilder.fileSource("base.jsonc"))
+				.addSource(new FileSource("dev.jsonc"))
+				.addSource(new FileSource("base.jsonc"))
 				.build(),
 		).toEqual({
 			appURL: "https://my-site.com",
@@ -71,7 +66,7 @@ describe("json5Parser", () => {
 
 	it("should throw an error if the file extension is not supported", () => {
 		expect(() =>
-			getConfig().addSource(ConfigBuilder.fileSource("base.yaml")).build(),
+			getConfig().addSource(new FileSource("base.yaml")).build(),
 		).toThrowError();
 	});
 });

@@ -1,13 +1,12 @@
 import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import yamlParser from "./index";
 
 describe("yamlParser", () => {
 	it("should load config from .yaml file", () => {
-		const result = getConfig()
-			.addSource(ConfigBuilder.fileSource("base.yaml"))
-			.build();
+		const result = getConfig().addSource(new FileSource("base.yaml")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -18,9 +17,7 @@ describe("yamlParser", () => {
 	});
 
 	it("should load config from .yml file", () => {
-		const result = getConfig()
-			.addSource(ConfigBuilder.fileSource("base.yml"))
-			.build();
+		const result = getConfig().addSource(new FileSource("base.yml")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -33,8 +30,8 @@ describe("yamlParser", () => {
 	it("should add layer json files", () => {
 		expect(
 			getConfig()
-				.addSource(ConfigBuilder.fileSource("base.yaml"))
-				.addSource(ConfigBuilder.fileSource("dev.yaml"))
+				.addSource(new FileSource("base.yaml"))
+				.addSource(new FileSource("dev.yaml"))
 				.build(),
 		).toEqual({
 			appURL: "https://dev.company-app.com",
@@ -45,8 +42,8 @@ describe("yamlParser", () => {
 
 		expect(
 			getConfig()
-				.addSource(ConfigBuilder.fileSource("dev.yaml"))
-				.addSource(ConfigBuilder.fileSource("base.yaml"))
+				.addSource(new FileSource("dev.yaml"))
+				.addSource(new FileSource("base.yaml"))
 				.build(),
 		).toEqual({
 			appURL: "https://my-site.com",
@@ -58,7 +55,7 @@ describe("yamlParser", () => {
 
 	it("should throw an error if the file extension is not supported", () => {
 		expect(() =>
-			getConfig().addSource(ConfigBuilder.fileSource("base.json")).build(),
+			getConfig().addSource(new FileSource("base.json")).build(),
 		).toThrowError();
 	});
 });

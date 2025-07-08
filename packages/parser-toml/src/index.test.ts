@@ -1,13 +1,12 @@
 import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import tomlParser from "./index";
 
 describe("tomlParser", () => {
 	it("should load config from .toml file", () => {
-		const result = getConfig()
-			.addSource(ConfigBuilder.fileSource("base.toml"))
-			.build();
+		const result = getConfig().addSource(new FileSource("base.toml")).build();
 
 		expect(result).toEqual({
 			appURL: "http://localhost:3000",
@@ -21,8 +20,8 @@ describe("tomlParser", () => {
 	it("should add layer json files", () => {
 		expect(
 			getConfig()
-				.addSource(ConfigBuilder.fileSource("base.toml"))
-				.addSource(ConfigBuilder.fileSource("dev.toml"))
+				.addSource(new FileSource("base.toml"))
+				.addSource(new FileSource("dev.toml"))
 				.build(),
 		).toEqual({
 			appURL: "https://dev.company-app.com",
@@ -34,8 +33,8 @@ describe("tomlParser", () => {
 
 		expect(
 			getConfig()
-				.addSource(ConfigBuilder.fileSource("dev.toml"))
-				.addSource(ConfigBuilder.fileSource("base.toml"))
+				.addSource(new FileSource("dev.toml"))
+				.addSource(new FileSource("base.toml"))
 				.build(),
 		).toEqual({
 			appURL: "http://localhost:3000",
@@ -48,7 +47,7 @@ describe("tomlParser", () => {
 
 	it("should throw an error if the file extension is not supported", () => {
 		expect(() =>
-			getConfig().addSource(ConfigBuilder.fileSource("base.yaml")).build(),
+			getConfig().addSource(new FileSource("base.yaml")).build(),
 		).toThrowError();
 	});
 });

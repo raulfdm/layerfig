@@ -49,7 +49,7 @@
         "zod": "3.25.67",
       },
       "peerDependencies": {
-        "@layerfig/config": "^1.0.0 | ^2.0.0",
+        "@layerfig/config": "^2.0.0",
       },
     },
     "packages/parser-toml": {
@@ -66,7 +66,7 @@
         "zod": "3.25.67",
       },
       "peerDependencies": {
-        "@layerfig/config": "^1.0.0 | ^2.0.0",
+        "@layerfig/config": "^2.0.0",
       },
     },
     "packages/parser-yaml": {
@@ -83,7 +83,7 @@
         "zod": "3.25.67",
       },
       "peerDependencies": {
-        "@layerfig/config": "^1.0.0 | ^2.0.0",
+        "@layerfig/config": "^2.0.0",
       },
     },
     "packages/tsconfig": {
