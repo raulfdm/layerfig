@@ -1,0 +1,49 @@
+---
+title: Client Configuration
+---
+
+Layerfig was originally designed to work on the server side. This is because it relies on configuration files that you commit (which use Node.js APIs) or on environment variables accessed via `process.env`.
+
+We don't recommend using Layerfig solely for client-side configuration, as this can be accomplished with only a schema validation library like Zod:
+
+```ts
+// client-config.ts
+import { z } from "zod/v4";
+
+const schema = z.object({
+  appURL: z.url(),
+});
+
+export const config = schema.parse({
+  appURL: import.meta.env.PUBLIC_APP_URL,
+});
+```
+
+However, if you are already using Layerfig and want to leverage your existing setup, you can achieve a similar result by using `ObjectSource` and the `slots` feature.
+
+The advantage of this approach is that you can have separate `server-config.ts`, `client-config.ts`, and `schema.ts` files. The client schema can then be derived from the main schema to include only client-specific properties:
+
+> The following example uses [`.pick`](https://zod.dev/api?id=pick) from Zod.
+
+```ts
+// client-config.ts
+import { ConfigBuilder } from "@layerfig/config";
+import { ObjectSource } from "@layerfig/config/sources/object";
+import { configSchema } from "./schema";
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) =>
+    configSchema
+      .pick({
+        appURL: true,
+      })
+      .parse(finalConfig),
+  runtimeEnv: import.meta.env,
+})
+  .addSource(
+    new Object({
+      appURL: "$PUBLIC_APP_URL",
+    })
+  )
+  .build();
+```

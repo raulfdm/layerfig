@@ -54,6 +54,7 @@ export default defineConfig({
 						"guides/deno",
 						"guides/docker",
 						"guides/dynamic-environment",
+						"guides/client-config",
 					],
 				},
 				{
