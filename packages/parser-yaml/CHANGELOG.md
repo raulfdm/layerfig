@@ -1,5 +1,13 @@
 # @layerfig/parser-yaml
 
+## 5.0.0-next.4
+
+### Patch Changes
+
+- Updated dependencies [59a8819]
+- Updated dependencies [28b5078]
+  - @layerfig/config@2.0.0-next.4
+
 ## 5.0.0-next.3
 
 ### Patch Changes
