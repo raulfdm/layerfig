@@ -2,60 +2,67 @@
 title: Sources
 ---
 
-import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
 
 Sources define where the library reads your configuration from, such as files or environment variables.
 
-## JSON
+## File
 
-By default, if no parser is specified, `@layerfig/config` uses its internal JSON parser for `.json` files.
+For loading source from files, use `new FileSource('[file-name].[ext]')`:
 
-<Tabs>
-    <TabItem label="config.ts">
+```ts {2,8}
+import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { schema } from "./schema";
 
-```ts
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig)
+  validate: (finalConfig) => schema.parse(finalConfig),
 })
-    .addSource("base.json")
-    .addSource("prod.json")
-    .build();
+  .addSource(new FileSource("base.json"))
+  .build();
 ```
 
-    </TabItem>
+In this case, `base.json` is a file located in the `<root-project-dir>/config` directory (or the one specified via `configFolder`).
 
-    <TabItem label="base.json">
+<Aside>Without a specified parser, you can only load `.json`.</Aside>
 
-```json
-{
-  "appURL": "http://localhost:3000"
-}
-```
+### Other File Extensions
 
-    </TabItem>
-
-    <TabItem label="prod.json">
-
-```jsonc
-{
-  "appURL": "http://my-app.com"
-}
-```
-
-    </TabItem>
-</Tabs>
-
-## Other File Extensions
-
-To support various project needs, we provide parsers for other common configuration file formats:
+To support various project needs and preferences, we provide parsers for other common configuration file formats:
 
 - [YAML](/parsers/yaml/)
 - [JSONC or JSON5](/parsers/json5/)
-- [Toml](/parsers/toml/)
+- [TOML](/parsers/toml/)
 
-... or [create your own parser](/parsers/custom).
+... or [you can create your own parser](/parsers/custom).
 
+## Object
 
+The `ObjectSource` is a simple yet powerful tool for creating client-side configurations with Layerfig. It's ideal when you want to avoid using files or need to override/debug your configuration. It also supports `slots`, allowing you to use environment variables:
+
+```ts {2,7,10-13}
+import { ConfigBuilder } from "@layerfig/config";
+import { ObjectSource } from "@layerfig/config/sources/object";
+import { schema } from "./schema";
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  runtimeEnv: import.meta.env,
+})
+  .addSource(
+    new ObjectSource({
+      baseURL: "$PUBLIC_BASE_URL",
+      randomValue: true,
+    })
+  )
+  .build();
+```
+
+Since a framework like Vite adds `PUBLIC_*` environment variables to `import.meta.env` and makes them available on the client, your `config` object will contain all the type-checked values.
+
+<Aside>
+  See more details on [Client Configuration](/guides/client-config/) guide.
+</Aside>
 
 ## Environment Variables
 
@@ -63,17 +70,19 @@ Consider the following scenario:
 
 Your application's configuration files are committed to version control and used to build a Docker image for production. When running this image locally for debugging, any change to a configuration value requires rebuilding the image. This process can be slow and results in testing a modified image rather than the actual production build.
 
-To avoid this, use `ConfigBuilder.createEnvVarSource()` to override configuration values at runtime without modifying the source files:
+To avoid this, use `EnvironmentVariableSource` to override configuration values at runtime without modifying the source files:
 
-```ts {8}
+```ts {3,10}
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig)
+  validate: (finalConfig) => schema.parse(finalConfig),
 })
-  .addSource("base.json")
-  .addSource(ConfigBuilder.createEnvVarSource())
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
@@ -86,7 +95,8 @@ By default, the library expects environment variables with the following structu
 For example, the environment variable `APP_port` overrides the `port` key in your configuration.
 
 <Aside title="Important">
-Configuration keys in environment variables must exactly match the keys defined in your schema.
+  Configuration keys in environment variables must exactly match the keys
+  defined in your schema.
 </Aside>
 
 ### Example Usage
@@ -104,19 +114,22 @@ Suppose your `base.json` contains:
 Define your schema and load the sources:
 
 ```ts
+import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
       appURL: z.url(),
       port: z.coerce.number().int().positive(),
-      appEnv: z.enum(["local", "dev", "prod"])
+      appEnv: z.enum(["local", "dev", "prod"]),
     });
 
-    return schema.parse(finalConfig)
-  }
+    return schema.parse(finalConfig);
+  },
 })
-  .addSource("base.json")
-  .addSource(ConfigBuilder.createEnvVarSource())
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
@@ -133,7 +146,11 @@ Since the environment variable source is added last, its values take precedence.
 Use `__` (double underscores) as a separator to target nested keys:
 
 ```ts
-const AppConfigSchema = z.object({
+import { ConfigBuilder, z } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+
+const schema = z.object({
   api: z.object({
     vendor: z.object({
       aws: z.object({
@@ -143,9 +160,11 @@ const AppConfigSchema = z.object({
   }),
 });
 
-const config = new ConfigBuilder(AppConfigSchema)
-  .addSource("base.json")
-  .addSource(ConfigBuilder.createEnvVarSource())
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+})
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
   .build();
 ```
 
@@ -158,10 +177,16 @@ APP_api__vendor__aws__apiToken=12345 node index.js
 You can customize the prefix, prefix separator, and nested-key separator:
 
 ```ts
-const config = new ConfigBuilder(AppConfigSchema)
-  .addSource("base.json")
+import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { schema } from "./schema";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+})
+  .addSource(new FileSource("base.json"))
   .addSource(
-    ConfigBuilder.createEnvVarSource({
+    new EnvironmentVariableSource({
       prefix: "VULCAN",
       prefixSeparator: "--",
       separator: "----",

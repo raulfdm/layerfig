@@ -1,27 +1,12 @@
-import { ConfigBuilder } from "@layerfig/config";
+import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import json5Parser from "./index";
 
-const schema = z.object({
-	appURL: z.url(),
-	api: z.object({
-		port: z
-			.string()
-			.transform((val) => Number.parseInt(val, 10))
-			.or(z.number()),
-	}),
-});
-
 describe("json5Parser", () => {
-	const config = new ConfigBuilder({
-		validate: (config) => schema.parse(config),
-		configFolder: "./src/__fixtures__",
-		parser: json5Parser,
-	});
-
 	it("should load config from .json file", () => {
-		const result = config.addSource("base.json").build();
+		const result = getConfig().addSource(new FileSource("base.json")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -32,7 +17,7 @@ describe("json5Parser", () => {
 	});
 
 	it("should load config from .jsonc file", () => {
-		const result = config.addSource("base.jsonc").build();
+		const result = getConfig().addSource(new FileSource("base.jsonc")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -43,7 +28,7 @@ describe("json5Parser", () => {
 	});
 
 	it("should load config from .json5 file", () => {
-		const result = config.addSource("base.json5").build();
+		const result = getConfig().addSource(new FileSource("base.json5")).build();
 
 		expect(result).toEqual({
 			appURL: "https://my-site.com",
@@ -55,7 +40,10 @@ describe("json5Parser", () => {
 
 	it("should add layer json files", () => {
 		expect(
-			config.addSource("base.jsonc").addSource("dev.jsonc").build(),
+			getConfig()
+				.addSource(new FileSource("base.jsonc"))
+				.addSource(new FileSource("dev.jsonc"))
+				.build(),
 		).toEqual({
 			appURL: "https://dev.company-app.com",
 			api: {
@@ -64,7 +52,10 @@ describe("json5Parser", () => {
 		});
 
 		expect(
-			config.addSource("dev.jsonc").addSource("base.jsonc").build(),
+			getConfig()
+				.addSource(new FileSource("dev.jsonc"))
+				.addSource(new FileSource("base.jsonc"))
+				.build(),
 		).toEqual({
 			appURL: "https://my-site.com",
 			api: {
@@ -74,6 +65,27 @@ describe("json5Parser", () => {
 	});
 
 	it("should throw an error if the file extension is not supported", () => {
-		expect(() => config.addSource("base.yaml").build()).toThrowError();
+		expect(() =>
+			getConfig().addSource(new FileSource("base.yaml")).build(),
+		).toThrowError();
 	});
 });
+
+function getConfig(options?: Partial<ConfigBuilderOptions>) {
+	const schema = z.object({
+		appURL: z.url(),
+		api: z.object({
+			port: z
+				.string()
+				.transform((val) => Number.parseInt(val, 10))
+				.or(z.number()),
+		}),
+	});
+
+	return new ConfigBuilder({
+		validate: (config) => schema.parse(config),
+		configFolder: "./src/__fixtures__",
+		parser: json5Parser,
+		...options,
+	});
+}

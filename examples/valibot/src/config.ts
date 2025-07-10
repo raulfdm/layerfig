@@ -1,4 +1,5 @@
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import * as v from "valibot";
 
 export const configSchema = v.object({
@@ -8,6 +9,6 @@ export const configSchema = v.object({
 export const config = new ConfigBuilder({
 	validate: (finalConfig) => v.parse(configSchema, finalConfig),
 })
-	.addSource("base.json")
-	.addSource("prod.json")
+	.addSource(new FileSource("base.json"))
+	.addSource(new FileSource("prod.json"))
 	.build();

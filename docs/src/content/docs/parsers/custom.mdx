@@ -2,7 +2,7 @@
 title: Custom Parser
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import { Aside } from "@astrojs/starlight/components";
 
 The library provides abstractions to support common configuration file extensions. However, you may need to parse a file type that isn't supported out-of-the-box.
 
@@ -23,7 +23,8 @@ export const customParser = defineConfigParser({
 ```
 
 <Aside>
-    The extensions you have defined in `acceptedFileExtensions` will be the only allowed. Else it'll throw an error.
+  The extensions you have defined in `acceptedFileExtensions` will be the only
+  allowed. Else it'll throw an error.
 </Aside>
 
 The `parse` function must return an object that conforms to the `Result` type:
@@ -44,6 +45,7 @@ Then, use your custom parser by passing it to the `ConfigBuilder`:
 
 ```ts {2,13}
 import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 import { customParser } from "./path/to/custom-parser";
 
 export const config = new ConfigBuilder({
@@ -53,12 +55,12 @@ export const config = new ConfigBuilder({
       port: z.number(),
     });
 
-    return schema.parse(finalConfig)
+    return schema.parse(finalConfig);
   },
   parser: customParser,
 })
-  .addSource("base.ini")
-  .addSource("live.ini")
+  .addSource(new FileSource("base.ini"))
+  .addSource(new FileSource("live.ini"))
   .build();
 ```
 

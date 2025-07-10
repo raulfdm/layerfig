@@ -12,6 +12,7 @@ const tabs: Tab[] = [
 		label: "index.ts",
 		language: "ts",
 		code: `import { ConfigBuilder } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) =>
@@ -21,8 +22,8 @@ export const config = new ConfigBuilder({
       })
       .parse(finalConfig),
 })
-  .addSource("base.json")
-  .addSource("live.json")
+  .addSource(new FileSource("base.json"))
+  .addSource(new FileSource("live.json"))
   .build();
 
 `,

@@ -1,18 +1,16 @@
 import { ConfigBuilder } from "@layerfig/config";
-
-if (!process.env.APP_ENV) {
-	throw new Error("APP_ENV environment variable is not set");
-}
+import { FileSource } from "@layerfig/config/sources/file";
 
 export const config = new ConfigBuilder({
 	validate: (finalConfig, z) => {
 		const configSchema = z.object({
-			appURL: z.url(),
+			baseURL: z.url(),
+			port: z.coerce.number().int().positive(),
+			appEnv: z.enum(["local", "dev", "prod"]),
 		});
 
 		return configSchema.parse(finalConfig);
 	},
 })
-	.addSource("base.json")
-	.addSource(`${process.env.APP_ENV}.json`)
+	.addSource(new FileSource("base.json"))
 	.build();

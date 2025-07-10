@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/config",
 	"description": "Layer and runtime-validate type-safe configs for JavaScript apps.",
-	"version": "1.0.0",
+	"version": "2.0.0-next.4",
 	"keywords": [
 		"configuration",
 		"layered",
@@ -24,9 +24,6 @@
 		"access": "public"
 	},
 	"type": "module",
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
 	"files": [
 		"dist",
 		"LICENSE"
@@ -42,12 +39,23 @@
 				"types": "./dist/index.d.cts",
 				"default": "./dist/index.cjs"
 			}
+		},
+		"./sources/*": {
+			"import": {
+				"types": "./dist/sources/*/index.d.ts",
+				"default": "./dist/sources/*/index.js"
+			},
+			"require": {
+				"types": "./dist/sources/*/index.d.cts",
+				"default": "./dist/sources/*/index.cjs"
+			}
 		}
 	},
 	"scripts": {
 		"prepack": "bun turbo build --output-logs=errors-only",
 		"build": "tsdown",
 		"check-types": "tsc",
+		"check-exports": "attw --pack --profile node16 .",
 		"test": "vitest --typecheck",
 		"test:coverage": "bun run test --coverage --coverage.exclude src/__fixtures__ --coverage.include src"
 	},
@@ -57,13 +65,9 @@
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.2",
 		"@types/bun": "1.2.18",
-		"@types/lodash-es": "4.17.12",
 		"@vitest/coverage-v8": "3.2.4",
-		"joi": "17.13.3",
 		"tsdown": "0.12.9",
 		"typescript": "5.8.3",
-		"valibot": "1.1.0",
-		"vitest": "3.2.4",
-		"yup": "1.6.1"
+		"vitest": "3.2.4"
 	}
 }

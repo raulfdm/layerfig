@@ -16,18 +16,15 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v2.0.2
         with:
           bun-version-file: "./package.json"
 
       - name: Install Dependencies
         run: bun i
-
-      - name: Install Global Dependencies
-        run: bun install turbo --dev
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets

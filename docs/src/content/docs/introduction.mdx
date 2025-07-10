@@ -1,6 +1,6 @@
 ---
-title: ''
-description: 'Type-safe layered configuration. Merge files and environment variables, validate with any schema, and get a runtime-checked object with full TypeScript IntelliSense.'
+title: ""
+description: "Type-safe layered configuration. Merge files and environment variables, validate with any schema, and get a runtime-checked object with full TypeScript IntelliSense."
 tableOfContents: false
 head:
   - tag: title
@@ -40,12 +40,13 @@ hero:
         src="https://img.shields.io/github/stars/raulfdm/layerfig.svg?style=social&label=Star"
       />
     </a>
+
   </nav>
 
 ## Features
 
 - Define declarative, isolated, and per-environment configuration files (`.json`, or other file extensions via [parsers](/setup/sources#other-file-extensions)).
-- Validate your configuration with [*zod*](https://zod.dev), or bring your preferred schema validation library.
+- Validate your configuration with [_zod_](https://zod.dev), or bring your preferred schema validation library.
 - Use a type-safe and runtime-checked configuration object across your app.
 
 ## How It Works
@@ -58,24 +59,26 @@ When using `ConfigBuilder`, configuration is loaded from two primary sources:
 Since the configuration follows a cascading approach, the final result depends on the order in which sources are added.
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
+import { ConfigBuilder, z } from "@layerfig/config";
+import { FileSource } from "@layerfig/config/sources/file";
+import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+
+const schema = z.object({
+  baseURL: z.url(),
+});
 
 export const config = new ConfigBuilder({
-  validate: (finalConfig, z) => {
-    const schema = z.object({
-      baseURL: z.url()
-    })
-
-    return schema.parse(finalConfig)
-  },
+  validate: (finalConfig) => schema.parse(finalConfig),
 })
-  // 1. Starts with a base configuration.
-  .addSource("base.json")
-  // 2. Merges with the previous source.
-  .addSource("live.json")
-  // 3. Allows environment variables to override previous values (optional).
-  .addSource(ConfigBuilder.createEnvVarSource())
-  // 4. Validates the merged configuration and returns the final, type-safe object.
+  /* 1. Starts with a base configuration. */
+  .addSource(new FileSource("base.json"))
+  /* 2. Merges with the previous source. */
+  .addSource(new FileSource("live.json"))
+  /* 3. Allows environment variables to 
+        override previous values (optional). */
+  .addSource(new EnvironmentVariableSource())
+  /* 4. Validates the merged configuration and returns 
+        the final, type-safe object. */
   .build();
 ```
 

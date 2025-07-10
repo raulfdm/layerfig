@@ -1,0 +1,41 @@
+name: Release (Next)
+
+on:
+  push:
+    branches:
+      - next
+  workflow_dispatch:
+    
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2.0.2
+        with:
+          bun-version-file: "./package.json"
+
+      - name: Install Dependencies
+        run: bun i
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1.5.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        with:
+          # We need to update versions and update lockfile
+          version: bun run scripts/version-next.ts
+          publish: bun changeset publish
+          createGithubReleases: true
