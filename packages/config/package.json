@@ -40,34 +40,14 @@
 				"default": "./dist/index.cjs"
 			}
 		},
-		"./sources/env": {
+		"./sources/*": {
 			"import": {
-				"types": "./dist/sources/env/index.d.ts",
-				"default": "./dist/sources/env/index.js"
+				"types": "./dist/sources/*/index.d.ts",
+				"default": "./dist/sources/*/index.js"
 			},
 			"require": {
-				"types": "./dist/sources/env/index.d.cts",
-				"default": "./dist/sources/env/index.cjs"
-			}
-		},
-		"./sources/file": {
-			"import": {
-				"types": "./dist/sources/file/index.d.ts",
-				"default": "./dist/sources/file/index.js"
-			},
-			"require": {
-				"types": "./dist/sources/file/index.d.cts",
-				"default": "./dist/sources/file/index.cjs"
-			}
-		},
-		"./sources/object": {
-			"import": {
-				"types": "./dist/sources/object/index.d.ts",
-				"default": "./dist/sources/object/index.js"
-			},
-			"require": {
-				"types": "./dist/sources/object/index.d.cts",
-				"default": "./dist/sources/object/index.cjs"
+				"types": "./dist/sources/*/index.d.cts",
+				"default": "./dist/sources/*/index.cjs"
 			}
 		}
 	},
