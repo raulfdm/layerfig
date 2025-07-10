@@ -1,4 +1,5 @@
 import type { ConfigParser } from "../parser/define-config-parser";
+import type { Prettify } from "../types";
 
 interface RuntimeEnv {
 	[key: string]: string | undefined;
@@ -22,16 +23,14 @@ interface ExtractedSlot {
 	value: string;
 }
 
-export abstract class Source {
+export abstract class Source<T = Record<string, unknown>> {
 	/**
 	 * An abstract method that must be implemented by any subclass.
 	 * It defines the contract for loading a source.
 	 * @param loadSourceOptions - The options for loading the source.
 	 * @returns A record representing the loaded source data.
 	 */
-	abstract loadSource(
-		loadSourceOptions: LoadSourceOptions,
-	): Record<string, unknown>;
+	abstract loadSource(loadSourceOptions: LoadSourceOptions): Prettify<T>;
 
 	maybeReplaceSlotFromValue({
 		value,

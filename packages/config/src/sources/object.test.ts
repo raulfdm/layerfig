@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { assertType, describe, expect, it } from "vitest";
 import { basicJsonParser } from "../parser/parser-json";
 import { ObjectSource } from "./object";
 import type { LoadSourceOptions } from "./source";
@@ -22,6 +22,21 @@ describe("ObjectSource", () => {
 		const envVarSource = new ObjectSource(testObject);
 
 		expect(envVarSource.loadSource(baseLoadSourceOptions)).toEqual(testObject);
+	});
+
+	it("should infer the type from the object", () => {
+		const testObject = {
+			foo: "bar",
+			nested: {
+				baz: "qux",
+			},
+		};
+
+		type TestObject = typeof testObject;
+
+		const envVarSource = new ObjectSource(testObject);
+
+		assertType<TestObject>(envVarSource.loadSource(baseLoadSourceOptions));
 	});
 
 	describe("slots", () => {
