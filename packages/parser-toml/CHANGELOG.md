@@ -1,5 +1,11 @@
 # @layerfig/parser-toml
 
+## 5.0.0
+
+### Major Changes
+
+- 865babc: Align `parser-toml` version with other parsers versions.
+
 ## 4.0.0
 
 ### Major Changes

@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/parser-toml",
 	"description": "Source parser for .toml config files",
-	"version": "4.0.0",
+	"version": "5.0.0",
 	"keywords": [
 		"@layerfig/config",
 		"source",
