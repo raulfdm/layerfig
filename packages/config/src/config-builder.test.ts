@@ -4,17 +4,19 @@ import { ConfigBuilder, type ConfigBuilderOptions } from "./config-builder";
 import { defineConfigParser } from "./parser/define-config-parser";
 import { EnvironmentVariableSource } from "./sources/env-var";
 import { FileSource } from "./sources/file";
+import { ObjectSource } from "./sources/object";
+
+const Schema = z.object({
+	appURL: z.url(),
+	api: z.object({
+		port: z.coerce.number().int().positive(),
+	}),
+});
+type Schema = z.infer<typeof Schema>;
 
 const baseConfigBuilderOptions: ConfigBuilderOptions = {
-	validate: (finalConfig, z) => {
-		const schema = z.object({
-			appURL: z.url(),
-			api: z.object({
-				port: z.coerce.number().int().positive(),
-			}),
-		});
-
-		return schema.parse(finalConfig);
+	validate: (finalConfig) => {
+		return Schema.parse(finalConfig);
 	},
 };
 
@@ -199,6 +201,67 @@ describe("ConfigBuilder", () => {
 					port: 3000,
 				},
 			});
+		});
+	});
+
+	describe("from object", () => {
+		it("should load an object source", () => {
+			const result = getConfig()
+				.addSource(
+					new ObjectSource<Schema>({
+						appURL: "https://my-site.com",
+						api: { port: 3000 },
+					}),
+				)
+				.build();
+
+			expect(result).toEqual({
+				appURL: "https://my-site.com",
+				api: {
+					port: 3000,
+				},
+			});
+		});
+
+		it("should merge object sources", () => {
+			const result = getConfig()
+				.addSource(new ObjectSource({ appURL: "https://my-site.com" }))
+				.addSource(new ObjectSource({ api: { port: 4000 } }))
+				.build();
+
+			expect(result).toEqual({
+				appURL: "https://my-site.com",
+				api: {
+					port: 4000,
+				},
+			});
+		});
+
+		it("should throw an error if the object is not valid", () => {
+			expect(() =>
+				getConfig()
+					.addSource(new ObjectSource({ appURL: "not-a-url" }))
+					.build(),
+			).toThrowErrorMatchingInlineSnapshot(`
+				[ZodError: [
+				  {
+				    "code": "invalid_format",
+				    "format": "url",
+				    "path": [
+				      "appURL"
+				    ],
+				    "message": "Invalid URL"
+				  },
+				  {
+				    "expected": "object",
+				    "code": "invalid_type",
+				    "path": [
+				      "api"
+				    ],
+				    "message": "Invalid input: expected object, received undefined"
+				  }
+				]]
+			`);
 		});
 	});
 
