@@ -1,5 +1,135 @@
 # @layerfig/config
 
+## 2.0.0
+
+### Major Changes
+
+- 2d846ce: BREAKING CHANGE:
+
+  ## .addSource() API Change
+
+  The API for loading a file source has changed. Instead of passing a file path as a string, you now import a source from the new `/sources/*` sub-modules and define it:
+
+  ```diff
+  import { ConfigBuilder } from "@layerfig/config"
+  +import { FileSource } from "@layerfig/config/sources/file"
+  +import { EnvironmentVariableSource } from "@layerfig/config/sources/env"
+
+  const config = new ConfigBuilder({
+    validate: (finalConfig) => finalConfig,
+  })
+  -  .addSource("config.json")
+  +  .addSource(new FileSource("config.json"))
+  -  .addSource(ConfigBuilder.createEnvVarSource(options))
+  +  .addSource(new EnvironmentVariableSource(options))
+    .build()
+  ```
+
+  Under the hood, both the file source and the environment source now extend from a common base class. This change simplifies maintenance and makes it easier to implement future extensions.
+
+  ## `runtimeEnv` Moved to `ConfigBuilder`
+
+  The `EnvironmentVariableSource` no longer accepts the `runtimeEnv` option.
+
+  Previously, you could pass a runtime environment directly to the source:
+
+  ```ts
+  const config = new ConfigBuilder({
+    validate: (finalConfig) => finalConfig,
+  })
+    .addSource(
+      ConfigBuilder.createEnvVarSource({
+        runtimeEnv: import.meta.env, // from here...
+      })
+    )
+    .build();
+  ```
+
+  This option has been moved to the `ConfigBuilder` constructor to centralize environment variable handling:
+
+  ```ts
+  const config = new ConfigBuilder({
+    validate: (finalConfig) => finalConfig,
+    runtimeEnv: import.meta.env, // ... to here
+  })
+    .addSource(new EnvironmentVariableSource())
+    .build();
+  ```
+
+  This change ensures a single, consistent strategy for managing environment variables within the `ConfigBuilder`.
+
+### Minor Changes
+
+- 2d846ce: Log if slot was defined but no env var with the slot name was found.
+
+  This intend to help developers easily understand if an environment variable is missing.
+
+- 2d846ce: Expanded the `slot` feature to support environment variables.
+
+  You can now use environment variables with slots. For example, given the following setup:
+
+  ```ts
+  import { ConfigBuilder } from "@layerfig/config";
+  import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+
+  const config = new ConfigBuilder({
+    validate: (finalConfig, z) => {
+      const schema = z.object({
+        appURL: z.url(),
+        port: z.coerce.number().int().positive(),
+      });
+
+      return schema.parse(finalConfig);
+    },
+  })
+    .addSource(new EnvironmentVariableSource())
+    .build();
+  ```
+
+  When running your application with the following command:
+
+  ```bash
+  PORT=3000 HOST=localhost APP_port=$PORT APP_appURL=http://$HOST:$PORT npm run dev
+  ```
+
+  The `config` object will be parsed as:
+
+  ```ts
+  const config = {
+    appURL: "http://localhost:3000",
+    port: 3000,
+  };
+  ```
+
+- 2d846ce: remove support for node 10 imports
+- 2d846ce: Adds the `ObjectSource`. This new source enables the use of Layerfig on the client-side. It also facilitates debugging and testing by allowing configuration to be passed in directly, eliminating the need to modify configuration files.
+
+  ```ts
+  import { ConfigBuilder, z } from "@layerfig/config";
+  import { ObjectSource } from "@layerfig/config/sources/object";
+
+  const ConfigSchema = z.object({
+    appURL: z.url(),
+    api: z.object({
+      port: z.coerce.number().int().positive(),
+    }),
+  });
+
+  const config = new ConfigBuilder({
+    validate: (finalConfig) => ConfigSchema.parse(finalConfig),
+    runtimeEnv: import.meta.env,
+  })
+    .addSource(
+      new ObjectSource({
+        appURL: "$PUBLIC_APP_URL",
+        api: {
+          port: "$PORT",
+        },
+      })
+    )
+    .build();
+  ```
+
 ## 2.0.0-next.4
 
 ### Minor Changes
