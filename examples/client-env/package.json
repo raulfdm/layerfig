@@ -4,11 +4,12 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "cross-env NODE_ENV=development node server.js",
+    "dev": "cross-env NODE_ENV=development PORT=3000 VITE_APP_ENV=local node server.js",
     "start": "node server.js",
     "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
+    "@layerfig/config": "2.0.0",
     "@react-router/express": "^7.5.3",
     "@react-router/node": "^7.5.3",
     "compression": "^1.7.5",
