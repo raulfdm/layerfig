@@ -80,6 +80,7 @@ export const examples = new Map<string, Example>([
     new Example({
       name: "client-env",
       title: "Client Environment Example",
+      startFile: 'app/config/client.ts',
       sideMenu:{
         label: 'Client Environment'
       }
