@@ -2,15 +2,14 @@
 title: Getting Started
 ---
 
-import { FileTree, Steps } from '@astrojs/starlight/components';
-import Instalation from './installation.astro';
-import BaseFiles from './base-files.astro';
-
+import { FileTree, Steps } from "@astrojs/starlight/components";
+import { CodePackageManagers } from "starlight-theme-nova/components";
+import BaseFiles from "./base-files.astro";
 
 <Steps>
     1. Install the dependencies
 
-        <Instalation />
+        <CodePackageManagers packages="@layerfig/config" />
 
     2. Define your files
 
@@ -39,4 +38,5 @@ import BaseFiles from './base-files.astro';
         config.appURL; // string => "https://live.my-app.company"
         config.port; // number => 3000
         ```
+
 </Steps>

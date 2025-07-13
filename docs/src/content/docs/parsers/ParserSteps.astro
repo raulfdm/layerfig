@@ -1,6 +1,6 @@
 ---
-import { Code, Steps } from "@astrojs/starlight/components";
-import PackageManagerCmd from "../../../components/PackageManagerCmd.astro";
+import { Steps } from "@astrojs/starlight/components";
+import { Code, CodePackageManagers } from "starlight-theme-nova/components";
 
 interface Props {
 	packageName: string;
@@ -42,16 +42,11 @@ export const config = new ConfigBuilder({
 </p>
 
 <Steps>
-   <ol>
+  <ol>
     <li>
       <p>Install the dependency.</p>
 
-      <PackageManagerCmd
-        npm={`npm install ${Astro.props.packageName}`}
-        pnpm={`pnpm install ${Astro.props.packageName}`}
-        yarn={`yarn add ${Astro.props.packageName}`}
-        bun={`bun add ${Astro.props.packageName}`}
-      />
+      <CodePackageManagers packages={Astro.props.packageName} />
     </li>
 
     <li>
@@ -62,11 +57,9 @@ export const config = new ConfigBuilder({
       <p>
         Add the parser to your <code>ConfigBuilder</code>.
       </p>
-      <Code code={code} lang='typescript' wrap meta="{3,12}"/>
+      <Code code={code} lang="typescript" wrap meta="{3,12}" />
     </li>
-   </ol>
+  </ol>
 </Steps>
 
-<p>
-  Your application is now configured to parse these file formats.
-</p>
+<p>Your application is now configured to parse these file formats.</p>

@@ -1,10 +1,11 @@
 ---
-import { Code, TabItem, Tabs } from "@astrojs/starlight/components";
+import { TabItem, Tabs } from "@astrojs/starlight/components";
+import { Code } from "starlight-theme-nova/components";
 
 interface Tab {
 	label: string;
 	code: string;
-	language: string;
+	language: "ts" | "json";
 }
 
 const tabs: Tab[] = [
@@ -47,7 +48,11 @@ export const config = new ConfigBuilder({
 ---
 
 <Tabs>
-    {tabs.map(tab => <TabItem label={tab.label}>
-      <Code  code={tab.code} lang={tab.language}/>
-    </TabItem>)}
+  {
+    tabs.map((tab) => (
+      <TabItem label={tab.label}>
+        <Code code={tab.code} lang={tab.language} />
+      </TabItem>
+    ))
+  }
 </Tabs>
