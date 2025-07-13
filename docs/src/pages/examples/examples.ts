@@ -7,7 +7,6 @@ interface ExampleOptions {
     label: string,
     link?: string
   }
-  external?: boolean
 }
 
 class Example {
@@ -50,7 +49,7 @@ class Example {
   } {
     return {
       label: this.options.sideMenu.label,
-      link: this.options.sideMenu.link || `example/${this.options.name}`,
+      link: this.options.sideMenu.link || `examples/${this.options.name}`,
       badge: this.isExternal ? {
         text: 'repo'
       }:  undefined,
@@ -61,7 +60,7 @@ class Example {
   }
 
   get isExternal(): boolean{
-    return this.options.external || false
+    return Boolean(this.options.sideMenu.link) || false
   }
 }
 
@@ -77,9 +76,9 @@ export const examples = new Map<string, Example>([
     }),
   ],
   [
-    "client",
+    "client-env",
     new Example({
-      name: "client",
+      name: "client-env",
       title: "Client Environment Example",
       sideMenu:{
         label: 'Client Environment'
@@ -124,7 +123,6 @@ export const examples = new Map<string, Example>([
     new Example({
       name: 'multi-tenant',
       title:'Multi Tenant Environment',
-      external: true,
       sideMenu:{
         label: "Multi-tenant App",
         link: 'https://github.com/raulfdm/layerfig/tree/main/examples/multi-tenant'
@@ -136,7 +134,6 @@ export const examples = new Map<string, Example>([
     new Example({
       name: 'deno',
       title:'Deno',
-      external: true,
       sideMenu:{
         label: "Deno",
         link: 'https://github.com/raulfdm/layerfig/tree/main/examples/multi-tenant'
