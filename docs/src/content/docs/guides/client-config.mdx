@@ -27,21 +27,21 @@ The advantage of this approach is that you can have separate `server-config.ts`,
 
 ```ts
 // client-config.ts
-import { ConfigBuilder } from "@layerfig/config";
+import { ConfigBuilder, z } from "@layerfig/config";
 import { ObjectSource } from "@layerfig/config/sources/object";
 import { configSchema } from "./schema";
 
+const ClientSchema = configSchema.pick({
+  appURL: true,
+});
+type ClientSchema = z.infer<typeof ClientSchema>;
+
 export const config = new ConfigBuilder({
-  validate: (finalConfig) =>
-    configSchema
-      .pick({
-        appURL: true,
-      })
-      .parse(finalConfig),
+  validate: (finalConfig) => ClientSchema.parse(finalConfig),
   runtimeEnv: import.meta.env,
 })
   .addSource(
-    new Object({
+    new Object<ClientSchema>({
       appURL: "$PUBLIC_APP_URL",
     })
   )
