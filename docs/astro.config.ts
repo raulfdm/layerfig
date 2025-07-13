@@ -1,6 +1,6 @@
-// @ts-check
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import { examples } from "./src/pages/examples/examples";
 
 // https://astro.build/config
 export default defineConfig({
@@ -59,48 +59,9 @@ export default defineConfig({
 				},
 				{
 					label: "Examples",
-					items: [
-						{
-							label: "Basic",
-							link: "examples/basic",
-						},
-						{
-							label: "Docker",
-							link: "examples/docker",
-						},
-						{
-							label: "Dynamic Environment",
-							link: "examples/dynamic-env",
-						},
-						{
-							label: "Json5",
-							link: "examples/json5",
-						},
-						{
-							label: "Toml",
-							link: "examples/toml",
-						},
-						{
-							label: "Yaml",
-							link: "examples/yaml",
-						},
-						{
-							label: "Valibot",
-							link: "examples/valibot",
-						},
-						{
-							label: "Slots",
-							link: "examples/slots",
-						},
-						{
-							label: "Multi-tenant App",
-							link: "https://github.com/raulfdm/layerfig/tree/main/examples/multi-tenant",
-						},
-						{
-							label: "Deno",
-							link: "https://github.com/raulfdm/layerfig/tree/main/examples/deno",
-						},
-					],
+					items: Array.from(examples.values()).map(
+						(example) => example.sideMenu,
+					),
 				},
 			],
 		}),

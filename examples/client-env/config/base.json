@@ -1,0 +1,4 @@
+{
+  "port": "$PORT",
+  "env": "$VITE_APP_ENV"
+}

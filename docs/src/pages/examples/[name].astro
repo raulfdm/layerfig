@@ -1,115 +1,12 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { examples } from "./examples";
 
 export function getStaticPaths() {
-  return [
-    { params: { name: "basic" } },
-    { params: { name: "docker" } },
-    { params: { name: "dynamic-env" } },
-    { params: { name: "json5" } },
-    { params: { name: "slots" } },
-    { params: { name: "toml" } },
-    { params: { name: "valibot" } },
-    { params: { name: "yaml" } },
-  ];
+  return Array.from(examples.values())
+    .filter((e) => e.isExternal === false)
+    .map((example) => example.route);
 }
-
-interface ExampleOptions {
-  name: string;
-  title: string;
-  note?: string;
-  startFile?: string;
-}
-class Example {
-  constructor(private options: ExampleOptions) {}
-
-  get title() {
-    return this.options.title;
-  }
-
-  get note() {
-    return this.options.note;
-  }
-
-  get src() {
-    const baseURL = new URL(
-      `https://stackblitz.com/github/raulfdm/layerfig/tree/main/examples/${this.options.name}`
-    );
-    baseURL.searchParams.set("embed", "1");
-    baseURL.searchParams.set(
-      "file",
-      this.options.startFile || "src/config/index.ts"
-    );
-
-    return baseURL.toString();
-  }
-}
-
-const examples = new Map<string, Example>([
-  [
-    "basic",
-    new Example({
-      name: "basic",
-      title: "Basic Example",
-    }),
-  ],
-  [
-    "json5",
-    new Example({
-      name: "json5",
-      startFile: "src/config/index.ts",
-      title: "JSONC-like example",
-    }),
-  ],
-  [
-    "toml",
-    new Example({
-      name: "toml",
-      startFile: "src/config/index.ts",
-      title: "Toml example",
-    }),
-  ],
-  [
-    "yaml",
-    new Example({
-      name: "yaml",
-      startFile: "src/config/index.ts",
-      title: "Yaml example",
-    }),
-  ],
-  [
-    "dynamic-env",
-    new Example({
-      name: "dynamic-env",
-      startFile: "src/config/index.ts",
-      title: "Dynamic Environment",
-    }),
-  ],
-  [
-    "docker",
-    new Example({
-      name: "docker",
-      startFile: "Dockerfile",
-      title: "Multi-staged Dockerfile",
-    }),
-  ],
-  [
-    "valibot",
-    new Example({
-      name: "valibot",
-      startFile: "src/config/index.ts",
-      title: "Valibot example",
-    }),
-  ],
-  [
-    "slots",
-    new Example({
-      name: "slots",
-      startFile: "config/basic.json",
-      title: "Slots example",
-    }),
-  ],
-]);
 
 const { name } = Astro.params;
 
