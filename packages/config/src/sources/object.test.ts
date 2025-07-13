@@ -1,4 +1,5 @@
 import { assertType, describe, expect, it } from "vitest";
+import { z } from "zod/v4";
 import { basicJsonParser } from "../parser/parser-json";
 import { ObjectSource } from "./object";
 import type { LoadSourceOptions } from "./source";
@@ -37,6 +38,24 @@ describe("ObjectSource", () => {
 		const envVarSource = new ObjectSource(testObject);
 
 		assertType<TestObject>(envVarSource.loadSource(baseLoadSourceOptions));
+	});
+
+	it("should not TS error if the type is different from the schema", () => {
+		const schema = z.object({
+			port: z.coerce.number().int().positive(),
+			nested: z.object({
+				foo: z.coerce.boolean(),
+			}),
+		});
+
+		type Schema = z.infer<typeof schema>;
+
+		new ObjectSource<Schema>({
+			port: "$PORT",
+			nested: {
+				foo: "false",
+			},
+		});
 	});
 
 	describe("slots", () => {

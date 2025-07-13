@@ -19,3 +19,16 @@ export type Result<TSuccess = undefined, TError = undefined> =
 export type Prettify<T> = {
 	[K in keyof T]: T[K];
 } & {};
+
+export type PartialDeepUnknown<T> = {
+	[K in keyof T]?: T[K] extends Record<string, unknown>
+		? T[K] extends unknown[]
+			? unknown // Arrays become unknown
+			: T[K] extends Date
+				? unknown // Dates become unknown
+				: // biome-ignore lint/complexity/noBannedTypes: It's a lib, trust me
+					T[K] extends Function
+					? unknown // Functions become unknown
+					: PartialDeepUnknown<T[K]> // Recursively handle plain objects
+		: unknown; // Primitives become any
+};
