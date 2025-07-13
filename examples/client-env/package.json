@@ -9,7 +9,7 @@
     "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
-    "@layerfig/config": "2.0.0",
+    "@layerfig/config": "2.1.0",
     "@react-router/express": "^7.5.3",
     "@react-router/node": "^7.5.3",
     "compression": "^1.7.5",
