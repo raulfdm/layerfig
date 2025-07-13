@@ -1,0 +1,89 @@
+---
+title: Motivation
+---
+
+Every application has some form of settings. This could be simple things like a `port` number or more in-depth configurations like feature flags, database settings, third-party integration credentials, and so on. The only difference across applications is how developers choose to implement them.
+
+In other languages and frameworks, a package or mechanism is often provided to allow the creation of setting files, declaring configuration outside of the code. This makes it easier to maintain, override, and tweak when needed. However, as JavaScript has no enforcements apart from the language itself, everyone comes up with their own way of doing it.
+
+Tired of implementing this logic in every project I worked on, I created Layerfig to abstract it away and provide a unified tool for managing settings.
+
+While every application has configuration, another problem arises: different environments (such as dev, staging, and live) often require slightly different settings.
+
+For example, when running locally, I might not want to use `TLS`. However, in the environments where my application is deployed, `TLS` must be enabled. The problem is that with a single `config.json` file, I would need to override the `tls` value with an environment variable in every single deployment environment.
+
+That would work just fine, and it's what the 12-factor app methodology suggests:
+
+> "[...] The twelve-factor app stores config in environment variables (often shortened to env vars or env). Env vars are easy to change between deploys without changing any code; unlike config files, there is little chance of them being checked into the code repo accidentally; and unlike custom config files, or other config mechanisms such as Java System Properties, they are a language- and OS-agnostic standard. [...]"
+>
+> [https://12factor.net/config](https://12factor.net/config)
+
+This principle is sound, but sometimes I already know the values I want for a specific environment. Hardcoding the values for a specific environment is often sufficient, and it means I don't need to go to a dashboard to change a value. Instead, I can make the change directly in a version-controlled file and have a clear history of why it was changed.
+
+So, how can we solve this problem?
+
+## Layered Configuration Concept
+
+The layered configuration concept addresses this problem. The idea is to have a "cascading" configuration that gets merged to produce a final set of values.
+
+In a nutshell, we have a few configuration files and must specify the order in which they are merged.
+
+For example, imagine we have three environments:
+
+- local => running on my machine
+- staging => preview version of my app
+- prod => production version of my app
+
+These three environments will most likely have identical configurations, except for a few specific settings.
+
+In this scenario, I want a `base` config where I declare the settings that every environment will use, which can then be overridden on a per-environment basis if needed. This would result in files like this:
+
+```
+base.json
+local.json
+staging.json
+prod.json
+```
+
+Using the `TLS` example, we would have something like this:
+
+```json
+// base.json
+{
+  "port": 3000,
+  "tls": false
+  // ... etc
+}
+```
+
+When it comes to `staging` and `prod`, I want to enable `tls`. So, in each of those files, I would have:
+
+```json
+{
+  "tls": true
+}
+```
+
+Now, when I run my application, I first need to load `base.json` and then merge it with the configuration file for the specific environment I'm running in. This can be achieved in various ways, but conceptually it would look like this:
+
+```ts
+const configMap = {
+  local: localConfig,
+  staging: stagingConfig,
+  prod: prodConfig,
+};
+
+const config = deepMerge({}, baseConfig, configMap[environment]);
+```
+
+... and because we're merging the objects, `tls` (defined as `false` in the base config) will be overridden to `true` if we're running in the staging or production environment.
+
+## In summary
+
+Implementing this logic may seem trivial, and you could certainly do it yourself. However, Layerfig offers this logic out of the box, along with some other features, such as:
+
+- Using `slots` to declare and reference environment variables in your settings files.
+- Support for different file types, such as YAML, TOML, JSONC, etc.
+- The ability to define configuration that is meant to be consumed by the client-side.
+
+All of this is achievable with just a few lines of code. 😎

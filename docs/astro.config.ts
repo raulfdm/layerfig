@@ -28,6 +28,10 @@ export default defineConfig({
 					items: [
 						{ label: "Introduction", slug: "introduction", link: "intro" },
 						{
+							label: "Motivation",
+							link: "getting-started/motivation",
+						},
+						{
 							label: "Getting Started",
 							slug: "getting-started",
 							link: "getting-started/index",
@@ -50,7 +54,6 @@ export default defineConfig({
 				{
 					label: "Guides & Best Practices",
 					items: [
-						"guides/12-factor-app",
 						"guides/deno",
 						"guides/docker",
 						"guides/dynamic-environment",
