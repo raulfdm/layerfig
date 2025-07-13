@@ -469,7 +469,7 @@
   }
   ```
 
-  > [Read more about slots](https://layerfig.raulmelo.workers.dev/introduction/setup/slots/)
+  > [Read more about slots](https://layerfig.dev/introduction/setup/slots/)
 
 ## 0.3.0
 

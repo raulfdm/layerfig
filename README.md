@@ -37,4 +37,4 @@
   </a>
 </div>
 
-### [Read the docs →](https://layerfig.raulmelo.workers.dev)
+### [Read the docs →](https://layerfig.dev)
