@@ -1,11 +1,13 @@
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import starlightThemeNova from "starlight-theme-nova";
 import { examples } from "./src/pages/examples/examples";
 
 // https://astro.build/config
 export default defineConfig({
 	integrations: [
 		starlight({
+			plugins: [starlightThemeNova()],
 			title: "",
 			logo: {
 				light: "./src/assets/light-logo.svg",
