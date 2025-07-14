@@ -74,19 +74,41 @@ The `z.coerce.number()` function will parse the string `"3000"` and transform it
 
 By default, Layerfig uses `$` as the slot prefix, but you can change it by passing the [`slotPrefix`](/setup/configuration/#optionsslotprefix) option.
 
-## Multiple Fallbacks
+## Chaining Environment Variables
 
-There are cases where you might want to try multiple environment variables for a single value, providing a chain of fallbacks.
+There are cases where you might want to try multiple environment variables for a single value, providing a chain of options in a specific order of priority.
 
-For example, imagine you want to determine the current Git branch. This value could be sourced from several environment variables in a specific order of priority:
+For example, imagine you want to determine the current Git branch. This value could be sourced from several environment variables:
 
 1.  `process.env.GIT_REF`
 2.  `process.env.REF`
 3.  `process.env.MAIN_REF`
 
-...and if none of those are defined, you want to use a default value of `main`.
+To achieve this, you can use the extended slot syntax, separating each variable name with a colon:
 
-To achieve this, you can use the extended slot syntax:
+```json
+{
+  "branch": "${GIT_REF:REF:MAIN_REF}"
+}
+```
+
+Layerfig processes this from left to right. It checks for `GIT_REF`, then `REF`, and so on, using the first defined environment variable it finds. If no environment variables in the chain are found, Layerfig will preserve the original slot string.
+
+## Literal Fallbacks
+
+In addition to chaining variables, you can also provide a literal fallback value to be used if none of the environment variables are set.
+
+This is achieved by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
+
+```json
+{
+  "port": "${PORT:-3000}"
+}
+```
+
+If the `PORT` environment variable is not defined, Layerfig will use `3000` as the value.
+
+Of course, this operator can be combined with variable chaining for more complex cases:
 
 ```json
 {
@@ -94,6 +116,4 @@ To achieve this, you can use the extended slot syntax:
 }
 ```
 
-Layerfig processes this from left to right. It checks for `GIT_REF`, then `REF`, and so on, using the first defined environment variable it finds. If none of the variables are defined, it will use the literal fallback value (`main`) provided after the `:-` operator.
-
-If you want to provide a chain of variables without a final literal fallback, simply omit the `:-` operator. In that case, if no environment variables in the chain are found, Layerfig will preserve the original slot string.
+If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, the value will fall back to the literal string `main`.
