@@ -14,6 +14,7 @@ export default defineConfig({
 				dark: "./src/assets/dark-logo.svg",
 				alt: "Layerfig",
 			},
+			customCss: ["./src/styles/globals.css"],
 			social: [
 				{
 					icon: "github",
