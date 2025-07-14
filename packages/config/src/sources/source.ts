@@ -19,8 +19,9 @@ interface MaybeReplaceSlotFromValueOptions
 
 interface ExtractedSlot {
 	slotPattern: RegExp;
-	envVarName: string;
+	envVarName: string[];
 	value: string;
+	fallback?: string;
 }
 
 export abstract class Source<T = Record<string, unknown>> {
@@ -49,7 +50,18 @@ export abstract class Source<T = Record<string, unknown>> {
 		let newValue = value;
 
 		for (const slot of slots) {
-			const envVarValue = runtimeEnv[slot.envVarName];
+			let envVarValue: string | undefined;
+
+			for (const envVar of slot.envVarName) {
+				const value = runtimeEnv[envVar];
+
+				if (value) {
+					envVarValue = value;
+					break;
+				}
+			}
+
+			envVarValue ??= slot.fallback;
 
 			if (envVarValue) {
 				newValue = newValue.replace(slot.slotPattern, envVarValue);
@@ -70,20 +82,64 @@ export abstract class Source<T = Record<string, unknown>> {
 	}: Pick<MaybeReplaceSlotFromValueOptions, "value" | "slotPrefix">):
 		| ExtractedSlot[]
 		| null {
-		const regex = new RegExp(`\\${slotPrefix}\\w+`, "g");
-		const matches = value.match(regex);
+		/**
+		 * Something like: /\$\w+/g
+		 * To match basic slots like $MY_VAR
+		 */
+		const basicSlotRegex = new RegExp(`\\${slotPrefix}\\w+`, "g");
+		/**
+		 * Something like: /\$\{.*\}/g
+		 * To match multi-slot patterns like ${MY_VAR:MY_OTHER_VAR}
+		 */
+		const multiSlotRegex = new RegExp(`\\${slotPrefix}{.*}`, "g");
 
-		if (matches === null) {
+		const basicMatches = value.match(basicSlotRegex);
+		const multiMatches = value.match(multiSlotRegex);
+
+		if (!basicMatches && !multiMatches) {
 			return null;
 		}
 
-		const uniqueSlots = new Set(matches);
+		const result: ExtractedSlot[] = [];
 
-		return Array.from(uniqueSlots).map((slotMatch) => ({
-			envVarName: slotMatch.replace(slotPrefix, ""),
-			slotPattern: this.#safeSlotRegex(slotMatch),
-			value,
-		}));
+		if (basicMatches) {
+			const uniqueSlots = new Set(basicMatches);
+
+			result.push(
+				...Array.from(uniqueSlots).map((slotMatch) => ({
+					envVarName: [slotMatch.replace(slotPrefix, "")],
+					slotPattern: this.#safeSlotRegex(slotMatch),
+					value,
+				})),
+			);
+		}
+
+		if (multiMatches) {
+			const possibleEnvVarSlots = new Set(multiMatches);
+
+			for (const possibleSlot of possibleEnvVarSlots) {
+				let fallbackValue: string | undefined;
+
+				const values = possibleSlot
+					.replace(`${slotPrefix}{`, "")
+					.replace("}", "")
+					.split(":");
+
+				// If the last value contains a hyphen, it is considered a fallback value
+				if (values[values.length - 1]?.includes("-")) {
+					fallbackValue = values.pop()?.trim().replace("-", "");
+				}
+
+				result.push({
+					envVarName: values,
+					slotPattern: this.#safeSlotRegex(possibleSlot),
+					value,
+					fallback: fallbackValue,
+				});
+			}
+		}
+
+		return result;
 	}
 
 	#safeSlotRegex(slot: string) {
