@@ -24,7 +24,6 @@ export const config = new ConfigBuilder({
       .parse(finalConfig),
 })
   .addSource(new FileSource("base.json"))
-  .addSource(new FileSource("live.json"))
   .build();
 
 `,
@@ -35,13 +34,6 @@ export const config = new ConfigBuilder({
 		code: `{
   "appURL": "http://localhost:3000",
   "port": 3000
-}`,
-	},
-	{
-		label: "live.json",
-		language: "json",
-		code: `{
-  "appURL": "https://live.my-app.company"
 }`,
 	},
 ];
