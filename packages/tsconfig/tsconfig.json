@@ -6,17 +6,15 @@
 		"allowJs": true,
 		"resolveJsonModule": true,
 		"moduleDetection": "force",
+		"module": "preserve",
 		"isolatedModules": true,
 		"verbatimModuleSyntax": true,
-
 		/* Strictness */
 		"strict": true,
 		"noUncheckedIndexedAccess": true,
 		"noImplicitOverride": true,
-
-		"module": "preserve",
+		"noUncheckedSideEffectImports": true,
 		"noEmit": true,
-
 		/* If your code doesn't run in the DOM: */
 		"lib": ["es2022"],
 		"allowImportingTsExtensions": true
