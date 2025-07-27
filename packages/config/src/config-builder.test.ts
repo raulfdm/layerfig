@@ -248,14 +248,14 @@ describe("ConfigBuilder", () => {
 					.addSource(new ObjectSource({ appURL: "not-a-url" }))
 					.build(),
 			).toThrowErrorMatchingInlineSnapshot(`
-				[ZodError: [
+				[$ZodError: [
 				  {
 				    "code": "invalid_format",
 				    "format": "url",
 				    "path": [
 				      "appURL"
 				    ],
-				    "message": "Invalid URL"
+				    "message": "Invalid input"
 				  },
 				  {
 				    "expected": "object",
@@ -263,7 +263,7 @@ describe("ConfigBuilder", () => {
 				    "path": [
 				      "api"
 				    ],
-				    "message": "Invalid input: expected object, received undefined"
+				    "message": "Invalid input"
 				  }
 				]]
 			`);
