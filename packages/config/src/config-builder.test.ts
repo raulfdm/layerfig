@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import { ConfigBuilder, type ConfigBuilderOptions } from "./config-builder";
-import { defineConfigParser } from "./parser/define-config-parser";
+import { ConfigParser } from "./parser/config-parser";
 import { EnvironmentVariableSource } from "./sources/env-var";
 import { FileSource } from "./sources/file";
 import { ObjectSource } from "./sources/object";
@@ -116,17 +116,22 @@ describe("ConfigBuilder", () => {
 	it("should re-throw parser error", () => {
 		const errorMessage = "This file is not valid";
 
+		class MyParser extends ConfigParser {
+			constructor() {
+				super({ acceptedFileExtensions: ["json"] });
+			}
+
+			load() {
+				return {
+					ok: false,
+					error: new Error(errorMessage),
+				} as const;
+			}
+		}
+
 		expect(() =>
 			getConfig({
-				parser: defineConfigParser({
-					acceptedFileExtensions: ["json"],
-					parse() {
-						return {
-							ok: false,
-							error: new Error(errorMessage),
-						};
-					},
-				}),
+				parser: new MyParser(),
 			})
 				.addSource(new FileSource("base.json"))
 				.build(),

@@ -1,4 +1,4 @@
-import type { ConfigParser } from "../parser/define-config-parser";
+import type { ConfigParser } from "../parser/config-parser";
 import type { Prettify } from "../types";
 
 interface RuntimeEnv {

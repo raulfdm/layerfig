@@ -1,5 +1,5 @@
 import { z as zod } from "zod/v4";
-import type { ConfigParser } from "./parser/define-config-parser";
+import type { ConfigParser } from "./parser/config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import { Source } from "./sources/source";
 import { merge } from "./utils";
