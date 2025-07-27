@@ -6,7 +6,7 @@ import type { Result } from "../types";
  * and checks if a file extension is accepted.
  */
 export abstract class ConfigParser {
-	protected acceptedFileExtensions: string[];
+	public acceptedFileExtensions: string[];
 
 	abstract load(fileContent: string): Result<Record<string, unknown>, Error>;
 
