@@ -29,7 +29,6 @@ Now, `z` is no longer regular zod but the [`mini`](https://zod.dev/packages/mini
 -z.string().optional().default("APP")
 +z._default(z.optional(z.string()), "APP")
 
-
 -schema.partial()
 +z.partial(schema)
 

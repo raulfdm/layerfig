@@ -84,7 +84,7 @@
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.2",
-		"@types/bun": "1.2.18",
+		"@types/bun": "1.2.19",
 		"@vitest/coverage-v8": "3.2.4",
 		"tsdown": "0.12.9",
 		"typescript": "^5.9.0-beta",
