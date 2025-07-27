@@ -2,6 +2,8 @@
 title: Client Configuration
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 Layerfig was originally designed to work on the server side. This is because it relies on configuration files that you commit (which use Node.js APIs) or on environment variables accessed via `process.env`.
 
 We don't recommend using Layerfig solely for client-side configuration, as this can be accomplished with only a schema validation library like Zod:
