@@ -1,8 +1,8 @@
-import { z as zod } from "zod/mini";
 import type { ConfigParser } from "./parser/config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import { Source } from "./sources/source";
 import { merge } from "./utils";
+import { z as zod } from "./zod-mini";
 
 export interface ConfigBuilderOptions<
 	T extends object = Record<string, unknown>,

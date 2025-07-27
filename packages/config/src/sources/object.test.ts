@@ -1,6 +1,6 @@
 import { assertType, describe, expect, it } from "vitest";
-import { z } from "zod/mini";
 import { basicJsonParser } from "../parser/parser-json";
+import { z } from "../zod-mini";
 import { ObjectSource } from "./object";
 import type { LoadSourceOptions } from "./source";
 
@@ -48,7 +48,7 @@ describe("ObjectSource", () => {
 			}),
 		});
 
-		type Schema = z.infer<typeof schema>;
+		type Schema = z.output<typeof schema>;
 
 		new ObjectSource<Schema>({
 			port: "$PORT",

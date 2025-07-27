@@ -60,7 +60,7 @@ const finalConfig = {
 To handle this, you can use a validation schema to coerce the string value into a number. For example, with Zod:
 
 ```ts {5}
-import { z } from "@layerfig/config";
+import { z } from "@layerfig/config/zod";
 
 const schema = z.object({
   appURL: z.string(),

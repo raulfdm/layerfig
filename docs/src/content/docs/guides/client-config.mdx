@@ -2,13 +2,15 @@
 title: Client Configuration
 ---
 
+import { Aside } from "@astrojs/starlight/components";
+
 Layerfig was originally designed to work on the server side. This is because it relies on configuration files that you commit (which use Node.js APIs) or on environment variables accessed via `process.env`.
 
 We don't recommend using Layerfig solely for client-side configuration, as this can be accomplished with only a schema validation library like Zod:
 
 ```ts
 // client-config.ts
-import { z } from "zod";
+import { z } from "zod/mini";
 
 const schema = z.object({
   appURL: z.url(),
@@ -27,14 +29,15 @@ The advantage of this approach is that you can have separate `server-config.ts`,
 
 ```ts
 // client-config.ts
-import { ConfigBuilder, z } from "@layerfig/config";
+import { ConfigBuilder } from "@layerfig/config";
+import { z } from "@layerfig/config/zod-mini";
 import { ObjectSource } from "@layerfig/config/sources/object";
 import { configSchema } from "./schema";
 
 const ClientSchema = configSchema.pick({
   appURL: true,
 });
-type ClientSchema = z.infer<typeof ClientSchema>;
+type ClientSchema = z.output<typeof ClientSchema>;
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => ClientSchema.parse(finalConfig),
@@ -47,3 +50,8 @@ export const config = new ConfigBuilder({
   )
   .build();
 ```
+
+<Aside>
+  [Zod mini](https://zod.dev/packages/mini) is recommended for client versions
+  since it ships a smaller bundle of zod.
+</Aside>
