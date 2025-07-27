@@ -60,16 +60,17 @@ When using `ConfigBuilder`, configuration is loaded from two primary sources:
 Since the configuration follows a cascading approach, the final result depends on the order in which sources are added.
 
 ```ts
-import { ConfigBuilder, z } from "@layerfig/config";
+import { ConfigBuilder } from "@layerfig/config";
 import { FileSource } from "@layerfig/config/sources/file";
 import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
 
-const schema = z.object({
-  baseURL: z.url(),
-});
-
 export const config = new ConfigBuilder({
-  validate: (finalConfig) => schema.parse(finalConfig),
+  validate: (finalConfig, z) =>
+    z
+      .object({
+        baseURL: z.url(),
+      })
+      .parse(finalConfig),
 })
   //  1. Starts with a base configuration.
   .addSource(new FileSource("base.json"))

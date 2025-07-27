@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod/mini";
 import { ConfigBuilder, type ConfigBuilderOptions } from "./config-builder";
 import { ConfigParser } from "./parser/config-parser";
 import { EnvironmentVariableSource } from "./sources/env-var";
 import { FileSource } from "./sources/file";
 import { ObjectSource } from "./sources/object";
+import { z } from "./zod-mini";
 
 const Schema = z.object({
 	appURL: z.url(),
@@ -12,7 +12,7 @@ const Schema = z.object({
 		port: z.coerce.number().check(z.int(), z.positive()),
 	}),
 });
-type Schema = z.infer<typeof Schema>;
+type Schema = z.output<typeof Schema>;
 
 const baseConfigBuilderOptions: ConfigBuilderOptions = {
 	validate: (finalConfig) => {

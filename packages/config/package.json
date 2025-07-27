@@ -49,6 +49,26 @@
 				"types": "./dist/sources/*/index.d.cts",
 				"default": "./dist/sources/*/index.cjs"
 			}
+		},
+		"./zod": {
+			"import": {
+				"types": "./dist/zod.d.ts",
+				"default": "./dist/zod.js"
+			},
+			"require": {
+				"types": "./dist/zod.d.cts",
+				"default": "./dist/zod.cjs"
+			}
+		},
+		"./zod-mini": {
+			"import": {
+				"types": "./dist/zod-mini.d.ts",
+				"default": "./dist/zod-mini.js"
+			},
+			"require": {
+				"types": "./dist/zod-mini.d.cts",
+				"default": "./dist/zod-mini.cjs"
+			}
 		}
 	},
 	"scripts": {

@@ -1,5 +1,5 @@
-import { z } from "zod/mini";
 import { set } from "../utils/set";
+import { z } from "../zod-mini";
 import { type LoadSourceOptions, Source } from "./source";
 
 const EnvironmentVariableSourceOptions = z.object({

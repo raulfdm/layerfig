@@ -146,7 +146,8 @@ Since the environment variable source is added last, its values take precedence.
 Use `__` (double underscores) as a separator to target nested keys:
 
 ```ts
-import { ConfigBuilder, z } from "@layerfig/config";
+import { ConfigBuilder } from "@layerfig/config";
+import { z } from "@layerfig/config/zod";
 import { FileSource } from "@layerfig/config/sources/file";
 import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
 

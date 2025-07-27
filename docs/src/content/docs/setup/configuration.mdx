@@ -12,7 +12,7 @@ The `ConfigBuilder` constructor requires a `validate` function. This function re
 import { ConfigBuilder } from "@layerfig/config";
 import { FileSource } from "@layerfig/config/sources/file";
 
-// config will be type `z.infer<typeof schema>` (the actual object type)
+// config will be type `z.output<typeof schema>` (the actual object type)
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({

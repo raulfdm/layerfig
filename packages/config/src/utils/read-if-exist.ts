@@ -1,7 +1,6 @@
 import fs from "node:fs";
-import { z } from "zod/mini";
-
 import type { Result } from "../types";
+import { z } from "../zod-mini";
 
 export function readIfExist(filePath: string): Result<string, string> {
 	if (fs.existsSync(filePath)) {
