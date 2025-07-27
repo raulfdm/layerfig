@@ -1,4 +1,4 @@
-import { z as zod } from "zod/v4";
+import { z as zod } from "zod/mini";
 import type { ConfigParser } from "./parser/config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import { Source } from "./sources/source";
@@ -10,7 +10,7 @@ export interface ConfigBuilderOptions<
 	/**
 	 * A function to validate the configuration object.
 	 * @param config - The configuration object to be validated
-	 * @param z - The zod 4 instance
+	 * @param z - The zod 4-mini instance
 	 */
 	validate: (config: Record<string, unknown>, z: typeof zod) => T;
 	/**

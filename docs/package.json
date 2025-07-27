@@ -14,6 +14,7 @@
 		"@astrojs/starlight": "0.34.4",
 		"astro": "5.10.1",
 		"sharp": "0.34.2",
-		"starlight-theme-nova": "0.9.0"
+		"starlight-theme-nova": "0.9.0",
+		"zod": "3.25.76"
 	}
 }

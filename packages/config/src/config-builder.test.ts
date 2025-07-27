@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod/v4";
+import { z } from "zod/mini";
 import { ConfigBuilder, type ConfigBuilderOptions } from "./config-builder";
 import { ConfigParser } from "./parser/config-parser";
 import { EnvironmentVariableSource } from "./sources/env-var";
@@ -9,7 +9,7 @@ import { ObjectSource } from "./sources/object";
 const Schema = z.object({
 	appURL: z.url(),
 	api: z.object({
-		port: z.coerce.number().int().positive(),
+		port: z.coerce.number().check(z.int(), z.positive()),
 	}),
 });
 type Schema = z.infer<typeof Schema>;
@@ -152,7 +152,7 @@ describe("ConfigBuilder", () => {
 				const schemaInsideValidate = z.object({
 					appURL: z.url(),
 					api: z.object({
-						port: z.coerce.number().int().positive(),
+						port: z.coerce.number().check(z.int(), z.positive()),
 					}),
 				});
 
@@ -248,14 +248,14 @@ describe("ConfigBuilder", () => {
 					.addSource(new ObjectSource({ appURL: "not-a-url" }))
 					.build(),
 			).toThrowErrorMatchingInlineSnapshot(`
-				[ZodError: [
+				[$ZodError: [
 				  {
 				    "code": "invalid_format",
 				    "format": "url",
 				    "path": [
 				      "appURL"
 				    ],
-				    "message": "Invalid URL"
+				    "message": "Invalid input"
 				  },
 				  {
 				    "expected": "object",
@@ -263,7 +263,7 @@ describe("ConfigBuilder", () => {
 				    "path": [
 				      "api"
 				    ],
-				    "message": "Invalid input: expected object, received undefined"
+				    "message": "Invalid input"
 				  }
 				]]
 			`);
@@ -338,7 +338,7 @@ describe("ConfigBuilder", () => {
 				validate: (finalConfig, z) => {
 					const schema = z.object({
 						appURL: z.url(),
-						port: z.coerce.number().int().positive(),
+						port: z.coerce.number().check(z.int(), z.positive()),
 					});
 
 					return schema.parse(finalConfig);
@@ -364,7 +364,7 @@ describe("ConfigBuilder", () => {
 		function getConfig(options?: Partial<ConfigBuilderOptions>) {
 			const schema = z.object({
 				appURL: z.url(),
-				port: z.coerce.number().positive().int(),
+				port: z.coerce.number().check(z.positive(), z.int()),
 			});
 
 			return new ConfigBuilder({
@@ -406,7 +406,7 @@ describe("ConfigBuilder", () => {
 
 			const schema = z.object({
 				appURL: z.url(),
-				port: z.coerce.number().positive().int(),
+				port: z.coerce.number().check(z.positive(), z.int()),
 				host: z.string(),
 			});
 
@@ -449,7 +449,7 @@ function getConfig(options?: Partial<ConfigBuilderOptions>) {
 	const schema = z.object({
 		appURL: z.url(),
 		api: z.object({
-			port: z.coerce.number().int().positive(),
+			port: z.coerce.number().check(z.int(), z.positive()),
 		}),
 	});
 

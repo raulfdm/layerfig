@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod/mini";
 import { set } from "../utils/set";
 import { type LoadSourceOptions, Source } from "./source";
 
@@ -7,25 +7,26 @@ const EnvironmentVariableSourceOptions = z.object({
 	 * The environment variable prefix to use
 	 * @default 'APP
 	 */
-	prefix: z.string().optional().default("APP"),
+	prefix: z._default(z.optional(z.string()), "APP"),
 	/**
 	 * The separator to use between the prefix and the key
 	 * @default '_'
 	 */
-	prefixSeparator: z.string().optional().default("_"),
+	prefixSeparator: z._default(z.optional(z.string()), "_"),
 	/**
 	 * The separator to navigate the object
 	 * @default '__'
 	 */
-	separator: z.string().optional().default("__"),
+	separator: z._default(z.optional(z.string()), "__"),
 });
 
-type EnvironmentVariableSourceOptions = z.Infer<
+type EnvironmentVariableSourceOptions = z.output<
 	typeof EnvironmentVariableSourceOptions
 >;
-const PartialEnvironmentVariableSourceOptions =
-	EnvironmentVariableSourceOptions.partial();
-export type PartialEnvironmentVariableSourceOptions = z.Infer<
+const PartialEnvironmentVariableSourceOptions = z.partial(
+	EnvironmentVariableSourceOptions,
+);
+export type PartialEnvironmentVariableSourceOptions = z.output<
 	typeof PartialEnvironmentVariableSourceOptions
 >;
 
