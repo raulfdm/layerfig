@@ -1,5 +1,5 @@
 import { assertType, describe, expect, it } from "vitest";
-import { z } from "zod/v4";
+import { z } from "zod/mini";
 import { basicJsonParser } from "../parser/parser-json";
 import { ObjectSource } from "./object";
 import type { LoadSourceOptions } from "./source";
@@ -42,7 +42,7 @@ describe("ObjectSource", () => {
 
 	it("should not TS error if the type is different from the schema", () => {
 		const schema = z.object({
-			port: z.coerce.number().int().positive(),
+			port: z.coerce.number().check(z.int(), z.positive()),
 			nested: z.object({
 				foo: z.coerce.boolean(),
 			}),

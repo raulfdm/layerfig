@@ -121,7 +121,7 @@ export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
       appURL: z.url(),
-      port: z.coerce.number().int().positive(),
+      port: z.coerce.number().check(z.int(), z.positive()),
       appEnv: z.enum(["local", "dev", "prod"]),
     });
 
