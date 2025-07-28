@@ -40,6 +40,34 @@ describe("ConfigBuilder", () => {
 		expect(envSpy).not.toHaveBeenCalled();
 	});
 
+	it("should return the configured object", () => {
+		const mockBaseURL = "http://localhost:3000";
+
+		// @ts-ignore
+		import.meta.env = {
+			BASE_URL: mockBaseURL,
+		};
+
+		const config = new ConfigBuilder({
+			validate: (finalConfig, z) =>
+				z
+					.object({
+						baseURL: z.url(),
+					})
+					.parse(finalConfig),
+
+			runtimeEnv: import.meta.env,
+		})
+			.addSource(
+				new ObjectSource({
+					baseURL: "$BASE_URL",
+				}),
+			)
+			.build();
+
+		expect(config.baseURL).toBe(mockBaseURL);
+	});
+
 	it("should export zod mini", () => {
 		expect(z).toBeDefined();
 		expect(z._default(z.string(), "foo").parse(undefined)).toBe("foo");
