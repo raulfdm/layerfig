@@ -1,5 +1,4 @@
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import tomlParser from "@layerfig/parser-toml";
 
 export const config = new ConfigBuilder({
@@ -13,6 +12,4 @@ export const config = new ConfigBuilder({
 	parser: tomlParser,
 })
 	.addSource(new FileSource("base.toml"))
-	.addSource(new FileSource("local.toml"))
-	.addSource(new FileSource("prod.toml"))
 	.build();
