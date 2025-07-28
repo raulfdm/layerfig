@@ -1,3 +1,7 @@
+import type { ConfigParser } from "./parser/config-parser";
+import type * as zod4 from "./zod";
+import type * as zod4Mini from "./zod-mini";
+
 interface ResultSuccess<TSuccess = undefined> {
 	ok: true;
 	data: TSuccess;
@@ -32,3 +36,56 @@ export type PartialDeepUnknown<T> = {
 					: PartialDeepUnknown<T[K]> // Recursively handle plain objects
 		: unknown; // Primitives become any
 };
+
+type RuntimeEnv = {
+	[key: string]: string | undefined;
+};
+
+export interface BaseConfigBuilderOptions {
+	/**
+	 * The folder where the configuration files are located.
+	 * @default "./config"
+	 */
+	configFolder?: string;
+	/**
+	 * Load source from different source types
+	 */
+	parser?: ConfigParser;
+	/**
+	 * Prefix used to search for slotted values
+	 * @default "$"
+	 */
+	slotPrefix?: string;
+}
+
+export interface ServerConfigBuilderOptions<
+	T extends object = Record<string, unknown>,
+> extends BaseConfigBuilderOptions {
+	/**
+	 * The runtime environment variables to use (e.g., process.env, import.meta.env, etc.)
+	 * @default process.env
+	 */
+	runtimeEnv?: RuntimeEnv;
+	/**
+	 * A function to validate the configuration object.
+	 * @param config - The configuration object to be validated
+	 * @param z - The zod 4 instance
+	 */
+	validate: (config: Record<string, unknown>, z: typeof zod4) => T;
+}
+
+export interface ClientConfigBuilderOptions<
+	T extends object = Record<string, unknown>,
+> extends BaseConfigBuilderOptions {
+	/**
+	 * The runtime environment variables to use (e.g., import.meta., object, e.v)
+	 * @default import.meta.env
+	 */
+	runtimeEnv?: RuntimeEnv;
+	/**
+	 * A function to validate the configuration object.
+	 * @param config - The configuration object to be validated
+	 * @param z - The zod 4-mini instance
+	 */
+	validate: (config: Record<string, unknown>, z: typeof zod4Mini) => T;
+}
