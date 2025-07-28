@@ -4,7 +4,7 @@ export const config = new ConfigBuilder({
   validate: (fullConfig, z) => {
     const schema = z.object({
       port: z.number(),
-      environment: z.string()
+      environment: z.string(),
     });
 
     return schema.parse(fullConfig);
