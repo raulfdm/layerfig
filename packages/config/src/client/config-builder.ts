@@ -2,7 +2,7 @@ import { EnvironmentVariableSource } from "../sources/env-var";
 import { ObjectSource } from "../sources/object";
 import type { ClientConfigBuilderOptions } from "../types";
 import { merge } from "../utils/merge";
-import * as zodMini from "../zod-mini";
+import { z as zmini } from "../zod-mini";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#options: ClientConfigBuilderOptions<T>;
@@ -32,7 +32,7 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 			partialConfig = merge({}, partialConfig, data);
 		}
 
-		return this.#options.validate(partialConfig, zodMini);
+		return this.#options.validate(partialConfig, zmini);
 	}
 
 	public addSource(source: ObjectSource | EnvironmentVariableSource): this {

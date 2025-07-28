@@ -3,7 +3,7 @@ import { basicJsonParser } from "../parser/parser-json";
 import { Source } from "../sources/source";
 import type { ServerConfigBuilderOptions } from "../types";
 import { merge } from "../utils/merge";
-import * as zod from "../zod";
+import { z } from "../zod";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#options: ServerConfigBuilderOptions<T>;
@@ -35,7 +35,7 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 			partialConfig = merge({}, partialConfig, data);
 		}
 
-		return this.#options.validate(partialConfig, zod);
+		return this.#options.validate(partialConfig, z);
 	}
 
 	public addSource(source: Source): this {
