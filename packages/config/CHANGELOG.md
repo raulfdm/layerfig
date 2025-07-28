@@ -1,5 +1,83 @@
 # @layerfig/config
 
+## 3.0.0-next.0
+
+### Major Changes
+
+- b81e683: BREAKING CHANGE: Remove `defineConfigParser` in favor of `ConfigParser` class.
+
+  ### Details
+
+  Before, for creating a custom parser you'd use the `defineConfigParser` function:
+
+  ```ts
+  import { defineConfigParser } from "@layerfig/config";
+
+  export const customParser = defineConfigParser({
+    acceptedFileExtensions: ["ini"],
+    parse: (fileContent) => {
+      // Logic to fetch, read, and parse the content
+    },
+  });
+  ```
+
+  Now, to achieve the same you have to define a class that extends `ConfigParser`:
+
+  ```ts
+  // ./path/to/custom-parser.ts
+  import { ConfigParser } from "@layerfig/config";
+
+  class IniParser extends ConfigParser {
+    constructor() {
+      super({
+        acceptedFileExtensions: ["ini"],
+      });
+    }
+
+    load(fileContent: string) {
+      // Logic to fetch, read, and parse the content
+      // should return a Result
+    }
+  }
+
+  export const iniParser = new InitParser();
+  ```
+
+  This will mostly help on lib internal checks and validations.
+
+### Minor Changes
+
+- 928dcc4: Feature: Client submodule
+
+  To improve separation of concerns and prevent accidental use of server-only APIs, a new submodule is now available for client-side configuration: `@layerfig/config/client`.
+
+  This module is built for the browser and omits all file-system, folder, and parser-related options.
+
+  It exports everything you need:
+
+  ```ts
+  import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+
+  const config = new ConfigBuilder({
+    validate: (finalConfig, z) =>
+      z
+        .object({
+          baseURL: z.url(),
+        })
+        .parse(finalConfig),
+
+    runtimeEnv: import.meta.env,
+  })
+    .addSource(
+      new ObjectSource({
+        baseURL: "$BASE_URL",
+      })
+    )
+    .build();
+  ```
+
+  > It also exports `z` (zod 4 mini) in case you want to separate your schema.
+
 ## 2.2.0
 
 ### Minor Changes
