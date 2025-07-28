@@ -1,0 +1,6 @@
+{
+  "id": "acme",
+  "name": "Acme Corp",
+  "subdomain": "acme",
+  "ssoProvider": "google"
+}
