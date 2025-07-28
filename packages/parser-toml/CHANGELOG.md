@@ -1,5 +1,13 @@
 # @layerfig/parser-toml
 
+## 6.0.0-next.0
+
+### Patch Changes
+
+- Updated dependencies [928dcc4]
+- Updated dependencies [b81e683]
+  - @layerfig/config@3.0.0-next.0
+
 ## 5.0.0
 
 ### Major Changes
