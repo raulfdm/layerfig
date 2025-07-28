@@ -1,5 +1,5 @@
 {
-  "name": "client-env",
+  "name": "client-env-example",
   "private": true,
   "type": "module",
   "scripts": {

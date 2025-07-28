@@ -1,5 +1,5 @@
 {
-  "name": "multitenant-app",
+  "name": "multi-tenant-app-example",
   "version": "1.0.0",
   "description": "Multi-tenant application example",
   "scripts": {
