@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
+import { ConfigParser } from "../parser/config-parser";
+import { EnvironmentVariableSource } from "../sources/env-var";
+import { FileSource } from "../sources/file";
+import { ObjectSource } from "../sources/object";
+import type { ServerConfigBuilderOptions } from "../types";
+import { z } from "../zod-mini";
 import { ConfigBuilder } from "./config-builder";
-import { ConfigParser } from "./parser/config-parser";
-import { EnvironmentVariableSource } from "./sources/env-var";
-import { FileSource } from "./sources/file";
-import { ObjectSource } from "./sources/object";
-import type { ServerConfigBuilderOptions } from "./types";
-import { z } from "./zod-mini";
 
 const Schema = z.object({
 	appURL: z.url(),

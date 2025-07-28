@@ -1,9 +1,9 @@
-import type { ConfigParser } from "./parser/config-parser";
-import { basicJsonParser } from "./parser/parser-json";
-import { Source } from "./sources/source";
-import type { ServerConfigBuilderOptions } from "./types";
-import { merge } from "./utils";
-import * as zod from "./zod";
+import type { ConfigParser } from "../parser/config-parser";
+import { basicJsonParser } from "../parser/parser-json";
+import { Source } from "../sources/source";
+import type { ServerConfigBuilderOptions } from "../types";
+import { merge } from "../utils/merge";
+import * as zod from "../zod";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#options: ServerConfigBuilderOptions<T>;
