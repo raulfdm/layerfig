@@ -17,5 +17,5 @@ npm run dev
 This will load only `config/base.json` and `config/local.json`. To see it consuming from `prod`, run:
 
 ```bash
-npm run build && npm run preview
+npm run preview
 ```

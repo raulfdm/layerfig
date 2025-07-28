@@ -8,7 +8,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.ts --outDir dist/server",
-    "preview": "cross-env NODE_ENV=production APP_ENV=prod node server"
+    "preview": "npm run build && cross-env NODE_ENV=production APP_ENV=prod node server"
   },
   "dependencies": {
     "@layerfig/config": "3.0.0-next.2",
