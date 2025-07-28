@@ -1,21 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { ConfigBuilder } from "./config-builder";
-import { ConfigParser } from "./parser/config-parser";
-import { EnvironmentVariableSource } from "./sources/env-var";
-import { FileSource } from "./sources/file";
-import { ObjectSource } from "./sources/object";
-import type { ServerConfigBuilderOptions } from "./types";
-import { z } from "./zod-mini";
+import {
+	ConfigBuilder,
+	type ConfigBuilderOptions,
+	ConfigParser,
+	EnvironmentVariableSource,
+	FileSource,
+	ObjectSource,
+	z,
+} from "./index";
 
 const Schema = z.object({
 	appURL: z.url(),
 	api: z.object({
-		port: z.coerce.number().check(z.int(), z.positive()),
+		port: z.coerce.number().int().positive(),
 	}),
 });
 type Schema = z.output<typeof Schema>;
 
-const baseConfigBuilderOptions: ServerConfigBuilderOptions = {
+const baseConfigBuilderOptions: ConfigBuilderOptions = {
 	validate: (finalConfig) => {
 		return Schema.parse(finalConfig);
 	},
@@ -249,7 +251,7 @@ describe("ConfigBuilder", () => {
 					.addSource(new ObjectSource({ appURL: "not-a-url" }))
 					.build(),
 			).toThrowErrorMatchingInlineSnapshot(`
-				[$ZodError: [
+				[ZodError: [
 				  {
 				    "code": "invalid_format",
 				    "format": "url",
@@ -362,7 +364,7 @@ describe("ConfigBuilder", () => {
 	});
 
 	describe("slots", () => {
-		function getConfig(options?: Partial<ServerConfigBuilderOptions>) {
+		function getConfig(options?: Partial<ConfigBuilderOptions>) {
 			const schema = z.object({
 				appURL: z.url(),
 				port: z.coerce.number().check(z.positive(), z.int()),
@@ -446,7 +448,7 @@ describe("ConfigBuilder", () => {
 	});
 });
 
-function getConfig(options?: Partial<ServerConfigBuilderOptions>) {
+function getConfig(options?: Partial<ConfigBuilderOptions>) {
 	const schema = z.object({
 		appURL: z.url(),
 		api: z.object({

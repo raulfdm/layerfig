@@ -9,8 +9,7 @@ If you maintain multiple environments (e.g., `local`, `dev`, `staging`, `prod`),
 However, you can’t load them all at once:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
@@ -29,8 +28,7 @@ This approach loads every file and merges them, with each subsequent layer overr
 A better solution is to use an environment variable (for example, `APP_ENV=local|dev|staging|prod`) and name your files accordingly:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({

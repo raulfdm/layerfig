@@ -49,9 +49,8 @@ const errorResult = {
 
 Then, use your custom parser by passing it to the `ConfigBuilder`:
 
-```ts {3,14}
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+```ts {2,13}
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import { iniParser } from "./path/to/custom-parser";
 
 export const config = new ConfigBuilder({

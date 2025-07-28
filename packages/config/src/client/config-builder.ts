@@ -1,12 +1,13 @@
+import { EnvironmentVariableSource } from "../sources/env-var";
 import { ObjectSource } from "../sources/object";
 import type { ClientConfigBuilderOptions } from "../types";
-import { merge } from "../utils";
+import { merge } from "../utils/merge";
 import * as zodMini from "../zod-mini";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
 	#options: ClientConfigBuilderOptions<T>;
 
-	#sources: ObjectSource[] = [];
+	#sources: (ObjectSource | EnvironmentVariableSource)[] = [];
 
 	constructor(options: ClientConfigBuilderOptions<T>) {
 		this.#options = options;
@@ -34,9 +35,16 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		return this.#options.validate(partialConfig, zodMini);
 	}
 
-	public addSource(source: ObjectSource): this {
-		if (source instanceof ObjectSource === false) {
-			throw new Error("Invalid source. Please provide a valid one.");
+	public addSource(source: ObjectSource | EnvironmentVariableSource): this {
+		if (
+			!(
+				source instanceof ObjectSource ||
+				source instanceof EnvironmentVariableSource
+			)
+		) {
+			throw new Error(
+				"Invalid source. Please provide either EnvironmentVariableSource or ObjectSource.",
+			);
 		}
 
 		this.#sources.push(source);
@@ -53,3 +61,5 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		return this.#options.slotPrefix || "$";
 	}
 }
+
+export type ConfigBuilderOptions = ClientConfigBuilderOptions;

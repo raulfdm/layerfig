@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { ConfigBuilder, ObjectSource, z } from "./index";
+import {
+	ConfigBuilder,
+	EnvironmentVariableSource,
+	ObjectSource,
+	z,
+} from "./index";
 
 describe("ConfigBuilder", () => {
 	it("should create an instance of ConfigBuilder", () => {
@@ -66,6 +71,37 @@ describe("ConfigBuilder", () => {
 			.build();
 
 		expect(config.baseURL).toBe(mockBaseURL);
+	});
+
+	it("should provide EnvironmentVariableSource", () => {
+		const mockFooValue = "zzzzz";
+
+		// @ts-expect-error: Mocking import.meta.env for testing purposes
+		import.meta.env = {
+			BASE_URL: "http://localhost:3000",
+			APP_foo: mockFooValue,
+		};
+
+		const config = new ConfigBuilder({
+			validate: (finalConfig, z) =>
+				z
+					.object({
+						baseURL: z.url(),
+						foo: z._default(z.string(), "bar"),
+					})
+					.parse(finalConfig),
+
+			runtimeEnv: import.meta.env,
+		})
+			.addSource(
+				new ObjectSource({
+					baseURL: "$BASE_URL",
+				}),
+			)
+			.addSource(new EnvironmentVariableSource())
+			.build();
+
+		expect(config.foo).toBe(mockFooValue);
 	});
 
 	it("should export zod mini", () => {
