@@ -1,5 +1,5 @@
 import path from "node:path";
-import { readIfExist } from "../utils";
+import { readIfExist } from "../utils/read-if-exist";
 import { type LoadSourceOptions, Source } from "./source";
 
 const APP_ROOT_PATH = process.cwd();

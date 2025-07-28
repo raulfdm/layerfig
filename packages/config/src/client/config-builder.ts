@@ -1,6 +1,6 @@
 import { ObjectSource } from "../sources/object";
 import type { ClientConfigBuilderOptions } from "../types";
-import { merge } from "../utils";
+import { merge } from "../utils/merge";
 import * as zodMini from "../zod-mini";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
