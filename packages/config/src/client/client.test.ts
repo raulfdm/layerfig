@@ -43,7 +43,7 @@ describe("ConfigBuilder", () => {
 	it("should return the configured object", () => {
 		const mockBaseURL = "http://localhost:3000";
 
-		// @ts-ignore
+		// @ts-expect-error: Mocking import.meta.env for testing purposes
 		import.meta.env = {
 			BASE_URL: mockBaseURL,
 		};
