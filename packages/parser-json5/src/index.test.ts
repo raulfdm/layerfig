@@ -1,5 +1,8 @@
-import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import {
+	ConfigBuilder,
+	type ConfigBuilderOptions,
+	FileSource,
+} from "@layerfig/config";
 import { describe, expect, it } from "vitest";
 import { z } from "zod/v4";
 import json5Parser from "./index";
