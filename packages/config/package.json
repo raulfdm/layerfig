@@ -46,16 +46,6 @@
 				"default": "./dist/client.js"
 			}
 		},
-		"./sources/*": {
-			"import": {
-				"types": "./dist/sources/*/index.d.ts",
-				"default": "./dist/sources/*/index.js"
-			},
-			"require": {
-				"types": "./dist/sources/*/index.d.cts",
-				"default": "./dist/sources/*/index.cjs"
-			}
-		},
 		"./zod": {
 			"import": {
 				"types": "./dist/zod.d.ts",
