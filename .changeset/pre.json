@@ -10,6 +10,7 @@
 		"@layerfig/tsconfig": "0.0.1"
 	},
 	"changesets": [
+		"clever-views-wonder",
 		"empty-groups-shine",
 		"good-carrots-give",
 		"moody-showers-kiss"

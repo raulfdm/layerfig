@@ -1,5 +1,13 @@
 # @layerfig/config
 
+## 3.0.0-next.2
+
+### Patch Changes
+
+- 38b091a: Fix zod types.
+
+  `z` on validate were being inferred as `any` and it shouldn't be the case.
+
 ## 3.0.0-next.1
 
 ### Major Changes
