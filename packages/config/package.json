@@ -40,6 +40,12 @@
 				"default": "./dist/index.cjs"
 			}
 		},
+		"./client": {
+			"import": {
+				"types": "./dist/client.d.ts",
+				"default": "./dist/client.js"
+			}
+		},
 		"./sources/*": {
 			"import": {
 				"types": "./dist/sources/*/index.d.ts",
