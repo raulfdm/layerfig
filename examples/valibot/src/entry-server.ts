@@ -2,7 +2,7 @@ import { config } from "./config";
 import typescriptLogo from "./typescript.svg";
 
 export function render(_url: string) {
-	const html = `
+  const html = `
     <div>
       <a href="https://vite.dev" target="_blank">
         <img src="/vite.svg" class="logo" alt="Vite logo" />
@@ -17,5 +17,5 @@ export function render(_url: string) {
       <pre><code>${JSON.stringify(config, null, 2)}</code></pre>
     </section>
   `;
-	return { html };
+  return { html };
 }
