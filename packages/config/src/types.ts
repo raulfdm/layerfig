@@ -79,7 +79,7 @@ export interface ClientConfigBuilderOptions<
 	T extends object = Record<string, unknown>,
 > extends Omit<BaseConfigBuilderOptions, "parser" | "configFolder"> {
 	/**
-	 * The runtime environment variables to use (e.g., import.meta., object, e.v)
+	 * The runtime environment variables to use (e.g., import.meta.env, object, etc.)
 	 * @default import.meta.env or {}
 	 */
 	runtimeEnv?: RuntimeEnv;
