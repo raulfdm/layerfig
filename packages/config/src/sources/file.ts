@@ -18,6 +18,14 @@ export class FileSource extends Source {
 		slotPrefix,
 		runtimeEnv,
 	}: LoadSourceOptions): Record<string, unknown> {
+		if (!relativeConfigFolderPath) {
+			throw new Error("relativeConfigFolderPath is required");
+		}
+
+		if (!parser) {
+			throw new Error("Parser is required");
+		}
+
 		const absoluteConfigFolderPath = path.join(
 			APP_ROOT_PATH,
 			relativeConfigFolderPath,

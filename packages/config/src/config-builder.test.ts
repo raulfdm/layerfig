@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { ConfigBuilder, type ConfigBuilderOptions } from "./config-builder";
+import { ConfigBuilder } from "./config-builder";
 import { ConfigParser } from "./parser/config-parser";
 import { EnvironmentVariableSource } from "./sources/env-var";
 import { FileSource } from "./sources/file";
 import { ObjectSource } from "./sources/object";
+import type { ServerConfigBuilderOptions } from "./types";
 import { z } from "./zod-mini";
 
 const Schema = z.object({
@@ -14,7 +15,7 @@ const Schema = z.object({
 });
 type Schema = z.output<typeof Schema>;
 
-const baseConfigBuilderOptions: ConfigBuilderOptions = {
+const baseConfigBuilderOptions: ServerConfigBuilderOptions = {
 	validate: (finalConfig) => {
 		return Schema.parse(finalConfig);
 	},
@@ -255,7 +256,7 @@ describe("ConfigBuilder", () => {
 				    "path": [
 				      "appURL"
 				    ],
-				    "message": "Invalid input"
+				    "message": "Invalid URL"
 				  },
 				  {
 				    "expected": "object",
@@ -263,7 +264,7 @@ describe("ConfigBuilder", () => {
 				    "path": [
 				      "api"
 				    ],
-				    "message": "Invalid input"
+				    "message": "Invalid input: expected object, received undefined"
 				  }
 				]]
 			`);
@@ -361,7 +362,7 @@ describe("ConfigBuilder", () => {
 	});
 
 	describe("slots", () => {
-		function getConfig(options?: Partial<ConfigBuilderOptions>) {
+		function getConfig(options?: Partial<ServerConfigBuilderOptions>) {
 			const schema = z.object({
 				appURL: z.url(),
 				port: z.coerce.number().check(z.positive(), z.int()),
@@ -445,7 +446,7 @@ describe("ConfigBuilder", () => {
 	});
 });
 
-function getConfig(options?: Partial<ConfigBuilderOptions>) {
+function getConfig(options?: Partial<ServerConfigBuilderOptions>) {
 	const schema = z.object({
 		appURL: z.url(),
 		api: z.object({

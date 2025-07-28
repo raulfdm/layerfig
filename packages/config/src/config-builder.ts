@@ -1,47 +1,16 @@
 import type { ConfigParser } from "./parser/config-parser";
 import { basicJsonParser } from "./parser/parser-json";
 import { Source } from "./sources/source";
+import type { ServerConfigBuilderOptions } from "./types";
 import { merge } from "./utils";
-import { z as zod } from "./zod-mini";
-
-export interface ConfigBuilderOptions<
-	T extends object = Record<string, unknown>,
-> {
-	/**
-	 * A function to validate the configuration object.
-	 * @param config - The configuration object to be validated
-	 * @param z - The zod 4-mini instance
-	 */
-	validate: (config: Record<string, unknown>, z: typeof zod) => T;
-	/**
-	 * The folder where the configuration files are located.
-	 * @default "./config"
-	 */
-	configFolder?: string;
-	/**
-	 * Load source from different source types
-	 */
-	parser?: ConfigParser;
-	/**
-	 * Prefix used to search for slotted values
-	 * @default "$"
-	 */
-	slotPrefix?: string;
-	/**
-	 * The runtime environment variables to use (e.g., process.env, import.env, etc.)
-	 * @default process.env
-	 */
-	runtimeEnv?: {
-		[key: string]: string | undefined;
-	};
-}
+import * as zod from "./zod";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
-	#options: ConfigBuilderOptions<T>;
+	#options: ServerConfigBuilderOptions<T>;
 
 	#sources: Source[] = [];
 
-	constructor(options: ConfigBuilderOptions<T>) {
+	constructor(options: ServerConfigBuilderOptions<T>) {
 		this.#options = options;
 	}
 
