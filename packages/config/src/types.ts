@@ -1,6 +1,6 @@
+import type { z as zod } from "zod";
+import type { z as zmini } from "zod/mini";
 import type { ConfigParser } from "./parser/config-parser";
-import type * as zod4 from "./zod";
-import type * as zod4Mini from "./zod-mini";
 
 interface ResultSuccess<TSuccess = undefined> {
 	ok: true;
@@ -72,7 +72,7 @@ export interface ServerConfigBuilderOptions<
 	 * @param config - The configuration object to be validated
 	 * @param z - The zod 4 instance
 	 */
-	validate: (config: Record<string, unknown>, z: typeof zod4) => T;
+	validate: (config: Record<string, unknown>, z: typeof zod) => T;
 }
 
 export interface ClientConfigBuilderOptions<
@@ -88,5 +88,5 @@ export interface ClientConfigBuilderOptions<
 	 * @param config - The configuration object to be validated
 	 * @param z - The zod 4-mini instance
 	 */
-	validate: (config: Record<string, unknown>, z: typeof zod4Mini) => T;
+	validate: (config: Record<string, unknown>, z: typeof zmini) => T;
 }
