@@ -4,7 +4,7 @@
     "": {
       "name": "multitenant-app",
       "dependencies": {
-        "@layerfig/config": "3.0.0-next.1",
+        "@layerfig/config": "3.0.0-next.2",
         "cors": "2.8.5",
         "express": "4.18.2",
         "helmet": "7.1.0",
@@ -18,7 +18,7 @@
     },
   },
   "packages": {
-    "@layerfig/config": ["@layerfig/config@3.0.0-next.1", "", { "dependencies": { "zod": "^4.0.10" } }, "sha512-5vo7s/w6rD5dJGtbqF70LS9oaEybCv0qJaVT6s7wp2TrgrL42nGiEH7pIkckZUiJXiECzmS1evsvb1vt3cTrlQ=="],
+    "@layerfig/config": ["@layerfig/config@3.0.0-next.2", "", { "dependencies": { "zod": "^4.0.10" } }, "sha512-OiIc4ro4eghB/tep7heTrOhLnq4pJ85mMS9QRhGS6xwKF9L4aDg+9ZF++jwI/i4lCnWPD3MP77/OLWSdf5yrgw=="],
 
     "@types/body-parser": ["@types/body-parser@1.19.6", "", { "dependencies": { "@types/connect": "*", "@types/node": "*" } }, "sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g=="],
 

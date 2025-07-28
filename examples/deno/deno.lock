@@ -14,7 +14,7 @@
     "jsr:@std/net@^1.0.4": "1.0.4",
     "jsr:@std/path@^1.1.1": "1.1.1",
     "jsr:@std/streams@^1.0.10": "1.0.10",
-    "npm:@layerfig/config@3.0.0-next.1": "3.0.0-next.1"
+    "npm:@layerfig/config@3.0.0-next.2": "3.0.0-next.2"
   },
   "jsr": {
     "@std/assert@1.0.13": {
@@ -75,8 +75,8 @@
     }
   },
   "npm": {
-    "@layerfig/config@3.0.0-next.1": {
-      "integrity": "sha512-5vo7s/w6rD5dJGtbqF70LS9oaEybCv0qJaVT6s7wp2TrgrL42nGiEH7pIkckZUiJXiECzmS1evsvb1vt3cTrlQ==",
+    "@layerfig/config@3.0.0-next.2": {
+      "integrity": "sha512-OiIc4ro4eghB/tep7heTrOhLnq4pJ85mMS9QRhGS6xwKF9L4aDg+9ZF++jwI/i4lCnWPD3MP77/OLWSdf5yrgw==",
       "dependencies": [
         "zod"
       ]
@@ -92,7 +92,7 @@
     ],
     "packageJson": {
       "dependencies": [
-        "npm:@layerfig/config@3.0.0-next.1"
+        "npm:@layerfig/config@3.0.0-next.2"
       ]
     }
   }
