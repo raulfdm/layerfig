@@ -42,15 +42,7 @@ type RuntimeEnv = {
 };
 
 export interface BaseConfigBuilderOptions {
-	/**
-	 * The folder where the configuration files are located.
-	 * @default "./config"
-	 */
-	configFolder?: string;
-	/**
-	 * Load source from different source types
-	 */
-	parser?: ConfigParser;
+	runtimeEnv?: RuntimeEnv;
 	/**
 	 * Prefix used to search for slotted values
 	 * @default "$"
@@ -61,6 +53,15 @@ export interface BaseConfigBuilderOptions {
 export interface ServerConfigBuilderOptions<
 	T extends object = Record<string, unknown>,
 > extends BaseConfigBuilderOptions {
+	/**
+	 * The folder where the configuration files are located.
+	 * @default "./config"
+	 */
+	configFolder?: string;
+	/**
+	 * Load source from different source types
+	 */
+	parser?: ConfigParser;
 	/**
 	 * The runtime environment variables to use (e.g., process.env, import.meta.env, etc.)
 	 * @default process.env
@@ -79,7 +80,7 @@ export interface ClientConfigBuilderOptions<
 > extends Omit<BaseConfigBuilderOptions, "parser" | "configFolder"> {
 	/**
 	 * The runtime environment variables to use (e.g., import.meta., object, e.v)
-	 * @default import.meta.env
+	 * @default import.meta.env or {}
 	 */
 	runtimeEnv?: RuntimeEnv;
 	/**
