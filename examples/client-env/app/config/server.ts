@@ -1,6 +1,8 @@
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
-import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+import {
+  ConfigBuilder,
+  EnvironmentVariableSource,
+  FileSource,
+} from "@layerfig/config";
 import { ConfigSchema } from "./schema";
 
 export const serverConfig = new ConfigBuilder({
