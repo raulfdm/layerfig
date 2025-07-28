@@ -9,5 +9,9 @@
 		"@layerfig/parser-yaml": "5.0.0",
 		"@layerfig/tsconfig": "0.0.1"
 	},
-	"changesets": ["empty-groups-shine", "moody-showers-kiss"]
+	"changesets": [
+		"empty-groups-shine",
+		"good-carrots-give",
+		"moody-showers-kiss"
+	]
 }
