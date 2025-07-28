@@ -251,7 +251,7 @@ describe("ConfigBuilder", () => {
 					.addSource(new ObjectSource({ appURL: "not-a-url" }))
 					.build(),
 			).toThrowErrorMatchingInlineSnapshot(`
-				[$ZodError: [
+				[ZodError: [
 				  {
 				    "code": "invalid_format",
 				    "format": "url",
