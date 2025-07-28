@@ -66,3 +66,5 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		return this.#options.slotPrefix || "$";
 	}
 }
+
+export type ConfigBuilderOptions = ServerConfigBuilderOptions;
