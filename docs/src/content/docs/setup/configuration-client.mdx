@@ -1,0 +1,98 @@
+---
+title: Client Configuration
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## options.validate
+
+The `ConfigBuilder` constructor requires a `validate` function. This function receives two arguments: the final merged configuration and a Zod mini instance (v4). It must return the validated configuration.
+
+```ts
+// src/config/client.ts
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+
+// config will be type `z.output<typeof schema>` (the actual object type)
+export const config = new ConfigBuilder({
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      appVersion: z.string(),
+    });
+
+    return schema.parse(finalConfig);
+  },
+  runtimeEnv: import.meta.env,
+})
+  .addSource(
+    new ObjectSource({
+      appVersion: "$PUBLIC_APP_VERSION",
+    })
+  )
+  .build();
+```
+
+You can also use other validation libraries. Return the result of the schema validation from the `validate` function, and the `config` object will be typed accordingly:
+
+```ts
+// src/config/client.ts
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+import * as v from "valibot";
+
+const configSchema = v.object({
+  appVersion: v.string(),
+});
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => v.parse(configSchema, finalConfig),
+  runtimeEnv: import.meta.env,
+})
+  .addSource(
+    new ObjectSource({
+      appVersion: "$PUBLIC_APP_VERSION",
+    })
+  )
+  .build();
+```
+
+## options.slotPrefix
+
+> Default: `"$"`
+
+A string that identifies placeholders to be replaced with environment variables.
+
+By default, Layerfig looks for placeholders prefixed with `$`. You can customize this prefix to avoid conflicts or to match a team's convention.
+
+<Aside>Read more about [slots](/setup/slots).</Aside>
+
+For example, to use a double underscore (`__`) as the prefix:
+
+```ts
+// src/config/client.ts
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig, z) => {
+    const schema = z.object({
+      appVersion: z.string(),
+    });
+
+    return schema.parse(finalConfig);
+  },
+  runtimeEnv: import.meta.env,
+  slotPrefix: "__",
+})
+  .addSource(
+    new ObjectSource({
+      appVersion: "__PUBLIC_APP_VERSION",
+    })
+  )
+  .build();
+```
+
+Layerfig will now look for placeholders like `__PUBLIC_APP_VERSION` in your configuration files.
+
+Assuming the `PUBLIC_APP_VERSION` environment variable is set, the resolved configuration will be:
+
+```js
+config.appVersion; // 1f550b7
+```

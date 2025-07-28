@@ -1,5 +1,5 @@
 ---
-title: Client Configuration
+title: Client Setup
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -29,9 +29,7 @@ The advantage of this approach is that you can have separate `server-config.ts`,
 
 ```ts
 // client-config.ts
-import { ConfigBuilder } from "@layerfig/config";
-import { z } from "@layerfig/config/zod-mini";
-import { ObjectSource } from "@layerfig/config/sources/object";
+import { ConfigBuilder, ObjectSource, z } from "@layerfig/config/client";
 import { configSchema } from "./schema";
 
 const ClientSchema = configSchema.pick({
