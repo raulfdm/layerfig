@@ -1,5 +1,5 @@
 {
-	"$schema": "https://turborepo.com/schema.json",
+	"$schema": "./node_modules/turbo/schema.json",
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
@@ -8,9 +8,7 @@
 		"check-types": {
 			"dependsOn": ["^check-types", "^build"]
 		},
-		"check-exports": {
-			"dependsOn": ["^build", "build"]
-		},
+		"check-exports": {},
 		"test": {
 			"dependsOn": ["^build"]
 		},

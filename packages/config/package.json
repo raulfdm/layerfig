@@ -81,7 +81,9 @@
 		"prepack": "bun turbo build --output-logs=errors-only",
 		"build": "tsdown",
 		"check-types": "tsc",
-		"check-exports": "attw --pack --profile node16 .",
+		"check-exports": "bun run check-exports:server && bun run check-exports:client",
+		"check-exports:server": "attw --pack --profile node16 --exclude-entrypoints client ",
+		"check-exports:client": "attw --pack --profile esm-only --entrypoints client",
 		"test": "vitest --typecheck",
 		"test:coverage": "bun run test --coverage --coverage.exclude src/__fixtures__ --coverage.include src"
 	},
