@@ -11,8 +11,7 @@ Sources define where the library reads your configuration from, such as files or
 For loading source from files, use `new FileSource('[file-name].[ext]')`:
 
 ```ts {2,8}
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
@@ -40,14 +39,12 @@ To support various project needs and preferences, we provide parsers for other c
 
 The `ObjectSource` is a simple yet powerful tool for creating client-side configurations with Layerfig. It's ideal when you want to avoid using files or need to override/debug your configuration. It also supports `slots`, allowing you to use environment variables:
 
-```ts {2,7,10-13}
-import { ConfigBuilder } from "@layerfig/config";
-import { ObjectSource } from "@layerfig/config/sources/object";
+```ts {1,8-12}
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
-  runtimeEnv: import.meta.env,
 })
   .addSource(
     new ObjectSource({
@@ -72,10 +69,12 @@ Your application's configuration files are committed to version control and used
 
 To avoid this, use `EnvironmentVariableSource` to override configuration values at runtime without modifying the source files:
 
-```ts {3,10}
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
-import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+```ts {4,12}
+import {
+  ConfigBuilder,
+  FileSource,
+  EnvironmentVariableSource,
+} from "@layerfig/config";
 import { schema } from "./schema";
 
 export const config = new ConfigBuilder({
@@ -114,8 +113,7 @@ Suppose your `base.json` contains:
 Define your schema and load the sources:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
@@ -146,10 +144,12 @@ Since the environment variable source is added last, its values take precedence.
 Use `__` (double underscores) as a separator to target nested keys:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { z } from "@layerfig/config/zod";
-import { FileSource } from "@layerfig/config/sources/file";
-import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+import {
+  ConfigBuilder,
+  FileSource,
+  EnvironmentVariableSource,
+  z,
+} from "@layerfig/config";
 
 const schema = z.object({
   api: z.object({
@@ -178,8 +178,7 @@ APP_api__vendor__aws__apiToken=12345 node index.js
 You can customize the prefix, prefix separator, and nested-key separator:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import { schema } from "./schema";
 
 const config = new ConfigBuilder({

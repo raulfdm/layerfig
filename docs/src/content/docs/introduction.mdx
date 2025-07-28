@@ -60,9 +60,11 @@ When using `ConfigBuilder`, configuration is loaded from two primary sources:
 Since the configuration follows a cascading approach, the final result depends on the order in which sources are added.
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
-import { EnvironmentVariableSource } from "@layerfig/config/sources/env";
+import {
+  ConfigBuilder,
+  EnvironmentVariableSource,
+  FileSource,
+} from "@layerfig/config";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) =>
