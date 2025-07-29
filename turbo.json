@@ -17,5 +17,5 @@
 			"cache": false
 		}
 	},
-	"globalEnv": ["NPM_TOKEN"]
+	"globalEnv": ["NPM_TOKEN", "WORKERS_CI_BRANCH"]
 }

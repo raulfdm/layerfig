@@ -1,3 +1,5 @@
+import { config } from "../../config";
+
 interface ExampleOptions {
   name: string;
   title: string;
@@ -22,7 +24,7 @@ class Example {
 
   get src() {
     const baseURL = new URL(
-      `https://stackblitz.com/github/raulfdm/layerfig/tree/main/examples/${this.options.name}`,
+      `https://stackblitz.com/github/raulfdm/layerfig/tree/${config.branchName}/examples/${this.options.name}`,
     );
     baseURL.searchParams.set("embed", "1");
     baseURL.searchParams.set(
