@@ -1,4 +1,4 @@
-import type { TenantConfig } from "./config";
+import type { TenantConfigType, TenantId } from "./config";
 
 export interface Task {
   id: string;
@@ -9,13 +9,13 @@ export interface Task {
   updatedAt: Date;
 }
 
-export interface Tenant extends TenantConfig {
+export type AugmentedTenant<T extends TenantId> = TenantConfigType<T> & {
   createdAt: Date;
-}
+};
 
-export interface TenantContext {
-  tenantId: TenantConfig['id'];
-  tenant: Tenant;
+export interface TenantContext<T extends TenantId> {
+  tenantId: TenantId;
+  tenant: AugmentedTenant<T>;
 }
 
 export interface CreateTaskRequest {

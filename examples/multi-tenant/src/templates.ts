@@ -1,6 +1,11 @@
-import type { Task, Tenant } from './types';
+import type { TenantId } from "./config";
+import type { AugmentedTenant, Task } from "./types";
 
-const baseLayout = (title: string, content: string, tenant: Tenant): string => `
+const baseLayout = (
+  title: string,
+  content: string,
+  tenant: AugmentedTenant<TenantId>,
+): string => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -198,57 +203,70 @@ const baseLayout = (title: string, content: string, tenant: Tenant): string => `
 </html>
 `;
 
-export const renderTaskList = (tasks: Task[], tenant: Tenant): string => {
+export const renderTaskList = (
+  tasks: Task[],
+  tenant: AugmentedTenant<TenantId>,
+): string => {
   const content = `
     <div class="card">
         <h2>Tasks (${tasks.length})</h2>
-        ${tasks.length === 0
-          ? '<p>No tasks yet. <a href="/new">Create your first task!</a></p>'
-          : tasks.map(task => `
-            <div class="task ${task.completed ? 'completed' : ''}">
+        ${
+    tasks.length === 0
+      ? '<p>No tasks yet. <a href="/new">Create your first task!</a></p>'
+      : tasks.map((task) => `
+            <div class="task ${task.completed ? "completed" : ""}">
                 <div class="task-title">${task.title}</div>
                 <div class="task-description">${task.description}</div>
                 <div class="task-meta">
-                    Status: ${task.completed ? '✅ Completed' : '🔄 In Progress'} |
+                    Status: ${
+        task.completed ? "✅ Completed" : "🔄 In Progress"
+      } |
                     Created: ${task.createdAt.toLocaleDateString()}
                 </div>
                 <div class="task-actions">
                     <a href="/tasks/${task.id}" class="btn btn-secondary">View</a>
                     <a href="/tasks/${task.id}/edit" class="btn">Edit</a>
-                    ${!task.completed
-                      ? `<a href="/tasks/${task.id}/complete" class="btn btn-success">Complete</a>`
-                      : `<a href="/tasks/${task.id}/uncomplete" class="btn btn-secondary">Uncomplete</a>`
-                    }
+                    ${
+        !task.completed
+          ? `<a href="/tasks/${task.id}/complete" class="btn btn-success">Complete</a>`
+          : `<a href="/tasks/${task.id}/uncomplete" class="btn btn-secondary">Uncomplete</a>`
+      }
                     <a href="/tasks/${task.id}/delete" class="btn btn-danger"
                        onclick="return confirm('Are you sure you want to delete this task?')">Delete</a>
                 </div>
             </div>
-          `).join('')
-        }
+          `).join("")
+  }
     </div>
   `;
 
-  return baseLayout('Tasks', content, tenant);
+  return baseLayout("Tasks", content, tenant);
 };
 
-export const renderTask = (task: Task, tenant: Tenant): string => {
+export const renderTask = (
+  task: Task,
+  tenant: AugmentedTenant<TenantId>,
+): string => {
   const content = `
     <div class="card">
-        <div class="task ${task.completed ? 'completed' : ''}">
+        <div class="task ${task.completed ? "completed" : ""}">
             <div class="task-title">${task.title}</div>
             <div class="task-description">${task.description}</div>
             <div class="task-meta">
-                Status: ${task.completed ? '✅ Completed' : '🔄 In Progress'}<br>
+                Status: ${
+    task.completed ? "✅ Completed" : "🔄 In Progress"
+  }<br>
                 Created: ${task.createdAt.toLocaleString()}<br>
                 Updated: ${task.updatedAt.toLocaleString()}
             </div>
             <div class="task-actions">
                 <a href="/" class="btn btn-secondary">← Back to Tasks</a>
                 <a href="/tasks/${task.id}/edit" class="btn">Edit</a>
-                ${!task.completed
-                  ? `<a href="/tasks/${task.id}/complete" class="btn btn-success">Complete</a>`
-                  : `<a href="/tasks/${task.id}/uncomplete" class="btn btn-secondary">Uncomplete</a>`
-                }
+                ${
+    !task.completed
+      ? `<a href="/tasks/${task.id}/complete" class="btn btn-success">Complete</a>`
+      : `<a href="/tasks/${task.id}/uncomplete" class="btn btn-secondary">Uncomplete</a>`
+  }
                 <a href="/tasks/${task.id}/delete" class="btn btn-danger"
                    onclick="return confirm('Are you sure you want to delete this task?')">Delete</a>
             </div>
@@ -259,7 +277,7 @@ export const renderTask = (task: Task, tenant: Tenant): string => {
   return baseLayout(`Task: ${task.title}`, content, tenant);
 };
 
-export const renderNewTask = (tenant: Tenant): string => {
+export const renderNewTask = (tenant: AugmentedTenant<TenantId>): string => {
   const content = `
     <div class="card">
         <h2>Create New Task</h2>
@@ -280,10 +298,13 @@ export const renderNewTask = (tenant: Tenant): string => {
     </div>
   `;
 
-  return baseLayout('New Task', content, tenant);
+  return baseLayout("New Task", content, tenant);
 };
 
-export const renderEditTask = (task: Task, tenant: Tenant): string => {
+export const renderEditTask = (
+  task: Task,
+  tenant: AugmentedTenant<TenantId>,
+): string => {
   const content = `
     <div class="card">
         <h2>Edit Task</h2>
@@ -298,7 +319,9 @@ export const renderEditTask = (task: Task, tenant: Tenant): string => {
             </div>
             <div class="form-group">
                 <div class="checkbox-group">
-                    <input type="checkbox" id="completed" name="completed" ${task.completed ? 'checked' : ''}>
+                    <input type="checkbox" id="completed" name="completed" ${
+    task.completed ? "checked" : ""
+  }>
                     <label for="completed">Mark as completed</label>
                 </div>
             </div>
@@ -313,7 +336,10 @@ export const renderEditTask = (task: Task, tenant: Tenant): string => {
   return baseLayout(`Edit: ${task.title}`, content, tenant);
 };
 
-export const renderError = (error: string, tenant?: Tenant): string => {
+export const renderError = (
+  error: string,
+  tenant?: AugmentedTenant<TenantId>,
+): string => {
   const content = `
     <div class="card">
         <h2>❌ Error</h2>
@@ -324,6 +350,12 @@ export const renderError = (error: string, tenant?: Tenant): string => {
     </div>
   `;
 
-  const defaultTenant = { id: 'unknown', name: 'Unknown Tenant', subdomain: 'unknown', createdAt: new Date() };
-  return baseLayout('Error', content, tenant || defaultTenant);
+  const defaultTenant = {
+    id: "unknown",
+    name: "Unknown Tenant",
+    subdomain: "unknown",
+    createdAt: new Date(),
+  } as never;
+
+  return baseLayout("Error", content, tenant || defaultTenant);
 };

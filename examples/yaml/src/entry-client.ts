@@ -1,2 +1,2 @@
-import './style.css'
-import './typescript.svg'
+import "./style.css";
+import "./typescript.svg";

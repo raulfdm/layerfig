@@ -17,7 +17,7 @@ if (DEVELOPMENT) {
   const viteDevServer = await import("vite").then((vite) =>
     vite.createServer({
       server: { middlewareMode: true },
-    }),
+    })
   );
   app.use(viteDevServer.middlewares);
   app.use(async (req, res, next) => {
