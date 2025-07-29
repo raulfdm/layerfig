@@ -1,0 +1,2 @@
+branchName: ${CF_PAGES_BRANCH:-main}
+editLink: https://github.com/raulfdm/layerfig/tree/${CF_PAGES_BRANCH:-main}/docs

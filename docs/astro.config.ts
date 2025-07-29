@@ -1,6 +1,7 @@
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
 import starlightThemeNova from "starlight-theme-nova";
+import { config } from "./src/config";
 import { examples } from "./src/pages/examples/examples";
 
 // https://astro.build/config
@@ -23,7 +24,7 @@ export default defineConfig({
 				},
 			],
 			editLink: {
-				baseUrl: "https://github.com/raulfdm/layerfig/tree/main/docs",
+				baseUrl: config.editLink,
 			},
 			sidebar: [
 				{
