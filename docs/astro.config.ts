@@ -6,6 +6,17 @@ import { examples } from "./src/pages/examples/examples";
 
 // https://astro.build/config
 export default defineConfig({
+	vite: {
+		ssr: {
+			/**
+			 * Zod from astro is v3 while Layerfig uses v4
+			 * In a monorepo with bun, it mix the imports so we need to exclude it so we
+			 * need to exclude it from the SSR build.
+			 * @see https://github.com/withastro/astro/issues/14117#issuecomment-3117797751
+			 */
+			noExternal: ["zod"],
+		},
+	},
 	integrations: [
 		starlight({
 			plugins: [starlightThemeNova()],

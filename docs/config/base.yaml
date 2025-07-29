@@ -1,2 +1,2 @@
-branchName: ${WORKERS_CI_BRANCH:-main}
-editLink: https://github.com/raulfdm/layerfig/tree/${WORKERS_CI_BRANCH:-main}/docs
+branchName: ${WORKERS_CI_BRANCH:GITHUB_REF:-main}
+editLink: https://github.com/raulfdm/layerfig/tree/${WORKERS_CI_BRANCH:GITHUB_REF:-main}/docs
