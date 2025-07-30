@@ -1,7 +1,7 @@
+import { merge } from "es-toolkit/compat";
 import { EnvironmentVariableSource } from "../sources/env-var";
 import { ObjectSource } from "../sources/object";
 import type { ClientConfigBuilderOptions } from "../types";
-import { merge } from "../utils/merge";
 import { z as zmini } from "../zod-mini";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
