@@ -1,8 +1,8 @@
+import { merge } from "es-toolkit/compat";
 import type { ConfigParser } from "../parser/config-parser";
 import { basicJsonParser } from "../parser/parser-json";
 import { Source } from "../sources/source";
 import type { ServerConfigBuilderOptions } from "../types";
-import { merge } from "../utils/merge";
 import { z } from "../zod";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
