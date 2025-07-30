@@ -1,3 +1,4 @@
+import { get } from "es-toolkit/compat";
 import type { ConfigParser } from "../parser/config-parser";
 import type { Prettify } from "../types";
 
@@ -76,6 +77,31 @@ export abstract class Source<T = Record<string, unknown>> {
 		return newValue;
 	}
 
+	maybeReplaceSelfReferenceValue({
+		slotPrefix,
+		value,
+		partialConfig,
+	}: {
+		value: string;
+		slotPrefix: string;
+		partialConfig: Record<string, any>;
+	}): string | undefined {
+		const selfReferenceRegex = this.#getSelfReferenceRegex(slotPrefix);
+		const selfReferenceMatches = value.match(selfReferenceRegex);
+
+		if (!selfReferenceMatches) {
+			return value;
+		}
+
+		const propertyPath = value
+			.replace(slotPrefix, "")
+			.replace("self.", "")
+			.replaceAll("{", "")
+			.replaceAll("}", "");
+
+		return get(partialConfig, propertyPath);
+	}
+
 	#extractSlotName({
 		slotPrefix,
 		value,
@@ -88,10 +114,12 @@ export abstract class Source<T = Record<string, unknown>> {
 		 */
 		const basicSlotRegex = new RegExp(`\\${slotPrefix}\\w+`, "g");
 		/**
-		 * Something like: /\$\{.*\}/g
+		 * Something like: /\${(?!self\.).*}/g
+		 *
 		 * To match multi-slot patterns like ${MY_VAR:MY_OTHER_VAR}
+		 * ... but that does not start with ${self.}
 		 */
-		const multiSlotRegex = new RegExp(`\\${slotPrefix}{.*}`, "g");
+		const multiSlotRegex = new RegExp(`\\${slotPrefix}{(?!self\\.).*}`, "g");
 
 		const basicMatches = value.match(basicSlotRegex);
 		const multiMatches = value.match(multiSlotRegex);
@@ -152,5 +180,9 @@ export abstract class Source<T = Record<string, unknown>> {
 		 */
 		const safe = slot.replace(/^./, (m) => `\\${m}`);
 		return new RegExp(safe, "gm");
+	}
+
+	#getSelfReferenceRegex(slotPrefix: string): RegExp {
+		return new RegExp(`\\${slotPrefix}{self.*}`, "g");
 	}
 }

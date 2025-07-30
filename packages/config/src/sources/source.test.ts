@@ -17,6 +17,26 @@ describe("Source", () => {
 	});
 
 	describe(".maybeReplaceSlotFromValue", () => {
+		it("should not replace self-reference values", () => {
+			const source = new MyCustomSource();
+
+			const content = `myValue: $\{self.foo.bar\}
+port: $PORT`;
+
+			expect(
+				source.maybeReplaceSlotFromValue({
+					value: content,
+					runtimeEnv: {
+						PORT: "8080",
+					},
+					slotPrefix: "$",
+				}),
+			).toMatchInlineSnapshot(`
+				"myValue: \${self.foo.bar}
+				port: 8080"
+			`);
+		});
+
 		describe("basic slot $SLOT", () => {
 			it("should replace the slot", () => {
 				const source = new MyCustomSource();
@@ -32,6 +52,36 @@ describe("Source", () => {
 				});
 
 				expect(value).toBe(mockedName);
+			});
+
+			it("should replace multiple slots", () => {
+				const source = new MyCustomSource();
+
+				const mockedName = "John Doe";
+				const mockedPort = "8080";
+				const mockedBranch = "dev";
+
+				const value = `name: $NAME
+port: $PORT
+branch: $\{GIT_BRANCH:GIT_REF:-main\}
+baseBranch: $\{GIT_REF:-next\}`;
+
+				const expectedValue = `name: ${mockedName}
+port: ${mockedPort}
+branch: ${mockedBranch}
+baseBranch: next`;
+
+				const content = source.maybeReplaceSlotFromValue({
+					value,
+					runtimeEnv: {
+						NAME: mockedName,
+						PORT: mockedPort,
+						GIT_BRANCH: mockedBranch,
+					},
+					slotPrefix: "$",
+				});
+
+				expect(content).toBe(expectedValue);
 			});
 
 			it("should consider different slot prefix", () => {
@@ -168,6 +218,70 @@ describe("Source", () => {
 					}),
 				).toBe(mockedValue);
 			});
+		});
+	});
+
+	describe(".maybeReplaceSelfReferenceValue", () => {
+		it("should return value from the self-reference path", () => {
+			const source = new MyCustomSource();
+
+			const value = source.maybeReplaceSelfReferenceValue({
+				value: "${self.foo.bar}",
+				slotPrefix: "$",
+				partialConfig: {
+					foo: {
+						bar: "baz",
+					},
+				},
+			});
+
+			expect(value).toBe("baz");
+		});
+
+		it("should return the same value if not a self-reference match", () => {
+			const source = new MyCustomSource();
+
+			const value = source.maybeReplaceSelfReferenceValue({
+				value: "${it.foo.bar}",
+				slotPrefix: "$",
+				partialConfig: {
+					foo: {
+						bar: "baz",
+					},
+				},
+			});
+
+			expect(value).toBe("${it.foo.bar}");
+		});
+
+		it("should return undefined value from the self-reference path when not present", () => {
+			const source = new MyCustomSource();
+
+			const value = source.maybeReplaceSelfReferenceValue({
+				value: "${self.foo.bar}",
+				slotPrefix: "$",
+				partialConfig: {
+					foo: {},
+				},
+			});
+
+			expect(value).toBe(undefined);
+		});
+
+		it("should consider different slotPrefix", () => {
+			const source = new MyCustomSource();
+
+			const value = source.maybeReplaceSelfReferenceValue({
+				value: "#{self.foo.bar}",
+				slotPrefix: "#",
+				partialConfig: {
+					foo: {
+						bar: 1,
+					},
+				},
+			});
+
+			expect(value).toBe(1);
 		});
 	});
 });
