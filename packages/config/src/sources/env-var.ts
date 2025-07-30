@@ -1,4 +1,4 @@
-import { set } from "../utils/set";
+import { set } from "es-toolkit/compat";
 import { z } from "../zod-mini";
 import { type LoadSourceOptions, Source } from "./source";
 
