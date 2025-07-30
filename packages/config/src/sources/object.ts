@@ -23,6 +23,17 @@ export class ObjectSource<
 			runtimeEnv,
 		});
 
+		const partialConfig = JSON.parse(replacedObject);
+		// console.log(replacedObject);
+
+		const a = this.maybeReplaceSelfReferenceValue({
+			partialConfig,
+			slotPrefix,
+			value: replacedObject,
+		});
+
+		// console.log(a);
+
 		return JSON.parse(replacedObject) as Prettify<T>;
 	}
 }

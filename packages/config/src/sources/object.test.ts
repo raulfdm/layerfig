@@ -105,5 +105,29 @@ describe("ObjectSource", () => {
 				host: "localhost",
 			});
 		});
+
+		it("should replace self-reference slots", () => {
+			const testObject = {
+				port: "$PORT",
+				host: "$HOST",
+				appURL: "http://${self.host}:${self.port}",
+			};
+
+			const envVarSource = new ObjectSource(testObject);
+
+			expect(
+				envVarSource.loadSource({
+					...baseLoadSourceOptions,
+					runtimeEnv: {
+						PORT: "3000",
+						HOST: "localhost",
+					},
+				}),
+			).toEqual({
+				port: "3000",
+				host: "localhost",
+				appURL: "http://localhost:3000",
+			});
+		});
 	});
 });

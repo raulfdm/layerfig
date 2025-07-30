@@ -238,6 +238,23 @@ baseBranch: next`;
 			expect(value).toBe("baz");
 		});
 
+		it.only("should consider multiple self-references", () => {
+			const source = new MyCustomSource();
+
+			const value = source.maybeReplaceSelfReferenceValue({
+				value: "${self.foo.bar} and ${self.foo.baz}",
+				slotPrefix: "$",
+				partialConfig: {
+					foo: {
+						bar: "baz",
+						baz: "qux",
+					},
+				},
+			});
+
+			expect(value).toBe("baz and qux");
+		});
+
 		it("should return the same value if not a self-reference match", () => {
 			const source = new MyCustomSource();
 

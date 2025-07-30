@@ -93,11 +93,19 @@ export abstract class Source<T = Record<string, unknown>> {
 			return value;
 		}
 
-		const propertyPath = value
+		const propertyPath = selfReferenceMatches[0]
 			.replace(slotPrefix, "")
 			.replace("self.", "")
 			.replaceAll("{", "")
 			.replaceAll("}", "");
+
+		console.log({
+			selfReferenceMatches,
+			value,
+			slotPrefix,
+			partialConfig,
+			propertyPath,
+		});
 
 		return get(partialConfig, propertyPath);
 	}
