@@ -4,7 +4,7 @@ title: "Slots"
 
 import { Aside } from "@astrojs/starlight/components";
 
-You may need to define your configuration in a file while also sourcing values from environment variables.
+It's common to define your configuration in a file while also sourcing values from environment variables.
 
 Consider the following configuration file:
 
@@ -16,7 +16,7 @@ Consider the following configuration file:
 }
 ```
 
-Notice that the port number is used in two places. Instead of hardcoding this value, you can use a `PORT` variable defined in your environment, for example, in a `.env` file:
+Notice that the port number is used in two places. Instead of hardcoding this value, you can use a `PORT` variable from your environment, for example, in a `.env` file:
 
 ```env
 PORT=3000
@@ -32,15 +32,98 @@ To reference this environment variable, you can use a "slot":
 }
 ```
 
-When Layerfig processes your configuration, it searches for slots and replaces them with the corresponding environment variable's value:
+When Layerfig processes your configuration, it finds slots and replaces them with the corresponding environment variable's value:
 
 ```
-$PORT => PORT => 3000
+$PORT => process.env.PORT => 3000
 ```
 
 <Aside>Check out the [slots example](/examples/slots).</Aside>
 
+## Self-Referencing Slots
+
+For a more convenient experience, you can also reference values within the same configuration file. This is particularly useful for avoiding duplication and ensuring consistency.
+
+In the previous "port" example, instead of defining the `$PORT` slot in two places, you can use a self-referencing slot:
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:${self.port}",
+  "port": "${PORT:-3000}"
+}
+```
+
+Layerfig searches for the `${self.*}` syntax in the configuration file and uses the value after the dot as an "object-path" to find the value in the same configuration. In this case, it will look for the `port` value.
+
+The final configuration will be:
+
+```json
+{
+  "appURL": "http://localhost:3000",
+  "port": "3000"
+}
+```
+
+<Aside type="caution">
+  If the path doesn't match any value, Layerfig will not perform a replacement,
+  and the slot will remain unchanged.
+</Aside>
+
+## Different Prefix
+
+By default, Layerfig uses `$` as the slot prefix, but you can change it by passing the [`slotPrefix`](/setup/configuration/#optionsslotprefix) option.
+
+## Chaining Environment Variables
+
+You may want to try multiple environment variables for a single value, providing a chain of options in a specific order of priority.
+
+For example, imagine you want to determine the current Git branch. This value could be sourced from several environment variables:
+
+1.  `process.env.GIT_REF`
+2.  `process.env.REF`
+3.  `process.env.MAIN_REF`
+
+To achieve this, you can use the extended slot syntax, separating each variable name with a colon:
+
+```json
+// config/base.json
+{
+  "branch": "${GIT_REF:REF:MAIN_REF}"
+}
+```
+
+Layerfig processes this from left to right, checking for `GIT_REF`, then `REF`, and so on, using the first defined environment variable it finds. If none of the environment variables in the chain are found, Layerfig preserves the original slot string.
+
+## Literal Fallbacks
+
+In addition to chaining variables, you can also provide a literal fallback value if none of the environment variables are set.
+
+This is achieved by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
+
+```json
+// config/base.json
+{
+  "port": "${PORT:-3000}"
+}
+```
+
+If the `PORT` environment variable is not defined, Layerfig will use `3000` as the value.
+
+This operator can be combined with variable chaining for more complex cases:
+
+```json
+// config/base.json
+{
+  "branch": "${GIT_REF:REF:MAIN_REF:-main}"
+}
+```
+
+If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, the value will fall back to the literal string `main`.
+
 ## Caveats
+
+There are a few things to keep in mind when working with slots.
 
 If an environment variable for a slot is not defined, Layerfig will not perform a replacement. The configuration value will retain the original slot string:
 
@@ -69,51 +152,3 @@ const schema = z.object({
 ```
 
 The `z.coerce.number()` function will parse the string `"3000"` and transform it into the number `3000`.
-
-## Different Prefix
-
-By default, Layerfig uses `$` as the slot prefix, but you can change it by passing the [`slotPrefix`](/setup/configuration/#optionsslotprefix) option.
-
-## Chaining Environment Variables
-
-There are cases where you might want to try multiple environment variables for a single value, providing a chain of options in a specific order of priority.
-
-For example, imagine you want to determine the current Git branch. This value could be sourced from several environment variables:
-
-1.  `process.env.GIT_REF`
-2.  `process.env.REF`
-3.  `process.env.MAIN_REF`
-
-To achieve this, you can use the extended slot syntax, separating each variable name with a colon:
-
-```json
-{
-  "branch": "${GIT_REF:REF:MAIN_REF}"
-}
-```
-
-Layerfig processes this from left to right. It checks for `GIT_REF`, then `REF`, and so on, using the first defined environment variable it finds. If no environment variables in the chain are found, Layerfig will preserve the original slot string.
-
-## Literal Fallbacks
-
-In addition to chaining variables, you can also provide a literal fallback value to be used if none of the environment variables are set.
-
-This is achieved by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
-
-```json
-{
-  "port": "${PORT:-3000}"
-}
-```
-
-If the `PORT` environment variable is not defined, Layerfig will use `3000` as the value.
-
-Of course, this operator can be combined with variable chaining for more complex cases:
-
-```json
-{
-  "branch": "${GIT_REF:REF:MAIN_REF:-main}"
-}
-```
-
-If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, the value will fall back to the literal string `main`.
