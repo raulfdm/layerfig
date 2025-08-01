@@ -1,3 +1,4 @@
+import { get } from "es-toolkit/compat";
 import type { ConfigParser } from "../parser/config-parser";
 import type { Prettify } from "../types";
 
@@ -12,17 +13,36 @@ export interface LoadSourceOptions {
 	slotPrefix: string;
 }
 
-interface MaybeReplaceSlotFromValueOptions
+interface MaybeReplaceSlots<T = unknown>
 	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {
-	value: string;
+	contentString: string;
+	transform: (contentString: string) => T;
 }
 
-interface ExtractedSlot {
+interface BaseSlot {
 	slotPattern: RegExp;
-	envVarName: string[];
-	value: string;
-	fallback?: string;
 }
+
+interface SingleVariableSlot extends BaseSlot {
+	type: "single_variable";
+	envVarName: string;
+}
+
+interface MultiVariableSlot extends BaseSlot {
+	type: "multi_variable";
+	envVarName: string[];
+	fallback: string | undefined;
+}
+
+interface SelfReferencingSlot extends BaseSlot {
+	type: "self_referencing";
+	propertyPath: string;
+}
+
+type ExtractedSlot =
+	| SingleVariableSlot
+	| MultiVariableSlot
+	| SelfReferencingSlot;
 
 export abstract class Source<T = Record<string, unknown>> {
 	/**
@@ -33,89 +53,177 @@ export abstract class Source<T = Record<string, unknown>> {
 	 */
 	abstract loadSource(loadSourceOptions: LoadSourceOptions): Prettify<T>;
 
-	maybeReplaceSlotFromValue({
-		value,
-		slotPrefix,
-		runtimeEnv,
-	}: MaybeReplaceSlotFromValueOptions): string {
-		const slots = this.#extractSlotName({
-			slotPrefix,
-			value,
+	maybeReplaceSlots<T>(options: MaybeReplaceSlots<T>) {
+		const slots = this.#extractSlots({
+			slotPrefix: options.slotPrefix,
+			contentString: options.contentString,
 		});
 
 		if (slots === null) {
-			return value;
+			return options.transform(options.contentString);
 		}
 
-		let newValue = value;
-
-		for (const slot of slots) {
-			let envVarValue: string | undefined;
-
-			for (const envVar of slot.envVarName) {
-				const value = runtimeEnv[envVar];
-
-				if (value) {
-					envVarValue = value;
-					break;
+		const groupedSlots = slots.reduce(
+			(acc, slot) => {
+				switch (slot.type) {
+					case "single_variable":
+						acc.single_variable = [...acc.single_variable, slot];
+						break;
+					case "multi_variable":
+						acc.multi_variable = [...acc.multi_variable, slot];
+						break;
+					case "self_referencing":
+						acc.self_referencing = [...acc.self_referencing, slot];
+						break;
 				}
-			}
+				return acc;
+			},
+			{
+				single_variable: [],
+				multi_variable: [],
+				self_referencing: [],
+			} as {
+				single_variable: SingleVariableSlot[];
+				multi_variable: MultiVariableSlot[];
+				self_referencing: SelfReferencingSlot[];
+			},
+		);
 
-			envVarValue ??= slot.fallback;
+		let nextContentString = options.contentString;
 
-			if (envVarValue) {
-				newValue = newValue.replace(slot.slotPattern, envVarValue);
+		for (const slot of groupedSlots.single_variable) {
+			const envVar = options.runtimeEnv[slot.envVarName];
+
+			if (envVar) {
+				nextContentString = nextContentString.replaceAll(
+					slot.slotPattern,
+					envVar,
+				);
 			} else {
 				console.warn(
-					"[SLOT_REPLACEMENT]",
+					"[SINGLE_VARIABLE_SLOT]",
 					`The value for the slot "${slot.envVarName}" is not defined in the runtime environment. The slot will not be replaced.`,
 				);
 			}
 		}
 
-		return newValue;
+		for (const slot of groupedSlots.multi_variable) {
+			let envVar: string | undefined;
+
+			for (const envVarName of slot.envVarName) {
+				const envVarValue = options.runtimeEnv[envVarName];
+
+				if (envVarValue) {
+					envVar = envVarValue;
+					break;
+				}
+			}
+
+			envVar ??= slot.fallback;
+
+			if (envVar) {
+				nextContentString = nextContentString.replaceAll(
+					slot.slotPattern,
+					envVar,
+				);
+			} else {
+				console.warn(
+					"[MULTI_VARIABLE_SLOT]",
+					`None of the variables "${slot.envVarName.join(", ")}" are defined in the runtime environment. The slot will not be replaced.`,
+				);
+			}
+		}
+
+		const partialConfig = options.transform(nextContentString);
+
+		for (const selfReferencingSlot of groupedSlots.self_referencing) {
+			const propertyValue = get(
+				partialConfig,
+				selfReferencingSlot.propertyPath,
+			);
+
+			if (propertyValue) {
+				nextContentString = nextContentString.replaceAll(
+					selfReferencingSlot.slotPattern,
+					propertyValue,
+				);
+			} else {
+				console.warn(
+					"[SELF_REFERENCING_SLOT]",
+					`Self-referencing slot (path "${selfReferencingSlot.propertyPath}") is not defined in the config object. The slot will not be replaced.`,
+				);
+			}
+		}
+
+		return options.transform(nextContentString);
 	}
 
-	#extractSlotName({
+	#extractSlots({
 		slotPrefix,
-		value,
-	}: Pick<MaybeReplaceSlotFromValueOptions, "value" | "slotPrefix">):
+		contentString,
+	}: Pick<MaybeReplaceSlots, "contentString" | "slotPrefix">):
 		| ExtractedSlot[]
 		| null {
 		/**
-		 * Something like: /\$\w+/g
-		 * To match basic slots like $MY_VAR
+		 * Matches single slots like:
+		 * - $FOO
+		 * - ${FOO}
 		 */
-		const basicSlotRegex = new RegExp(`\\${slotPrefix}\\w+`, "g");
+		const basicSlotRegex = new RegExp(
+			`\\${slotPrefix}\\w+|\\${slotPrefix}{\\w+}`,
+			"g",
+		);
+
 		/**
-		 * Something like: /\$\{.*\}/g
-		 * To match multi-slot patterns like ${MY_VAR:MY_OTHER_VAR}
+		 * Matches multi-slot patterns like:
+		 * - ${FOO:BAR}
+		 * - ${FOO:BAR:NAME3:-fallback value}
+		 * - ${NAME1:NAME2:NAME3:-fallback value}
 		 */
-		const multiSlotRegex = new RegExp(`\\${slotPrefix}{.*}`, "g");
+		const multiSlotRegex = new RegExp(
+			`\\${slotPrefix}{\\w+(?::\\w+)*(?::-.+?)?}`,
+			"g",
+		);
 
-		const basicMatches = value.match(basicSlotRegex);
-		const multiMatches = value.match(multiSlotRegex);
+		/**
+		 * Matches self-referencing patterns like
+		 * - ${self.foo}
+		 * - ${self.foo.bar}
+		 */
+		const selfReferencingSlotRegex = new RegExp(
+			`\\${slotPrefix}{self.([^}]*)}`,
+			"gm",
+		);
 
-		if (!basicMatches && !multiMatches) {
+		const hasBasicSlot = basicSlotRegex.test(contentString);
+		const hasMultiSlot = multiSlotRegex.test(contentString);
+		const hasSelfReferencingSlot = selfReferencingSlotRegex.test(contentString);
+
+		if (!hasBasicSlot && !hasMultiSlot && !hasSelfReferencingSlot) {
 			return null;
 		}
 
 		const result: ExtractedSlot[] = [];
 
-		if (basicMatches) {
-			const uniqueSlots = new Set(basicMatches);
+		if (hasBasicSlot) {
+			const matches = contentString.match(basicSlotRegex);
+			const uniqueSlots = new Set(matches);
 
 			result.push(
-				...Array.from(uniqueSlots).map((slotMatch) => ({
-					envVarName: [slotMatch.replace(slotPrefix, "")],
-					slotPattern: this.#safeSlotRegex(slotMatch),
-					value,
-				})),
+				...Array.from(uniqueSlots).map(
+					(slotMatch) =>
+						({
+							type: "single_variable",
+							envVarName: slotMatch.replace(slotPrefix, ""),
+							slotPattern: this.#safeSlotRegex(slotMatch),
+						}) satisfies SingleVariableSlot,
+				),
 			);
 		}
 
-		if (multiMatches) {
-			const possibleEnvVarSlots = new Set(multiMatches);
+		if (hasMultiSlot) {
+			const matches = contentString.match(multiSlotRegex);
+			const possibleEnvVarSlots = new Set(matches);
 
 			for (const possibleSlot of possibleEnvVarSlots) {
 				let fallbackValue: string | undefined;
@@ -131,10 +239,31 @@ export abstract class Source<T = Record<string, unknown>> {
 				}
 
 				result.push({
+					type: "multi_variable",
 					envVarName: values,
 					slotPattern: this.#safeSlotRegex(possibleSlot),
-					value,
 					fallback: fallbackValue,
+				});
+			}
+		}
+
+		if (hasSelfReferencingSlot) {
+			for (const regexMatch of this.#extractRegexMatches(
+				selfReferencingSlotRegex,
+				contentString,
+			)) {
+				const [pattern, path] = regexMatch;
+
+				if (!path) {
+					throw new Error(
+						`Invalid self-referencing slot pattern: "${pattern}". Object Path is missing.`,
+					);
+				}
+
+				result.push({
+					type: "self_referencing",
+					propertyPath: path,
+					slotPattern: this.#safeSlotRegex(pattern),
 				});
 			}
 		}
@@ -152,5 +281,25 @@ export abstract class Source<T = Record<string, unknown>> {
 		 */
 		const safe = slot.replace(/^./, (m) => `\\${m}`);
 		return new RegExp(safe, "gm");
+	}
+
+	#extractRegexMatches(
+		regex: RegExp,
+		contentString: string,
+	): RegExpExecArray[] {
+		const matches: RegExpExecArray[] = [];
+
+		let currentMatch: RegExpExecArray | null;
+
+		// Ensure the regex has the global flag to avoid infinite loops
+		// Reset lastIndex to ensure we start from the beginning
+		regex.lastIndex = 0;
+
+		// biome-ignore lint/suspicious/noAssignInExpressions: Assignment in while condition is intentional for collecting all regex matches
+		while ((currentMatch = regex.exec(contentString)) !== null) {
+			matches.push(currentMatch);
+		}
+
+		return matches;
 	}
 }

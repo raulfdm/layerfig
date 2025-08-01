@@ -17,12 +17,11 @@ export class ObjectSource<
 		slotPrefix,
 		runtimeEnv,
 	}: LoadSourceOptions): Prettify<T> {
-		const replacedObject = this.maybeReplaceSlotFromValue({
-			value: JSON.stringify(this.#object),
+		return this.maybeReplaceSlots({
+			contentString: JSON.stringify(this.#object),
 			slotPrefix,
 			runtimeEnv,
+			transform: (contentString) => JSON.parse(contentString) as Prettify<T>,
 		});
-
-		return JSON.parse(replacedObject) as Prettify<T>;
 	}
 }

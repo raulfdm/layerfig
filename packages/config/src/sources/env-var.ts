@@ -63,15 +63,14 @@ export class EnvironmentVariableSource extends Source {
 				.split(this.#options.separator)
 				.join(".");
 
-			set(
-				tempObject,
-				keyParts,
-				this.maybeReplaceSlotFromValue({
-					value: envVarValue,
-					runtimeEnv,
-					slotPrefix,
-				}),
-			);
+			const value = this.maybeReplaceSlots({
+				slotPrefix,
+				contentString: envVarValue,
+				runtimeEnv,
+				transform: (content) => content,
+			});
+
+			set(tempObject, keyParts, value);
 		}
 
 		return tempObject;
