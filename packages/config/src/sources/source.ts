@@ -287,7 +287,7 @@ export abstract class Source<T = Record<string, unknown>> {
 		// Reset lastIndex to ensure we start from the beginning
 		regex.lastIndex = 0;
 
-		// biome-ignore lint/suspicious/noAssignInExpressions: take it easy bro
+		// biome-ignore lint/suspicious/noAssignInExpressions: Assignment in while condition is intentional for collecting all regex matches
 		while ((currentMatch = regex.exec(contentString)) !== null) {
 			matches.push(currentMatch);
 		}
