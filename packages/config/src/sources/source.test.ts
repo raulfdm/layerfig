@@ -126,6 +126,23 @@ describe("Source", () => {
 				});
 			});
 
+			it("should use fallback value if not found", () => {
+				const source = new MyCustomSource();
+
+				const json = {
+					name: "${NAME:-Joana Doe}",
+				};
+
+				const value = source.maybeReplaceSlots({
+					contentString: JSON.stringify(json),
+					runtimeEnv: {},
+					slotPrefix: "$",
+					transform: (content) => JSON.parse(content),
+				});
+
+				expect(value).toEqual({ name: "Joana Doe" });
+			});
+
 			it("should return the same value if no slot match was found and log it", () => {
 				const warnSpy = vi.spyOn(console, "warn");
 				const source = new MyCustomSource();
