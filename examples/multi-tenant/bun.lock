@@ -4,7 +4,7 @@
     "": {
       "name": "multitenant-app",
       "dependencies": {
-        "@layerfig/config": "3.0.0-next.2",
+        "@layerfig/config": "3.0.0-next.3",
         "cors": "2.8.5",
         "express": "4.18.2",
         "helmet": "7.1.0",
@@ -18,7 +18,7 @@
     },
   },
   "packages": {
-    "@layerfig/config": ["@layerfig/config@3.0.0-next.2", "", { "dependencies": { "zod": "^4.0.10" } }, "sha512-OiIc4ro4eghB/tep7heTrOhLnq4pJ85mMS9QRhGS6xwKF9L4aDg+9ZF++jwI/i4lCnWPD3MP77/OLWSdf5yrgw=="],
+    "@layerfig/config": ["@layerfig/config@3.0.0-next.3", "", { "dependencies": { "es-toolkit": "^1.39.8", "zod": "^4.0.10" } }, "sha512-KURClupwduz5CKwDCNhD5SaiIvvGVYfYJKEWLA6/KCENg59ylvPsty/SM4KYktzNZG1fo7F5uqr3iI/b60NK/w=="],
 
     "@types/body-parser": ["@types/body-parser@1.19.6", "", { "dependencies": { "@types/connect": "*", "@types/node": "*" } }, "sha512-HLFeCYgz89uk22N5Qg3dvGvsv46B8GLvKKo1zKG4NybA8U2DiEO3w9lqGg29t/tfLRJpJ6iQxnVw4OnB7MoM9g=="],
 
@@ -83,6 +83,8 @@
     "es-errors": ["es-errors@1.3.0", "", {}, "sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw=="],
 
     "es-object-atoms": ["es-object-atoms@1.1.1", "", { "dependencies": { "es-errors": "^1.3.0" } }, "sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA=="],
+
+    "es-toolkit": ["es-toolkit@1.39.8", "", {}, "sha512-A8QO9TfF+rltS8BXpdu8OS+rpGgEdnRhqIVxO/ZmNvnXBYgOdSsxukT55ELyP94gZIntWJ+Li9QRrT2u1Kitpg=="],
 
     "escape-html": ["escape-html@1.0.3", "", {}, "sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow=="],
 

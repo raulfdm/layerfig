@@ -5,7 +5,8 @@ export const config = new ConfigBuilder({
     const configSchema = z.object({
       baseURL: z.url(),
       port: z.coerce.number().int().positive(),
-      appEnv: z.enum(["local", "dev", "prod"]),
+      appVersion: z.string(),
+      debugLevel: z.enum(["error", "warn", "info", "debug"]),
     });
 
     return configSchema.parse(finalConfig);
