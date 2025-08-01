@@ -65,9 +65,17 @@ export abstract class Source<T = Record<string, unknown>> {
 
 		const groupedSlots = slots.reduce(
 			(acc, slot) => {
-				// @ts-expect-error
-				acc[slot.type] = [...acc[slot.type], slot];
-
+				switch (slot.type) {
+					case "single_variable":
+						acc.single_variable = [...acc.single_variable, slot];
+						break;
+					case "multi_variable":
+						acc.multi_variable = [...acc.multi_variable, slot];
+						break;
+					case "self_referencing":
+						acc.self_referencing = [...acc.self_referencing, slot];
+						break;
+				}
 				return acc;
 			},
 			{
