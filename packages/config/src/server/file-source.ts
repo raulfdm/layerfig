@@ -63,14 +63,12 @@ export class FileSource extends Source {
 	}
 }
 
-export const FileSourceOptions = z.lazy(() => {
-	const schema = z.required(LoadSourceOptions, {
-		parser: true,
-		relativeConfigFolderPath: true,
-	});
+const baseSchema = z.required(LoadSourceOptions, {
+	parser: true,
+	relativeConfigFolderPath: true,
+});
 
-	return z.extend(schema, {
-		runtimeEnv: z._default(RuntimeEnv, process.env),
-	});
+export const FileSourceOptions = z.extend(baseSchema, {
+	runtimeEnv: z._default(RuntimeEnv, process.env),
 });
 export type FileSourceOptions = z.output<typeof FileSourceOptions>;
