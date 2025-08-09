@@ -14,7 +14,8 @@
 			"!**/.astro/**/*",
 			"!**/examples/**/*",
 			"!**/.turbo/**/*",
-			"!**/coverage/**/*"
+			"!**/coverage/**/*",
+			"!packages/config/src/__fixtures__/invalid.json"
 		]
 	},
 	"formatter": {

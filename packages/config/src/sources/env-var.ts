@@ -2,39 +2,11 @@ import { set } from "es-toolkit/compat";
 import { z } from "../zod-mini";
 import { type LoadSourceOptions, Source } from "./source";
 
-const EnvironmentVariableSourceOptions = z.object({
-	/**
-	 * The environment variable prefix to use
-	 * @default 'APP
-	 */
-	prefix: z._default(z.optional(z.string()), "APP"),
-	/**
-	 * The separator to use between the prefix and the key
-	 * @default '_'
-	 */
-	prefixSeparator: z._default(z.optional(z.string()), "_"),
-	/**
-	 * The separator to navigate the object
-	 * @default '__'
-	 */
-	separator: z._default(z.optional(z.string()), "__"),
-});
-
-type EnvironmentVariableSourceOptions = z.output<
-	typeof EnvironmentVariableSourceOptions
->;
-const PartialEnvironmentVariableSourceOptions = z.partial(
-	EnvironmentVariableSourceOptions,
-);
-export type PartialEnvironmentVariableSourceOptions = z.output<
-	typeof PartialEnvironmentVariableSourceOptions
->;
-
 export class EnvironmentVariableSource extends Source {
-	#options: EnvironmentVariableSourceOptions;
+	#options: ValidatedEnvironmentVariableSourceOptions;
 	#prefixWithSeparator: string;
 
-	constructor(options: PartialEnvironmentVariableSourceOptions = {}) {
+	constructor(options: EnvironmentVariableSourceOptions = {}) {
 		super();
 		this.#options = EnvironmentVariableSourceOptions.parse(options);
 
@@ -76,3 +48,31 @@ export class EnvironmentVariableSource extends Source {
 		return tempObject;
 	}
 }
+
+interface EnvironmentVariableSourceOptions {
+	/**
+	 * The environment variable prefix to use
+	 * @default 'APP
+	 */
+	prefix?: string;
+	/**
+	 * The separator to use between the prefix and the key
+	 * @default '_'
+	 */
+	prefixSeparator?: string;
+	/**
+	 * The separator to navigate the object
+	 * @default '__'
+	 */
+	separator?: string;
+}
+
+const EnvironmentVariableSourceOptions = z.object({
+	prefix: z._default(z.optional(z.string()), "APP"),
+	prefixSeparator: z._default(z.optional(z.string()), "_"),
+	separator: z._default(z.optional(z.string()), "__"),
+}) satisfies z.ZodMiniType<EnvironmentVariableSourceOptions>;
+
+type ValidatedEnvironmentVariableSourceOptions = z.output<
+	typeof EnvironmentVariableSourceOptions
+>;
