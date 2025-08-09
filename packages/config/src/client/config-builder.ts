@@ -1,16 +1,21 @@
 import { merge } from "es-toolkit/compat";
-import { EnvironmentVariableSource } from "../sources/env-var";
-import { ObjectSource } from "../sources/object";
-import type { ClientConfigBuilderOptions } from "../types";
-import { z as zmini } from "../zod-mini";
+import type { EnvironmentVariableSource } from "../sources/env-var";
+import type { ObjectSource } from "../sources/object";
+
+import { z } from "./index";
+import {
+	ClientConfigBuilderOptions,
+	ClientSources,
+	type ValidateClientConfigBuilderOptions,
+} from "./types";
 
 export class ConfigBuilder<T extends object = Record<string, unknown>> {
-	#options: ClientConfigBuilderOptions<T>;
+	#options: ValidateClientConfigBuilderOptions;
 
-	#sources: (ObjectSource | EnvironmentVariableSource)[] = [];
+	#sources: ClientSources[] = [];
 
 	constructor(options: ClientConfigBuilderOptions<T>) {
-		this.#options = options;
+		this.#options = ClientConfigBuilderOptions.parse(options);
 	}
 
 	/* Public */
@@ -25,40 +30,26 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 
 		for (const source of this.#sources) {
 			const data = source.loadSource({
-				runtimeEnv: this.#runtime,
-				slotPrefix: this.#slotPrefix,
+				runtimeEnv: this.#options.runtimeEnv,
+				slotPrefix: this.#options.slotPrefix,
 			});
 
 			partialConfig = merge({}, partialConfig, data);
 		}
 
-		return this.#options.validate(partialConfig, zmini);
+		return this.#options.validate(partialConfig, z) as T;
 	}
 
 	public addSource(source: ObjectSource | EnvironmentVariableSource): this {
-		if (
-			!(
-				source instanceof ObjectSource ||
-				source instanceof EnvironmentVariableSource
-			)
-		) {
-			throw new Error(
-				"Invalid source. Please provide either EnvironmentVariableSource or ObjectSource.",
-			);
+		const validatedSourceResult = ClientSources.safeParse(source);
+
+		if (!validatedSourceResult.success) {
+			throw new Error(z.prettifyError(validatedSourceResult.error));
 		}
 
-		this.#sources.push(source);
+		this.#sources.push(validatedSourceResult.data);
 
 		return this;
-	}
-
-	/* Private */
-	get #runtime() {
-		return this.#options.runtimeEnv || import.meta.env || {};
-	}
-
-	get #slotPrefix() {
-		return this.#options.slotPrefix || "$";
 	}
 }
 

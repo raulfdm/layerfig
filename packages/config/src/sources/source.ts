@@ -1,48 +1,7 @@
 import { get } from "es-toolkit/compat";
-import type { ConfigParser } from "../parser/config-parser";
-import type { Prettify } from "../types";
-
-interface RuntimeEnv {
-	[key: string]: string | undefined;
-}
-
-export interface LoadSourceOptions {
-	parser?: ConfigParser;
-	relativeConfigFolderPath?: string;
-	runtimeEnv: RuntimeEnv;
-	slotPrefix: string;
-}
-
-interface MaybeReplaceSlots<T = unknown>
-	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {
-	contentString: string;
-	transform: (contentString: string) => T;
-}
-
-interface BaseSlot {
-	slotPattern: RegExp;
-}
-
-interface SingleVariableSlot extends BaseSlot {
-	type: "single_variable";
-	envVarName: string;
-}
-
-interface MultiVariableSlot extends BaseSlot {
-	type: "multi_variable";
-	envVarName: string[];
-	fallback: string | undefined;
-}
-
-interface SelfReferencingSlot extends BaseSlot {
-	type: "self_referencing";
-	propertyPath: string;
-}
-
-type ExtractedSlot =
-	| SingleVariableSlot
-	| MultiVariableSlot
-	| SelfReferencingSlot;
+import { ConfigParser } from "../parser/config-parser";
+import { BaseConfigBuilderOptions, type Prettify, RuntimeEnv } from "../types";
+import { z } from "../zod-mini";
 
 export abstract class Source<T = Record<string, unknown>> {
 	/**
@@ -303,3 +262,42 @@ export abstract class Source<T = Record<string, unknown>> {
 		return matches;
 	}
 }
+
+export const LoadSourceOptions = z.extend(BaseConfigBuilderOptions, {
+	runtimeEnv: RuntimeEnv,
+	parser: z.optional(z.instanceof(ConfigParser)),
+	relativeConfigFolderPath: z.optional(z.string()),
+});
+
+export type LoadSourceOptions = z.output<typeof LoadSourceOptions>;
+
+interface MaybeReplaceSlots<T = unknown>
+	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {
+	contentString: string;
+	transform: (contentString: string) => T;
+}
+
+interface BaseSlot {
+	slotPattern: RegExp;
+}
+
+interface SingleVariableSlot extends BaseSlot {
+	type: "single_variable";
+	envVarName: string;
+}
+
+interface MultiVariableSlot extends BaseSlot {
+	type: "multi_variable";
+	envVarName: string[];
+	fallback: string | undefined;
+}
+
+interface SelfReferencingSlot extends BaseSlot {
+	type: "self_referencing";
+	propertyPath: string;
+}
+
+type ExtractedSlot =
+	| SingleVariableSlot
+	| MultiVariableSlot
+	| SelfReferencingSlot;
