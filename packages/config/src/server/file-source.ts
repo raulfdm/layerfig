@@ -1,6 +1,8 @@
 import path from "node:path";
+import { LoadSourceOptions, Source } from "../sources/source";
+import { RuntimeEnv, type UnknownRecord } from "../types";
 import { readIfExist } from "../utils/read-if-exist";
-import { type LoadSourceOptions, Source } from "./source";
+import { z } from "../zod-mini";
 
 const APP_ROOT_PATH = process.cwd();
 
@@ -12,23 +14,12 @@ export class FileSource extends Source {
 		this.#fileName = fileName;
 	}
 
-	loadSource({
-		relativeConfigFolderPath,
-		parser,
-		slotPrefix,
-		runtimeEnv,
-	}: LoadSourceOptions): Record<string, unknown> {
-		if (!relativeConfigFolderPath) {
-			throw new Error("relativeConfigFolderPath is required");
-		}
-
-		if (!parser) {
-			throw new Error("Parser is required");
-		}
+	loadSource(options: FileSourceOptions): UnknownRecord {
+		const validatedOptions = FileSourceOptions.parse(options);
 
 		const absoluteConfigFolderPath = path.join(
 			APP_ROOT_PATH,
-			relativeConfigFolderPath,
+			validatedOptions.relativeConfigFolderPath,
 		);
 
 		const absoluteFilePath = path.resolve(
@@ -37,9 +28,9 @@ export class FileSource extends Source {
 		);
 		const fileExtension = this.#getFileExtension(absoluteFilePath);
 
-		if (parser.acceptsExtension(fileExtension) === false) {
+		if (validatedOptions.parser.acceptsExtension(fileExtension) === false) {
 			throw new Error(
-				`".${fileExtension}" file is not supported by this parser. Accepted files are: "${parser.acceptedFileExtensions.join(
+				`".${fileExtension}" file is not supported by this parser. Accepted files are: "${validatedOptions.parser.acceptedFileExtensions.join(
 					", ",
 				)}"`,
 			);
@@ -53,10 +44,10 @@ export class FileSource extends Source {
 
 		return this.maybeReplaceSlots({
 			contentString: fileContentResult.data,
-			slotPrefix,
-			runtimeEnv,
+			slotPrefix: validatedOptions.slotPrefix,
+			runtimeEnv: validatedOptions.runtimeEnv,
 			transform: (contentString: string) => {
-				const parserResult = parser.load(contentString);
+				const parserResult = validatedOptions.parser.load(contentString);
 
 				if (!parserResult.ok) {
 					throw parserResult.error;
@@ -71,3 +62,15 @@ export class FileSource extends Source {
 		return path.extname(filePath).slice(1);
 	}
 }
+
+export const FileSourceOptions = z.lazy(() => {
+	const schema = z.required(LoadSourceOptions, {
+		parser: true,
+		relativeConfigFolderPath: true,
+	});
+
+	return z.extend(schema, {
+		runtimeEnv: z._default(RuntimeEnv, process.env),
+	});
+});
+export type FileSourceOptions = z.output<typeof FileSourceOptions>;
