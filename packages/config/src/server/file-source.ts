@@ -1,8 +1,8 @@
 import path from "node:path";
-import { LoadSourceOptions, Source } from "../sources/source";
-import { RuntimeEnv, type UnknownRecord } from "../types";
+import { Source } from "../sources/source";
+import type { LoadSourceOptions, UnknownRecord } from "../types";
 import { readIfExist } from "../utils/read-if-exist";
-import { z } from "../zod-mini";
+import { ServerConfigBuilderOptionsSchema } from "./types";
 
 const APP_ROOT_PATH = process.cwd();
 
@@ -14,12 +14,12 @@ export class FileSource extends Source {
 		this.#fileName = fileName;
 	}
 
-	loadSource(options: FileSourceOptions): UnknownRecord {
-		const validatedOptions = FileSourceOptions.parse(options);
+	loadSource(options: LoadSourceOptions): UnknownRecord {
+		const validatedOptions = ServerConfigBuilderOptionsSchema.parse(options);
 
 		const absoluteConfigFolderPath = path.join(
 			APP_ROOT_PATH,
-			validatedOptions.relativeConfigFolderPath,
+			validatedOptions.configFolder,
 		);
 
 		const absoluteFilePath = path.resolve(
@@ -62,13 +62,3 @@ export class FileSource extends Source {
 		return path.extname(filePath).slice(1);
 	}
 }
-
-const baseSchema = z.required(LoadSourceOptions, {
-	parser: true,
-	relativeConfigFolderPath: true,
-});
-
-export const FileSourceOptions = z.extend(baseSchema, {
-	runtimeEnv: z._default(RuntimeEnv, process.env),
-});
-export type FileSourceOptions = z.output<typeof FileSourceOptions>;

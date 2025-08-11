@@ -1,21 +1,23 @@
 import { merge } from "es-toolkit/compat";
 import type { EnvironmentVariableSource } from "../sources/env-var";
 import type { ObjectSource } from "../sources/object";
-
+import type {
+	UnknownRecord,
+	ValidatedClientConfigBuilderOptions,
+} from "../types";
 import { z } from "./index";
 import {
-	ClientConfigBuilderOptions,
+	ClientConfigBuilderOptionsSchema,
 	ClientSources,
-	type ValidateClientConfigBuilderOptions,
+	type ConfigBuilderOptions,
 } from "./types";
 
-export class ConfigBuilder<T extends object = Record<string, unknown>> {
-	#options: ValidateClientConfigBuilderOptions;
-
+export class ConfigBuilder<T extends object = UnknownRecord> {
+	#options: ValidatedClientConfigBuilderOptions<T>;
 	#sources: ClientSources[] = [];
 
-	constructor(options: ClientConfigBuilderOptions<T>) {
-		this.#options = ClientConfigBuilderOptions.parse(options);
+	constructor(options: ConfigBuilderOptions<T>) {
+		this.#options = ClientConfigBuilderOptionsSchema.parse(options);
 	}
 
 	/* Public */
@@ -52,5 +54,3 @@ export class ConfigBuilder<T extends object = Record<string, unknown>> {
 		return this;
 	}
 }
-
-export type ConfigBuilderOptions = ClientConfigBuilderOptions;

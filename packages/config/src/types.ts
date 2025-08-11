@@ -1,4 +1,6 @@
-import { z } from "./zod-mini";
+import type { ConfigParser } from "./parser/config-parser";
+import type { z as zod } from "./zod";
+import { z as zm } from "./zod-mini";
 
 interface ResultSuccess<TSuccess = undefined> {
 	ok: true;
@@ -35,7 +37,7 @@ export type Prettify<T> = {
 	[K in keyof T]: T[K];
 } & {};
 
-export const RuntimeEnv = z.pipe(
+export const RuntimeEnv = zm.pipe(
 	/**
 	 * This transformation is needed because we're dealing with process.env in most of the cases.
 	 * It seems that process.env (for NodeJS environment) isn't a plain object for zod so
@@ -44,15 +46,19 @@ export const RuntimeEnv = z.pipe(
 	 * So this is a workaround to always "spread" the received object and transform it into a plain object.
 	 * @see https://github.com/colinhacks/zod/issues/5069#issuecomment-3166763647
 	 */
-	z.transform((env) => {
+	zm.transform((env) => {
 		return Object.assign({}, env);
 	}),
-	z.record(z.string(), z.union([z.string(), z.undefined()])),
+	zm.record(zm.string(), zm.union([zm.string(), zm.undefined()])),
 );
 
-export type RuntimeEnv = z.output<typeof RuntimeEnv>;
+export type RuntimeEnv = zm.output<typeof RuntimeEnv>;
 
-export interface BaseConfigBuilderOptions {
+export const DEFAULT_SLOT_PREFIX = "$" as const;
+
+export type UnknownRecord = Record<string, unknown>;
+
+interface BaseConfigBuilderOptions {
 	/**
 	 * Prefix used to search for slotted values
 	 * @default "$"
@@ -60,8 +66,56 @@ export interface BaseConfigBuilderOptions {
 	slotPrefix?: string;
 }
 
-export const BaseConfigBuilderOptions = z.object({
-	slotPrefix: z._default(z.string(), "$"),
-}) satisfies z.ZodMiniType<BaseConfigBuilderOptions>;
+export interface ClientConfigBuilderOptions<T extends object = UnknownRecord>
+	extends BaseConfigBuilderOptions {
+	/**
+	 * The runtime environment variables to use (e.g., import.meta.env, object, etc.)
+	 * @default import.meta.env or {}
+	 */
+	runtimeEnv?: RuntimeEnv;
+	/**
+	 * A function to validate the configuration object.
+	 * @param config - The configuration object to be validated
+	 * @param z - The zod 4 (mini) instance
+	 */
+	validate: (config: UnknownRecord, z: typeof zm) => T;
+}
 
-export type UnknownRecord = Record<string, unknown>;
+export type ValidatedClientConfigBuilderOptions<
+	T extends object = UnknownRecord,
+> = Required<ClientConfigBuilderOptions<T>>;
+
+export interface ServerConfigBuilderOptions<T extends object = UnknownRecord>
+	extends BaseConfigBuilderOptions {
+	// TODO: REMOVE THIS IN FAVOR OF ABSOLUTE
+	/**
+	 * The folder where the configuration files are located.
+	 * @default "./config"
+	 */
+	configFolder?: string;
+	/**
+	 * The runtime environment variables to use (e.g., process.env, import.meta.env, etc.)
+	 * @default process.env
+	 */
+	runtimeEnv?: RuntimeEnv;
+	/**
+	 * Load source from different source types
+	 *
+	 * @default basicJsonParser
+	 */
+	parser?: ConfigParser;
+	/**
+	 * A function to validate the configuration object.
+	 * @param config - The configuration object to be validated
+	 * @param z - The zod 4 instance
+	 */
+	validate: (config: Record<string, unknown>, z: typeof zod) => T;
+}
+
+export type ValidatedServerConfigBuilderOptions<
+	T extends object = UnknownRecord,
+> = Required<ServerConfigBuilderOptions<T>>;
+
+export type LoadSourceOptions<T extends object = UnknownRecord> =
+	| ValidatedClientConfigBuilderOptions<T>
+	| ValidatedServerConfigBuilderOptions<T>;

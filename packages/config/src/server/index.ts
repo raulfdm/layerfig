@@ -4,3 +4,4 @@ export * from "../sources/object";
 export { z } from "../zod";
 export * from "./config-builder";
 export * from "./file-source";
+export type { ConfigBuilderOptions } from "./types";

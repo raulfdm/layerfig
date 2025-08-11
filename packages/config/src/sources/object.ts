@@ -1,5 +1,5 @@
-import type { PartialDeepUnknown, Prettify } from "../types";
-import { type LoadSourceOptions, Source } from "./source";
+import type { LoadSourceOptions, PartialDeepUnknown, Prettify } from "../types";
+import { Source } from "./source";
 
 export class ObjectSource<
 	T extends object = Record<string, unknown>,
@@ -16,7 +16,7 @@ export class ObjectSource<
 	override loadSource({
 		slotPrefix,
 		runtimeEnv,
-	}: LoadSourceOptions): Prettify<T> {
+	}: Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix">): Prettify<T> {
 		return this.maybeReplaceSlots({
 			contentString: JSON.stringify(this.#object),
 			slotPrefix,
