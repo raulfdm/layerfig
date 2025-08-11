@@ -1,5 +1,24 @@
 # @layerfig/config
 
+## 3.0.0-next.5
+
+### Major Changes
+
+- 3f2c387: BREAKING CHANGE: Remove `configFolder` option in favor of `absoluteConfigFolderPath`
+
+  The `configFolder` option has been removed and replaced with `absoluteConfigFolderPath` to provide more explicit control over configuration file locations.
+
+  **Migration:**
+
+  ```diff
+  const config = new ConfigBuilder({
+  - configFolder: './my-config-folder',
+  + absoluteConfigFolderPath: path.resolve(process.cwd(), './my-config-folder')
+  })
+  ```
+
+  This change ensures clearer semantics about path resolution and removes ambiguity about relative path handling.
+
 ## 3.0.0-next.4
 
 ### Major Changes
