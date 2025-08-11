@@ -26,7 +26,7 @@
     },
     "packages/config": {
       "name": "@layerfig/config",
-      "version": "3.0.0-next.3",
+      "version": "3.0.0-next.4",
       "dependencies": {
         "es-toolkit": "^1.39.8",
         "zod": "^4.0.10",

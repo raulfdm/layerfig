@@ -1,5 +1,17 @@
 # @layerfig/config
 
+## 3.0.0-next.4
+
+### Major Changes
+
+- d6960bc: BREAKING CHANGES:
+
+  - Updated validation logic for configuration options
+  - Changed validation error handling and messages
+  - Modified the structure of validation result objects
+
+  This refactor improves the robustness and consistency of options validation across the package.
+
 ## 3.0.0-next.3
 
 ### Minor Changes
