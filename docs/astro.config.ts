@@ -51,6 +51,13 @@ export default defineConfig({
 							slug: "getting-started",
 							link: "getting-started/index",
 						},
+						{
+							label: "Migrate to v3",
+							link: "migrate-to-v3",
+							badge: {
+								text: "New",
+							},
+						},
 					],
 				},
 				{

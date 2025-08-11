@@ -1,0 +1,130 @@
+---
+title: Migrate to v3
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Layerfig v3 consolidates several learnings from migrating legacy projects to use Layerfig, making configuration more flexible and easier to maintain.
+
+## New Features
+
+### Self-Referencing Slots
+
+Previously, if you wanted to reuse the same slot value in multiple places, you had to repeat the logic:
+
+```jsonc
+{
+  "port": "${PORT:-3000}",
+  "host": "localhost:${PORT:-3000}" // repeating port logic
+}
+```
+
+While this worked, it wasn’t convenient.
+
+With **self-referencing slots**, you can now reference a value defined in the same configuration:
+
+```json
+{
+  "port": "${PORT:-3000}",
+  "host": "localhost:${self.port}"
+}
+```
+
+<Aside>
+  [Read more about self-referencing slots](/setup/slots/#self-referencing-slots)
+</Aside>
+
+---
+
+### Zod Submodules
+
+Layerfig now exports two new submodules:
+
+- `@layerfig/config/zod` → Zod v4
+- `@layerfig/config/zod-mini` → Zod v4 Mini
+
+These are useful if you want to:
+
+- Keep your schema in a separate file
+- Use Zod across your application without importing it from the main module
+
+<Aside type="tip">
+  For client-side code, always choose `zod-mini` due to its smaller size and
+  better tree-shaking support. [Learn more about Zod
+  Mini](https://zod.dev/packages/mini).
+</Aside>
+
+---
+
+## Breaking Changes
+
+### Custom Parser API
+
+In v2, creating a custom configuration parser looked like this:
+
+```ts
+import { defineConfigParser } from "@layerfig/config";
+
+export const iniParser = defineConfigParser({
+  acceptedFileExtensions: ["ini"],
+  parse: (fileContent) => {
+    // Logic to fetch, read, and parse the content
+    // Should return a Result
+  },
+});
+```
+
+In v3, you now need to create a class that extends `ConfigParser`:
+
+```ts
+// ./path/to/custom-parser.ts
+import { ConfigParser } from "@layerfig/config";
+
+class IniParser extends ConfigParser {
+  constructor() {
+    super({
+      acceptedFileExtensions: ["ini"],
+    });
+  }
+
+  load(fileContent: string) {
+    // Logic to fetch, read, and parse the content
+    // Should return a Result
+  }
+}
+
+export const iniParser = new IniParser();
+```
+
+This change improves internal checks and validations within Layerfig.
+
+---
+
+### Client vs. Server Modules
+
+To better separate client and server code, Layerfig now provides a dedicated **client** submodule:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config/client";
+```
+
+<Aside>
+  Because `FileSource` uses Node.js APIs, it cannot be used with the client
+  `ConfigBuilder` and is only available from the main (server) module.
+</Aside>
+
+All exports from the `client` submodule are safe for browser environments.  
+The included `z` instance is `zod/mini`, helping reduce your client bundle size.
+
+For server-side code, you can still import everything from the main module:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config";
+```
+
+---
+
+## Other Changes
+
+- User options are now validated with Zod (Mini)
+- Zod upgraded from v3 to v4
