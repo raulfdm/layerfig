@@ -1,7 +1,9 @@
 import { get } from "es-toolkit/compat";
-import { ConfigParser } from "../parser/config-parser";
-import { BaseConfigBuilderOptions, type Prettify, RuntimeEnv } from "../types";
-import { z } from "../zod-mini";
+import type {
+	ClientConfigBuilderOptions,
+	Prettify,
+	ServerConfigBuilderOptions,
+} from "../types";
 
 export abstract class Source<T = Record<string, unknown>> {
 	/**
@@ -263,13 +265,9 @@ export abstract class Source<T = Record<string, unknown>> {
 	}
 }
 
-export const LoadSourceOptions = z.extend(BaseConfigBuilderOptions, {
-	runtimeEnv: RuntimeEnv,
-	parser: z.optional(z.instanceof(ConfigParser)),
-	relativeConfigFolderPath: z.optional(z.string()),
-});
-
-export type LoadSourceOptions = z.output<typeof LoadSourceOptions>;
+type LoadSourceOptions = Prettify<
+	Required<ClientConfigBuilderOptions | ServerConfigBuilderOptions>
+>;
 
 interface MaybeReplaceSlots<T = unknown>
 	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {

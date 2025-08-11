@@ -1,10 +1,13 @@
 import { merge } from "es-toolkit/compat";
 import { Source } from "../sources/source";
-import type { UnknownRecord } from "../types";
+import type {
+	UnknownRecord,
+	ValidatedServerConfigBuilderOptions,
+} from "../types";
 import { z } from "./index";
 import {
-	ServerConfigBuilderOptions,
-	type ValidatedServerConfigBuilderOptions,
+	type ConfigBuilderOptions,
+	ServerConfigBuilderOptionsSchema,
 } from "./types";
 
 export class ConfigBuilder<T extends object = UnknownRecord> {
@@ -12,8 +15,8 @@ export class ConfigBuilder<T extends object = UnknownRecord> {
 
 	#sources: Source[] = [];
 
-	constructor(options: ServerConfigBuilderOptions<T>) {
-		this.#options = ServerConfigBuilderOptions.parse(options);
+	constructor(options: ConfigBuilderOptions<T>) {
+		this.#options = ServerConfigBuilderOptionsSchema.parse(options);
 	}
 
 	/* Public */
@@ -27,12 +30,7 @@ export class ConfigBuilder<T extends object = UnknownRecord> {
 		let partialConfig: UnknownRecord = {};
 
 		for (const source of this.#sources) {
-			const data = source.loadSource({
-				parser: this.#options.parser,
-				runtimeEnv: this.#options.runtimeEnv,
-				slotPrefix: this.#options.slotPrefix,
-				relativeConfigFolderPath: this.#options.configFolder,
-			});
+			const data = source.loadSource(this.#options);
 
 			partialConfig = merge({}, partialConfig, data);
 		}
@@ -52,5 +50,3 @@ export class ConfigBuilder<T extends object = UnknownRecord> {
 		return this;
 	}
 }
-
-export type ConfigBuilderOptions = ServerConfigBuilderOptions;

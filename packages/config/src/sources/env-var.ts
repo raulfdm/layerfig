@@ -1,6 +1,7 @@
 import { set } from "es-toolkit/compat";
+import type { LoadSourceOptions } from "../types";
 import { z } from "../zod-mini";
-import { type LoadSourceOptions, Source } from "./source";
+import { Source } from "./source";
 
 export class EnvironmentVariableSource extends Source {
 	#options: ValidatedEnvironmentVariableSourceOptions;
@@ -16,7 +17,10 @@ export class EnvironmentVariableSource extends Source {
 	loadSource({
 		runtimeEnv,
 		slotPrefix,
-	}: LoadSourceOptions): Record<string, unknown> {
+	}: Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix">): Record<
+		string,
+		unknown
+	> {
 		const envKeys = Object.keys(runtimeEnv).filter((key) =>
 			key.startsWith(this.#prefixWithSeparator),
 		);
