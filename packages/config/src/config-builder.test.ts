@@ -1,3 +1,4 @@
+import path from "node:path";
 import { assertType, describe, expect, it, vi } from "vitest";
 import * as ClientModule from "./client";
 import { basicJsonParser } from "./parser/parser-json";
@@ -96,7 +97,7 @@ describe.each(builders)(
 			});
 		});
 
-		describe("multi variable stot", () => {
+		describe("multi variable slot", () => {
 			it("should replace multi variable slots", () => {
 				const schema = z.object({
 					port: z.coerce.number().int().positive(),
@@ -491,7 +492,7 @@ describe("[CLIENT] ConfigBuilder", () => {
 
 describe("[SERVER] ConfigBuilder", () => {
 	const basicConfigOptions: ServerModule.ConfigBuilderOptions = {
-		configFolder: "src/__fixtures__",
+		absoluteConfigFolderPath: path.resolve(process.cwd(), "src/__fixtures__"),
 		parser: basicJsonParser,
 		runtimeEnv: process.env,
 		slotPrefix: "$",
@@ -520,7 +521,6 @@ describe("[SERVER] ConfigBuilder", () => {
 
 	describe("FileSource", () => {
 		it("should load from file source", () => {
-			// const fileSource = new FileSource("base.json");
 			const config = new ServerModule.ConfigBuilder(basicConfigOptions)
 				.addSource(new ServerModule.FileSource("base.json"))
 				.build();
@@ -531,6 +531,27 @@ describe("[SERVER] ConfigBuilder", () => {
 					port: 3000,
 				},
 			});
+		});
+
+		it("should throw an error if absoluteConfigFolderPath is not absolute", () => {
+			expect(() =>
+				new ServerModule.ConfigBuilder({
+					...basicConfigOptions,
+					absoluteConfigFolderPath: "./src/__fixtures__",
+				})
+					.addSource(new ServerModule.FileSource("base.json"))
+					.build(),
+			).toThrowErrorMatchingInlineSnapshot(`
+				[$ZodError: [
+				  {
+				    "code": "custom",
+				    "path": [
+				      "absoluteConfigFolderPath"
+				    ],
+				    "message": "Path must be absolute"
+				  }
+				]]
+			`);
 		});
 
 		it("should throw an error if try to load an invalid file extension", () => {

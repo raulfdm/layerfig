@@ -87,12 +87,11 @@ export type ValidatedClientConfigBuilderOptions<
 
 export interface ServerConfigBuilderOptions<T extends object = UnknownRecord>
 	extends BaseConfigBuilderOptions {
-	// TODO: REMOVE THIS IN FAVOR OF ABSOLUTE
 	/**
-	 * The folder where the configuration files are located.
-	 * @default "./config"
+	 * The absolute path to the folder where the configuration files are located.
+	 * @default "<process.cwd()>/config"
 	 */
-	configFolder?: string;
+	absoluteConfigFolderPath?: string;
 	/**
 	 * The runtime environment variables to use (e.g., process.env, import.meta.env, etc.)
 	 * @default process.env

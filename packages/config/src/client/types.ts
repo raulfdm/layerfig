@@ -19,16 +19,12 @@ import { z } from "../zod-mini";
  * This is likely not portable. A type annotation is necessary.
  * ```
  */
-export const ClientConfigBuilderOptionsSchema: z.ZodMiniType<
-	ValidatedClientConfigBuilderOptions,
-	ClientConfigBuilderOptions,
-	// biome-ignore lint/suspicious/noExplicitAny: unknown or never would not work
-	any
-> = z.object({
-	runtimeEnv: z._default(RuntimeEnv, import.meta.env || {}),
-	validate: z.custom<ClientConfigBuilderOptions["validate"]>(),
-	slotPrefix: z._default(z.string(), DEFAULT_SLOT_PREFIX),
-});
+export const ClientConfigBuilderOptionsSchema: z.ZodMiniType<ValidatedClientConfigBuilderOptions> =
+	z.object({
+		runtimeEnv: z._default(RuntimeEnv, import.meta.env || {}),
+		validate: z.custom<ClientConfigBuilderOptions["validate"]>(),
+		slotPrefix: z._default(z.string(), DEFAULT_SLOT_PREFIX),
+	});
 
 export const ClientSources = z.union(
 	[z.instanceof(ObjectSource), z.instanceof(EnvironmentVariableSource)],
