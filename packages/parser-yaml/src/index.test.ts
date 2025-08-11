@@ -1,3 +1,4 @@
+import path from "node:path";
 import {
 	ConfigBuilder,
 	type ConfigBuilderOptions,
@@ -76,7 +77,7 @@ function getConfig(options?: Partial<ConfigBuilderOptions>) {
 
 	return new ConfigBuilder({
 		validate: (config) => schema.parse(config),
-		configFolder: "./src/__fixtures__",
+		absoluteConfigFolderPath: path.resolve(process.cwd(), "./src/__fixtures__"),
 		parser: yamlParser,
 		...options,
 	});
