@@ -4,8 +4,6 @@ import type { LoadSourceOptions, UnknownRecord } from "../types";
 import { readIfExist } from "../utils/read-if-exist";
 import { ServerConfigBuilderOptionsSchema } from "./types";
 
-const APP_ROOT_PATH = process.cwd();
-
 export class FileSource extends Source {
 	#fileName: string;
 
@@ -15,15 +13,15 @@ export class FileSource extends Source {
 	}
 
 	loadSource(options: LoadSourceOptions): UnknownRecord {
+		/**
+		 * This is validated before this method is called. I've done this
+		 * just to get a type-safe type for the options and discard
+		 * the ClientConfigBuilderOptionsSchema (since it's an union).
+		 */
 		const validatedOptions = ServerConfigBuilderOptionsSchema.parse(options);
 
-		const absoluteConfigFolderPath = path.join(
-			APP_ROOT_PATH,
-			validatedOptions.configFolder,
-		);
-
 		const absoluteFilePath = path.resolve(
-			absoluteConfigFolderPath,
+			validatedOptions.absoluteConfigFolderPath,
 			this.#fileName,
 		);
 		const fileExtension = this.#getFileExtension(absoluteFilePath);

@@ -13,7 +13,7 @@ import {
 } from "./types";
 
 export class ConfigBuilder<T extends object = UnknownRecord> {
-	#options: ValidatedClientConfigBuilderOptions<T>;
+	#options: ValidatedClientConfigBuilderOptions;
 	#sources: ClientSources[] = [];
 
 	constructor(options: ConfigBuilderOptions<T>) {
