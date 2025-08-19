@@ -37,6 +37,15 @@ export type Prettify<T> = {
 	[K in keyof T]: T[K];
 } & {};
 
+export const RuntimeEnvValue = zm.union([
+	zm.boolean(),
+	zm.null(),
+	zm.number(),
+	zm.string(),
+	zm.undefined(),
+]);
+export type RuntimeEnvValue = zm.output<typeof RuntimeEnvValue>;
+
 export const RuntimeEnv = zm.pipe(
 	/**
 	 * This transformation is needed because we're dealing with process.env in most of the cases.
@@ -49,7 +58,7 @@ export const RuntimeEnv = zm.pipe(
 	zm.transform((env) => {
 		return Object.assign({}, env);
 	}),
-	zm.record(zm.string(), zm.union([zm.string(), zm.undefined()])),
+	zm.record(zm.string(), RuntimeEnvValue),
 );
 
 export type RuntimeEnv = zm.output<typeof RuntimeEnv>;

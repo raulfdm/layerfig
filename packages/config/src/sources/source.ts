@@ -2,6 +2,7 @@ import { get } from "es-toolkit/compat";
 import type {
 	ClientConfigBuilderOptions,
 	Prettify,
+	RuntimeEnvValue,
 	ServerConfigBuilderOptions,
 	UnknownArray,
 	UnknownRecord,
@@ -36,7 +37,7 @@ export abstract class Source<T = Record<string, unknown>> {
 		let updatedContentString = options.contentString;
 
 		for (const slot of slots) {
-			let envVarValue: string | undefined;
+			let envVarValue: RuntimeEnvValue;
 
 			for (const reference of slot.references) {
 				if (reference.type === "env_var") {
@@ -46,12 +47,13 @@ export abstract class Source<T = Record<string, unknown>> {
 				if (reference.type === "self_reference") {
 					const partialObj = options.transform(updatedContentString);
 
-					envVarValue = get(partialObj, reference.propertyPath) as
-						| string
-						| undefined;
+					envVarValue = get(
+						partialObj,
+						reference.propertyPath,
+					) as RuntimeEnvValue;
 				}
 
-				if (envVarValue) {
+				if (envVarValue !== null && envVarValue !== undefined) {
 					// If we found a value for the env var, we can stop looking
 					break;
 				}
@@ -63,7 +65,9 @@ export abstract class Source<T = Record<string, unknown>> {
 
 			updatedContentString = updatedContentString.replaceAll(
 				slot.slotMatch,
-				envVarValue || UNDEFINED_MARKER,
+				envVarValue !== null && envVarValue !== undefined
+					? String(envVarValue)
+					: UNDEFINED_MARKER,
 			);
 		}
 

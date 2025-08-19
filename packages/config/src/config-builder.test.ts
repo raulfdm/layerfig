@@ -167,6 +167,37 @@ describe.each(builders)(
 			});
 		});
 
+		it("should handle runtime with other types", () => {
+			const config = new ConfigBuilder({
+				validate: (finalConfig) => finalConfig,
+				runtimeEnv: {
+					DEV: true,
+					TEST: false,
+					ENV: "production",
+					NULL_VALUE: null,
+					UNDEFINED_VALUE: undefined,
+				},
+			})
+				.addSource(
+					new ObjectSource({
+						dev: "${DEV}",
+						test: "${TEST}",
+						env: "${ENV}",
+						nullValue: "${NULL_VALUE}",
+						undefinedValue: "${UNDEFINED_VALUE}",
+					}),
+				)
+				.build();
+
+			expect(config).toEqual({
+				dev: "true",
+				test: "false",
+				env: "production",
+				nullValue: undefined,
+				undefinedValue: undefined,
+			});
+		});
+
 		describe("slots", () => {
 			it("should replace single slots", () => {
 				const schema = z.object({
