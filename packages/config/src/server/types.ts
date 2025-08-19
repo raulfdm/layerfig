@@ -1,4 +1,5 @@
 import path from "node:path";
+import { z } from "zod/mini";
 import type { ConfigParser } from "../parser/config-parser";
 import { basicJsonParser } from "../parser/parser-json";
 import {
@@ -8,7 +9,6 @@ import {
 	type UnknownRecord,
 	type ValidatedServerConfigBuilderOptions,
 } from "../types";
-import { z } from "../zod-mini";
 
 export const ServerConfigBuilderOptionsSchema: z.ZodMiniType<ValidatedServerConfigBuilderOptions> =
 	z.object({

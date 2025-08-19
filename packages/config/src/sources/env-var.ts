@@ -1,6 +1,6 @@
 import { set } from "es-toolkit/compat";
+import { z } from "zod/mini";
 import type { LoadSourceOptions } from "../types";
-import { z } from "../zod-mini";
 import { Source } from "./source";
 
 export class EnvironmentVariableSource extends Source {

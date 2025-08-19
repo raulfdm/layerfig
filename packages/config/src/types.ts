@@ -1,6 +1,6 @@
+import type { z as zod } from "zod";
+import { z as zm } from "zod/mini";
 import type { ConfigParser } from "./parser/config-parser";
-import type { z as zod } from "./zod";
-import { z as zm } from "./zod-mini";
 
 interface ResultSuccess<TSuccess = undefined> {
 	ok: true;
