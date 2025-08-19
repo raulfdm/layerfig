@@ -30,7 +30,7 @@ export class EnvironmentVariableSource extends Source {
 		for (const envKey of envKeys) {
 			const envVarValue = runtimeEnv[envKey];
 
-			if (envVarValue === undefined) {
+			if (envVarValue === undefined || envVarValue === null) {
 				continue;
 			}
 
@@ -41,7 +41,7 @@ export class EnvironmentVariableSource extends Source {
 
 			const value = this.maybeReplaceSlots({
 				slotPrefix,
-				contentString: envVarValue,
+				contentString: String(envVarValue),
 				runtimeEnv,
 				transform: (content) => content,
 			});
