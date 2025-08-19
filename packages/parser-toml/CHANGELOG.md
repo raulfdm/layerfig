@@ -1,5 +1,11 @@
 # @layerfig/parser-toml
 
+## 6.0.0-next.1
+
+### Patch Changes
+
+- f159e86: Update smol-toml to ^1.4.2
+
 ## 6.0.0-next.0
 
 ### Patch Changes
