@@ -16,7 +16,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@astrojs/starlight": "0.34.4",
-        "@layerfig/config": "3.0.0-next.5",
+        "@layerfig/config": "3.0.0-next.8",
         "@layerfig/parser-yaml": "6.0.0-next.0",
         "astro": "5.10.1",
         "sharp": "0.34.2",
