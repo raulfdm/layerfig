@@ -55,7 +55,6 @@
 		"@types/bun": "1.2.20",
 		"tsdown": "0.12.9",
 		"typescript": "^5.9.0-beta",
-		"vitest": "3.2.4",
-		"zod": "3.25.67"
+		"vitest": "3.2.4"
 	}
 }

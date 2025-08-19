@@ -5,7 +5,6 @@ import {
 	FileSource,
 } from "@layerfig/config";
 import { describe, expect, it } from "vitest";
-import { z } from "zod/v4";
 import json5Parser from "./index";
 
 describe("json5Parser", () => {
@@ -76,18 +75,16 @@ describe("json5Parser", () => {
 });
 
 function getConfig(options?: Partial<ConfigBuilderOptions>) {
-	const schema = z.object({
-		appURL: z.url(),
-		api: z.object({
-			port: z
-				.string()
-				.transform((val) => Number.parseInt(val, 10))
-				.or(z.number()),
-		}),
-	});
-
 	return new ConfigBuilder({
-		validate: (config) => schema.parse(config),
+		validate: (config, z) =>
+			z
+				.object({
+					appURL: z.url(),
+					api: z.object({
+						port: z.coerce.number(),
+					}),
+				})
+				.parse(config),
 		absoluteConfigFolderPath: path.resolve(process.cwd(), "./src/__fixtures__"),
 		parser: json5Parser,
 		...options,
