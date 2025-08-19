@@ -10,8 +10,10 @@
 		"@layerfig/tsconfig": "0.0.1"
 	},
 	"changesets": [
+		"busy-rooms-sell",
 		"clever-views-wonder",
 		"empty-groups-shine",
+		"funny-impalas-study",
 		"good-carrots-give",
 		"green-wombats-pump",
 		"moody-showers-kiss",
