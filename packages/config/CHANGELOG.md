@@ -1,5 +1,11 @@
 # @layerfig/config
 
+## 3.0.0-next.10
+
+### Patch Changes
+
+- 4dc1595: Remove configFolder from type
+
 ## 3.0.0-next.9
 
 ### Patch Changes
