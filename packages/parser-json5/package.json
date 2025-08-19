@@ -52,7 +52,7 @@
 	},
 	"devDependencies": {
 		"@layerfig/config": "workspace:*",
-		"@types/bun": "1.2.19",
+		"@types/bun": "1.2.20",
 		"tsdown": "0.12.9",
 		"typescript": "^5.9.0-beta",
 		"vitest": "3.2.4",
