@@ -12,7 +12,7 @@ export const clientEnv = new ConfigBuilder({
 })
   .addSource(
     new ObjectSource<ClientEnvSchema>({
-      env: "$VITE_APP_ENV",
+      env: "${VITE_APP_ENV}",
     }),
   )
   .build();

@@ -1,4 +1,4 @@
 {
-  "port": "$PORT",
-  "env": "$VITE_APP_ENV"
+  "port": "${PORT::-3000}",
+  "env": "${VITE_APP_ENV}"
 }
