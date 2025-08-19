@@ -27,8 +27,8 @@ To reference this environment variable, you can use a "slot":
 ```json
 // config/base.json
 {
-  "appURL": "http://localhost:$PORT",
-  "port": "$PORT"
+  "appURL": "http://localhost:${PORT}",
+  "port": "${PORT}"
 }
 ```
 
@@ -50,11 +50,11 @@ In the previous "port" example, instead of defining the `$PORT` slot in two plac
 // config/base.json
 {
   "appURL": "http://localhost:${self.port}",
-  "port": "${PORT:-3000}"
+  "port": "${PORT::-3000}"
 }
 ```
 
-Layerfig searches for the `${self.*}` syntax in the configuration file and uses the value after the dot as an "object-path" to find the value in the same configuration. In this case, it will look for the `port` value.
+Layerfig searches for the `self.*` syntax in the configuration file and uses the value after the dot as an "object-path" to find the value in the same configuration. In this case, it will look for the `port` value.
 
 The final configuration will be:
 
@@ -78,18 +78,18 @@ By default, Layerfig uses `$` as the slot prefix, but you can change it by passi
 
 You may want to try multiple environment variables for a single value, providing a chain of options in a specific order of priority.
 
-For example, imagine you want to determine the current Git branch. This value could be sourced from several environment variables:
+For example, imagine you want to determine the current Git branch. This value could be sourced different sources:
 
 1.  `process.env.GIT_REF`
 2.  `process.env.REF`
-3.  `process.env.MAIN_REF`
+3.  `.branch` (from the same configuration file)
 
 To achieve this, you can use the extended slot syntax, separating each variable name with a colon:
 
 ```json
 // config/base.json
 {
-  "branch": "${GIT_REF:REF:MAIN_REF}"
+  "branch": "${GIT_REF::REF::self.branch}"
 }
 ```
 
@@ -104,7 +104,7 @@ This is achieved by adding the `:-` operator to the extended slot syntax. This w
 ```json
 // config/base.json
 {
-  "port": "${PORT:-3000}"
+  "port": "${PORT::-3000}"
 }
 ```
 
@@ -115,7 +115,7 @@ This operator can be combined with variable chaining for more complex cases:
 ```json
 // config/base.json
 {
-  "branch": "${GIT_REF:REF:MAIN_REF:-main}"
+  "branch": "${GIT_REF::REF::MAIN_REF::-main}"
 }
 ```
 
@@ -125,10 +125,32 @@ If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, 
 
 There are a few things to keep in mind when working with slots.
 
-If an environment variable for a slot is not defined, Layerfig will not perform a replacement. The configuration value will retain the original slot string:
+If an environment variable for a slot is not defined, Layerfig will perform a replacement with `undefined` value. The configuration value will retain the original slot string:
 
 ```ts
-config.appURL; // "http://localhost:$PORT"
+config.appURL; // undefined
+```
+
+In this case, if your schema does expect a defined value, it would throw an error during validation. Also, for array items, if value gets resolved to undefined it'll be removed.
+
+For example, let's say we only have `ORIGIN_1` defined in our environment variables.
+
+```
+ORIGIN_1=*
+```
+
+The following config:
+
+```
+allowOrigins: ["${ORIGIN_1}", "${ORIGIN_2}"]
+```
+
+Will be resolved to:
+
+```ts
+const config = {
+  allowOrigins: ["*"], // ORIGIN_2 got discarded.
+};
 ```
 
 Additionally, all environment variables are treated as strings. If a slot is used for a value that should be a number, like `port`, the resulting configuration will have a string value:
