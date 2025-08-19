@@ -1,0 +1,198 @@
+---
+title: Migrate to v3
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Layerfig v3 consolidates several learnings from migrating legacy projects to use Layerfig, making configuration more flexible and easier to maintain.
+
+## New Features
+
+### Self-Referencing Slots
+
+Previously, if you wanted to reuse the same slot value in multiple places, you had to repeat the logic:
+
+```jsonc
+{
+  "port": "${PORT:-3000}",
+  "host": "localhost:${PORT:-3000}" // repeating port logic
+}
+```
+
+While this worked, it wasn’t convenient.
+
+With **self-referencing slots**, you can now reference a value defined in the same configuration:
+
+```json
+{
+  "port": "${PORT:-3000}",
+  "host": "localhost:${self.port}"
+}
+```
+
+<Aside>
+  [Read more about self-referencing slots](/setup/slots/#self-referencing-slots)
+</Aside>
+
+---
+
+### Zod Submodules
+
+Layerfig now exports two new submodules:
+
+- `@layerfig/config/zod` → Zod v4
+- `@layerfig/config/zod-mini` → Zod v4 Mini
+
+These are useful if you want to:
+
+- Keep your schema in a separate file
+- Use Zod across your application without importing it from the main module
+
+<Aside type="tip">
+  For client-side code, always choose `zod-mini` due to its smaller size and
+  better tree-shaking support. [Learn more about Zod
+  Mini](https://zod.dev/packages/mini).
+</Aside>
+
+---
+
+## Breaking Changes
+
+### Remove `configFolder`
+
+Before, if you wanted to point out a different config folder to Layerfig search for files, you would use the `configFolder` option:
+
+```ts
+import path from "node:path";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  configFolder: "./path/to/config-folder",
+})
+  .addSource(new FileSource("base.json"))
+  .build();
+```
+
+The problem was that internally, Layerfig would use `process.cwd()` and resolve to the folder you've specified but in some cases this caused issues.
+
+Now, if you want to change the default folder (or have a different one based on the environment), you can use the `absoluteConfigFolderPath` option:
+
+```ts
+import path from "node:path";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  absoluteConfigFolderPath: path.resolve(
+    process.cwd(),
+    "./path/to/config-folder"
+  ),
+})
+  .addSource(new FileSource("base.json"))
+  .build();
+```
+
+Please notice that as the name states, this option expects an **absolute** path to the folder where Layerfig should look for configuration files. If not it will throw an error.
+
+### Custom Parser API
+
+In v2, creating a custom configuration parser looked like this:
+
+```ts
+import { defineConfigParser } from "@layerfig/config";
+
+export const iniParser = defineConfigParser({
+  acceptedFileExtensions: ["ini"],
+  parse: (fileContent) => {
+    // Logic to fetch, read, and parse the content
+    // Should return a Result
+  },
+});
+```
+
+In v3, you now need to create a class that extends `ConfigParser`:
+
+```ts
+// ./path/to/custom-parser.ts
+import { ConfigParser } from "@layerfig/config";
+
+class IniParser extends ConfigParser {
+  constructor() {
+    super({
+      acceptedFileExtensions: ["ini"],
+    });
+  }
+
+  load(fileContent: string) {
+    // Logic to fetch, read, and parse the content
+    // Should return a Result
+  }
+}
+
+export const iniParser = new IniParser();
+```
+
+This change improves internal checks and validations within Layerfig.
+
+---
+
+### Client vs. Server Modules
+
+To better separate client and server code, Layerfig now provides a dedicated **client** submodule:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config/client";
+```
+
+<Aside>
+  Because `FileSource` uses Node.js APIs, it cannot be used with the client
+  `ConfigBuilder` and is only available from the main (server) module.
+</Aside>
+
+All exports from the `client` submodule are safe for browser environments.  
+The included `z` instance is `zod/mini`, helping reduce your client bundle size.
+
+For server-side code, you can still import everything from the main module:
+
+```ts
+import { ConfigBuilder } from "@layerfig/config";
+```
+
+### Slots syntax
+
+In v2, slots could be defined in a few ways:
+
+- `$PORT` => it would get `process.env.PORT`
+- `${APP_PORT:PORT}` => it would try to resolve `process.env.APP_PORT` and if not found, `process.env.PORT`
+- `${APP_PORT:PORT:3000}` => same but if both not found, fallback to `3000`
+- `${self.port}` => reference to the `.port` value of the config
+
+This strategy made unnecessarily complex and error prone to define what is a slot and split the values inside.
+
+Now, every slot needs to be wrapped by `${}` (or defining your own slotPrefix, e.g., `#{}`, `@{}`, etc.).
+
+```diff
+-port: $PORT
++port: ${PORT}
+```
+
+Also, when channing values, instead using single colon (`:`) to separate the values, you must use double colon (`::`):
+
+```diff
+-port: ${APP_PORT:PORT:-3000}
++port: ${APP_PORT::PORT::-3000}
+```
+
+This refactor now allow you to specify more complex cases, such as multiple slots in the same value:
+
+```yaml
+host:
+  ${HOST::-localhost}:${self.port::-3000}
+  # 👆🏽 gets resolved to `localhost:3000` if neither `HOST` nor `self.port` are defined
+```
+
+---
+
+## Other Changes
+
+- User options are now validated with Zod (Mini)
+- Zod upgraded from v3 to v4

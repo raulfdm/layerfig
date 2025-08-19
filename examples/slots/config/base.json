@@ -1,5 +1,6 @@
 {
-	"baseURL": "http://localhost:$PORT",
-	"port": "$PORT",
-	"appEnv": "$APP_ENV"
+  "port": "${PORT}",
+  "baseURL": "http://localhost:${self.port}",
+  "appVersion": "${APP_VERSION::-not set}",
+  "debugLevel": "${DEBUG_LEVEL::LEGACY_DEBUG_LEVEL}"
 }

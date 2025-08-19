@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/parser-yaml",
 	"description": "Source parser for .yaml and .yml config files",
-	"version": "5.0.0",
+	"version": "6.0.1",
 	"keywords": [
 		"@layerfig/config",
 		"source",
@@ -45,17 +45,16 @@
 		"test": "vitest --typecheck"
 	},
 	"peerDependencies": {
-		"@layerfig/config": "^2.0.0"
+		"@layerfig/config": "^3.0.0"
 	},
 	"dependencies": {
 		"yaml": "^2.8.0"
 	},
 	"devDependencies": {
 		"@layerfig/config": "workspace:*",
-		"@types/bun": "1.2.18",
-		"tsdown": "0.12.9",
+		"@types/bun": "1.2.20",
+		"tsdown": "0.14.1",
 		"typescript": "^5.9.0-beta",
-		"vitest": "3.2.4",
-		"zod": "3.25.67"
+		"vitest": "3.2.4"
 	}
 }

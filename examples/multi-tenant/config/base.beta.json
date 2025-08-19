@@ -1,0 +1,6 @@
+{
+  "id": "beta",
+  "name": "Beta Corp",
+  "subdomain": "beta",
+  "webhooks": ["https://webhook.beta.example.com"]
+}

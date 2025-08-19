@@ -16,9 +16,7 @@ const formatter = new Intl.ListFormat("en", {
 
 const files = formatter.format(Astro.props.supportedFiles);
 
-const code = `
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+const code = `import { ConfigBuilder, FileSource } from "@layerfig/config";
 import ${Astro.props.parserName} from "${Astro.props.packageName}";
 
 export const config = new ConfigBuilder({
@@ -57,7 +55,7 @@ export const config = new ConfigBuilder({
       <p>
         Add the parser to your <code>ConfigBuilder</code>.
       </p>
-      <Code code={code} lang="typescript" wrap meta="{3,12}" />
+      <Code code={code} lang="typescript" wrap meta="{2,13}" />
     </li>
   </ol>
 </Steps>

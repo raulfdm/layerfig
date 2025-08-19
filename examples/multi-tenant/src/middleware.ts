@@ -1,22 +1,26 @@
-import type { Request, Response, NextFunction } from 'express';
-import type { TenantContext } from './types';
-import { getTenantBySubdomain } from './data-store';
-import { getTenantSettings } from './utils';
+import type { NextFunction, Request, Response } from "express";
+import { getTenantBySubdomain } from "./data-store";
+import { getTenantSettings } from "./utils";
+import { getTenantConfig, type TenantId } from "./config";
+import type { AugmentedTenant } from "./types";
 
 declare global {
   namespace Express {
     interface Request {
-      tenantContext?: TenantContext;
+      tenantContext?: {
+        tenantId: TenantId;
+        tenant: AugmentedTenant<TenantId>;
+      };
     }
   }
 }
 
-const tentantsSettings = getTenantSettings()
+const tenantsSettings = getTenantSettings();
 
 export const tenantMiddleware = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   const host = req.headers.host;
 
@@ -25,18 +29,21 @@ export const tenantMiddleware = (
       <h1>Invalid Request</h1>
       <p>No host header found. Please access via subdomain:</p>
       <ul>
-        ${tentantsSettings.map(t => `<li><a href="${t.url}">${t.url}</a></li>`).join('\n')}
+        ${
+      tenantsSettings.map((t) => `<li><a href="${t.url}">${t.url}</a></li>`)
+        .join("\n")
+    }
       </ul>
     `);
     return;
   }
 
   // Extract subdomain (everything before the first dot, or the whole host if no dots)
-  const subdomain = host.split('.')[0];
+  const subdomain = host.split(".")[0];
 
   // For localhost development, handle both localhost:3000 and subdomain.localhost:3000
   let tenant;
-  if (host.includes('localhost')) {
+  if (host.includes("localhost")) {
     tenant = getTenantBySubdomain(subdomain!);
   }
 
@@ -46,7 +53,11 @@ export const tenantMiddleware = (
       <p>No tenant found for subdomain: <strong>${subdomain}</strong></p>
       <p>Available tenants:</p>
       <ul>
-        ${tentantsSettings.map(t => `<li><a href="${t.url}">${t.url.host}</a> (${t.name})</li>`).join('\n')}
+        ${
+      tenantsSettings.map((t) =>
+        `<li><a href="${t.url}">${t.url.host}</a> (${t.name})</li>`
+      ).join("\n")
+    }
       </ul>
       <p><small>Make sure to add these entries to your /etc/hosts file for local development</small></p>
     `);
@@ -55,7 +66,7 @@ export const tenantMiddleware = (
 
   req.tenantContext = {
     tenantId: tenant.id,
-    tenant,
+    tenant: getTenantConfig(tenant.id) as AugmentedTenant<TenantId>,
   };
 
   next();
@@ -66,7 +77,7 @@ export const errorHandler = (
   _req: Request,
   res: Response,
 ): void => {
-  console.error('Error:', err);
+  console.error("Error:", err);
 
   res.status(500).send(`
     <h1>Server Error</h1>

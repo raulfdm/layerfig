@@ -9,10 +9,9 @@ import { Aside } from "@astrojs/starlight/components";
 The `ConfigBuilder` constructor requires a `validate` function. This function receives two arguments: the final merged configuration and a Zod instance (v4). It must return the validated configuration.
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 
-// config will be type `z.infer<typeof schema>` (the actual object type)
+// config will be type `z.output<typeof schema>` (the actual object type)
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
@@ -30,8 +29,7 @@ export const config = new ConfigBuilder({
 You can also use other validation libraries. Return the result of the schema validation from the `validate` function, and the `config` object will be typed accordingly:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import * as v from "valibot";
 
 export const configSchema = v.object({
@@ -45,22 +43,32 @@ export const config = new ConfigBuilder({
   .build();
 ```
 
-## options.configFolder
+## options.absoluteConfigFolderPath
 
-> Default: `'./config'`
+> Default: `'<process.cwd()>/config'`
 
-By default, file-based sources added via `addSource` are loaded from a `config` folder in the project's root. You can customize this path using the `configFolder` option:
+By default, file-based sources added via `addSource` are loaded from a `config` folder in the project's root. You can customize this path using the `absoluteConfigFolderPath` option:
 
 ```ts
+import path from "node:path";
+
 const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
-  configFolder: "./path/to/config-folder",
+  absoluteConfigFolderPath: path.resolve(
+    process.cwd(),
+    "./path/to/config-folder"
+  ),
 })
   .addSource(new FileSource("base.json"))
   .build();
 ```
 
 In this example, the library will look for `<root>/path/to/config-folder/base.json`.
+
+<Aside type="danger">
+  `absoluteConfigFolderPath` must be an absolute path, otherwise it'll throw an
+  error.
+</Aside>
 
 ## options.parser
 

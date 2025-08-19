@@ -1,7 +1,10 @@
-import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import path from "node:path";
+import {
+	ConfigBuilder,
+	type ConfigBuilderOptions,
+	FileSource,
+} from "@layerfig/config";
 import { describe, expect, it } from "vitest";
-import { z } from "zod/v4";
 import tomlParser from "./index";
 
 describe("tomlParser", () => {
@@ -53,16 +56,18 @@ describe("tomlParser", () => {
 });
 
 function getConfig(options?: Partial<ConfigBuilderOptions>) {
-	const schema = z.object({
-		appURL: z.url(),
-		cache: z.object({
-			port: z.number(),
-			host: z.string(),
-		}),
-	});
 	return new ConfigBuilder({
-		validate: (config) => schema.parse(config),
-		configFolder: "./src/__fixtures__",
+		validate: (config, z) =>
+			z
+				.object({
+					appURL: z.url(),
+					cache: z.object({
+						port: z.number(),
+						host: z.string(),
+					}),
+				})
+				.parse(config),
+		absoluteConfigFolderPath: path.resolve(process.cwd(), "./src/__fixtures__"),
 		parser: tomlParser,
 		...options,
 	});

@@ -1,39 +1,13 @@
-import { z } from "zod/v4";
-import { set } from "../utils/set";
-import { type LoadSourceOptions, Source } from "./source";
-
-const EnvironmentVariableSourceOptions = z.object({
-	/**
-	 * The environment variable prefix to use
-	 * @default 'APP
-	 */
-	prefix: z.string().optional().default("APP"),
-	/**
-	 * The separator to use between the prefix and the key
-	 * @default '_'
-	 */
-	prefixSeparator: z.string().optional().default("_"),
-	/**
-	 * The separator to navigate the object
-	 * @default '__'
-	 */
-	separator: z.string().optional().default("__"),
-});
-
-type EnvironmentVariableSourceOptions = z.Infer<
-	typeof EnvironmentVariableSourceOptions
->;
-const PartialEnvironmentVariableSourceOptions =
-	EnvironmentVariableSourceOptions.partial();
-export type PartialEnvironmentVariableSourceOptions = z.Infer<
-	typeof PartialEnvironmentVariableSourceOptions
->;
+import { set } from "es-toolkit/compat";
+import { z } from "zod/mini";
+import type { LoadSourceOptions } from "../types";
+import { Source } from "./source";
 
 export class EnvironmentVariableSource extends Source {
-	#options: EnvironmentVariableSourceOptions;
+	#options: ValidatedEnvironmentVariableSourceOptions;
 	#prefixWithSeparator: string;
 
-	constructor(options: PartialEnvironmentVariableSourceOptions = {}) {
+	constructor(options: EnvironmentVariableSourceOptions = {}) {
 		super();
 		this.#options = EnvironmentVariableSourceOptions.parse(options);
 
@@ -43,7 +17,10 @@ export class EnvironmentVariableSource extends Source {
 	loadSource({
 		runtimeEnv,
 		slotPrefix,
-	}: LoadSourceOptions): Record<string, unknown> {
+	}: Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix">): Record<
+		string,
+		unknown
+	> {
 		const envKeys = Object.keys(runtimeEnv).filter((key) =>
 			key.startsWith(this.#prefixWithSeparator),
 		);
@@ -53,7 +30,7 @@ export class EnvironmentVariableSource extends Source {
 		for (const envKey of envKeys) {
 			const envVarValue = runtimeEnv[envKey];
 
-			if (envVarValue === undefined) {
+			if (envVarValue === undefined || envVarValue === null) {
 				continue;
 			}
 
@@ -62,17 +39,44 @@ export class EnvironmentVariableSource extends Source {
 				.split(this.#options.separator)
 				.join(".");
 
-			set(
-				tempObject,
-				keyParts,
-				this.maybeReplaceSlotFromValue({
-					value: envVarValue,
-					runtimeEnv,
-					slotPrefix,
-				}),
-			);
+			const value = this.maybeReplaceSlots({
+				slotPrefix,
+				contentString: String(envVarValue),
+				runtimeEnv,
+				transform: (content) => content,
+			});
+
+			set(tempObject, keyParts, value);
 		}
 
 		return tempObject;
 	}
 }
+
+interface EnvironmentVariableSourceOptions {
+	/**
+	 * The environment variable prefix to use
+	 * @default 'APP
+	 */
+	prefix?: string;
+	/**
+	 * The separator to use between the prefix and the key
+	 * @default '_'
+	 */
+	prefixSeparator?: string;
+	/**
+	 * The separator to navigate the object
+	 * @default '__'
+	 */
+	separator?: string;
+}
+
+const EnvironmentVariableSourceOptions = z.object({
+	prefix: z._default(z.optional(z.string()), "APP"),
+	prefixSeparator: z._default(z.optional(z.string()), "_"),
+	separator: z._default(z.optional(z.string()), "__"),
+}) satisfies z.ZodMiniType<EnvironmentVariableSourceOptions>;
+
+type ValidatedEnvironmentVariableSourceOptions = z.output<
+	typeof EnvironmentVariableSourceOptions
+>;

@@ -1,28 +1,15 @@
-import type { ConfigParser } from "../parser/define-config-parser";
-import type { Prettify } from "../types";
+import { get } from "es-toolkit/compat";
+import type {
+	ClientConfigBuilderOptions,
+	Prettify,
+	RuntimeEnvValue,
+	ServerConfigBuilderOptions,
+	UnknownArray,
+	UnknownRecord,
+} from "../types";
+import { extractSlotsFromExpression, hasSlot, type Slot } from "../utils/slot";
 
-interface RuntimeEnv {
-	[key: string]: string | undefined;
-}
-
-export interface LoadSourceOptions {
-	parser: ConfigParser;
-	relativeConfigFolderPath: string;
-	runtimeEnv: RuntimeEnv;
-	slotPrefix: string;
-}
-
-interface MaybeReplaceSlotFromValueOptions
-	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {
-	value: string;
-}
-
-interface ExtractedSlot {
-	slotPattern: RegExp;
-	envVarName: string[];
-	value: string;
-	fallback?: string;
-}
+const UNDEFINED_MARKER = "___UNDEFINED_MARKER___" as const;
 
 export abstract class Source<T = Record<string, unknown>> {
 	/**
@@ -33,124 +20,132 @@ export abstract class Source<T = Record<string, unknown>> {
 	 */
 	abstract loadSource(loadSourceOptions: LoadSourceOptions): Prettify<T>;
 
-	maybeReplaceSlotFromValue({
-		value,
-		slotPrefix,
-		runtimeEnv,
-	}: MaybeReplaceSlotFromValueOptions): string {
-		const slots = this.#extractSlotName({
-			slotPrefix,
-			value,
-		});
-
-		if (slots === null) {
-			return value;
+	maybeReplaceSlots<T>(options: MaybeReplaceSlotsOptions<T>) {
+		const initialObject = options.transform(options.contentString);
+		/**
+		 * If there's no slot, we don't need to do anything
+		 */
+		if (!hasSlot(options.contentString, options.slotPrefix)) {
+			return initialObject;
 		}
 
-		let newValue = value;
+		const slots = this.#extractSlots(
+			initialObject as UnknownRecord,
+			options.slotPrefix,
+		);
+
+		let updatedContentString = options.contentString;
 
 		for (const slot of slots) {
-			let envVarValue: string | undefined;
+			let envVarValue: RuntimeEnvValue;
 
-			for (const envVar of slot.envVarName) {
-				const value = runtimeEnv[envVar];
+			for (const reference of slot.references) {
+				if (reference.type === "env_var") {
+					envVarValue = options.runtimeEnv[reference.envVar];
+				}
 
-				if (value) {
-					envVarValue = value;
+				if (reference.type === "self_reference") {
+					const partialObj = options.transform(updatedContentString);
+
+					envVarValue = get(
+						partialObj,
+						reference.propertyPath,
+					) as RuntimeEnvValue;
+				}
+
+				if (envVarValue !== null && envVarValue !== undefined) {
+					// If we found a value for the env var, we can stop looking
 					break;
 				}
 			}
 
-			envVarValue ??= slot.fallback;
-
-			if (envVarValue) {
-				newValue = newValue.replace(slot.slotPattern, envVarValue);
-			} else {
-				console.warn(
-					"[SLOT_REPLACEMENT]",
-					`The value for the slot "${slot.envVarName}" is not defined in the runtime environment. The slot will not be replaced.`,
-				);
+			if (!envVarValue && slot.fallbackValue) {
+				envVarValue = slot.fallbackValue;
 			}
-		}
 
-		return newValue;
-	}
-
-	#extractSlotName({
-		slotPrefix,
-		value,
-	}: Pick<MaybeReplaceSlotFromValueOptions, "value" | "slotPrefix">):
-		| ExtractedSlot[]
-		| null {
-		/**
-		 * Something like: /\$\w+/g
-		 * To match basic slots like $MY_VAR
-		 */
-		const basicSlotRegex = new RegExp(`\\${slotPrefix}\\w+`, "g");
-		/**
-		 * Something like: /\$\{.*\}/g
-		 * To match multi-slot patterns like ${MY_VAR:MY_OTHER_VAR}
-		 */
-		const multiSlotRegex = new RegExp(`\\${slotPrefix}{.*}`, "g");
-
-		const basicMatches = value.match(basicSlotRegex);
-		const multiMatches = value.match(multiSlotRegex);
-
-		if (!basicMatches && !multiMatches) {
-			return null;
-		}
-
-		const result: ExtractedSlot[] = [];
-
-		if (basicMatches) {
-			const uniqueSlots = new Set(basicMatches);
-
-			result.push(
-				...Array.from(uniqueSlots).map((slotMatch) => ({
-					envVarName: [slotMatch.replace(slotPrefix, "")],
-					slotPattern: this.#safeSlotRegex(slotMatch),
-					value,
-				})),
+			updatedContentString = updatedContentString.replaceAll(
+				slot.slotMatch,
+				envVarValue !== null && envVarValue !== undefined
+					? String(envVarValue)
+					: UNDEFINED_MARKER,
 			);
 		}
 
-		if (multiMatches) {
-			const possibleEnvVarSlots = new Set(multiMatches);
+		const partialConfig = this.#cleanUndefinedMarkers(
+			options.transform(updatedContentString),
+		);
 
-			for (const possibleSlot of possibleEnvVarSlots) {
-				let fallbackValue: string | undefined;
+		return partialConfig;
+	}
 
-				const values = possibleSlot
-					.replace(`${slotPrefix}{`, "")
-					.replace("}", "")
-					.split(":");
+	#extractSlots(
+		value: UnknownRecord | UnknownArray,
+		slotPrefix: string,
+	): Slot[] {
+		const result: Slot[] = [];
 
-				// If the last value contains a hyphen, it is considered a fallback value
-				if (values[values.length - 1]?.includes("-")) {
-					fallbackValue = values.pop()?.trim().replace("-", "");
+		if (Array.isArray(value)) {
+			for (const item of value) {
+				result.push(...this.#extractSlots(item as UnknownRecord, slotPrefix));
+			}
+		} else if (typeof value === "string") {
+			result.push(...extractSlotsFromExpression(value, slotPrefix));
+		} else if (value && typeof value === "object") {
+			for (const [_, v] of Object.entries(value)) {
+				if (typeof v === "string") {
+					result.push(...extractSlotsFromExpression(v, slotPrefix));
+				} else {
+					result.push(...this.#extractSlots(v as UnknownRecord, slotPrefix));
 				}
-
-				result.push({
-					envVarName: values,
-					slotPattern: this.#safeSlotRegex(possibleSlot),
-					value,
-					fallback: fallbackValue,
-				});
 			}
 		}
 
 		return result;
 	}
 
-	#safeSlotRegex(slot: string) {
-		/**
-		 * Escape the first character to ensure it is treated literally in the regex
-		 * This is necessary because the first character could be a special regex character
-		 * such as $, ^, or \, which would otherwise be interpreted by the regex engine.
-		 * For example, if the slot is "$MY_VAR", we want to match it literally as "\$MY_VAR".
-		 * This ensures that the regex will match the slot name exactly as it appears in the string.
-		 */
-		const safe = slot.replace(/^./, (m) => `\\${m}`);
-		return new RegExp(safe, "gm");
+	#cleanUndefinedMarkers<T = unknown>(value: T): any {
+		if (value === UNDEFINED_MARKER) {
+			return undefined;
+		}
+
+		if (typeof value === "string" && value.includes(UNDEFINED_MARKER)) {
+			// If it's mixed content with undefined slots, return undefined
+			return undefined;
+		}
+
+		if (Array.isArray(value)) {
+			const newList: any[] = [];
+
+			for (const item of value) {
+				const cleanedItem = this.#cleanUndefinedMarkers(item);
+				if (cleanedItem !== undefined) {
+					newList.push(cleanedItem);
+				}
+			}
+
+			return newList;
+		}
+
+		if (value && typeof value === "object") {
+			const result: UnknownRecord = {};
+
+			for (const [oKey, oValue] of Object.entries(value)) {
+				result[oKey] = this.#cleanUndefinedMarkers(oValue);
+			}
+
+			return result;
+		}
+
+		return value;
 	}
+}
+
+type LoadSourceOptions = Prettify<
+	Required<ClientConfigBuilderOptions | ServerConfigBuilderOptions>
+>;
+
+interface MaybeReplaceSlotsOptions<T = unknown>
+	extends Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix"> {
+	contentString: string;
+	transform: (contentString: string) => T;
 }

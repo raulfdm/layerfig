@@ -4,7 +4,7 @@ title: "Slots"
 
 import { Aside } from "@astrojs/starlight/components";
 
-You may need to define your configuration in a file while also sourcing values from environment variables.
+It's common to define your configuration in a file while also sourcing values from environment variables.
 
 Consider the following configuration file:
 
@@ -16,7 +16,7 @@ Consider the following configuration file:
 }
 ```
 
-Notice that the port number is used in two places. Instead of hardcoding this value, you can use a `PORT` variable defined in your environment, for example, in a `.env` file:
+Notice that the port number is used in two places. Instead of hardcoding this value, you can use a `PORT` variable from your environment, for example, in a `.env` file:
 
 ```env
 PORT=3000
@@ -27,37 +27,150 @@ To reference this environment variable, you can use a "slot":
 ```json
 // config/base.json
 {
-  "appURL": "http://localhost:$PORT",
-  "port": "$PORT"
+  "appURL": "http://localhost:${PORT}",
+  "port": "${PORT}"
 }
 ```
 
-When Layerfig processes your configuration, it searches for slots and replaces them with the corresponding environment variable's value:
+When Layerfig processes your configuration, it finds slots and replaces them with the corresponding environment variable's value:
 
 ```
-$PORT => PORT => 3000
+$PORT => process.env.PORT => 3000
 ```
 
 <Aside>Check out the [slots example](/examples/slots).</Aside>
 
-## Caveats
+## Self-Referencing Slots
 
-If an environment variable for a slot is not defined, Layerfig will not perform a replacement. The configuration value will retain the original slot string:
+For convenience, you can also reference values within the same configuration file. This helps avoid duplication and keeps your configuration consistent.
 
-```ts
-config.appURL; // "http://localhost:$PORT"
+In the previous "port" example, instead of defining the `$PORT` slot in two places, you can use a self-referencing slot:
+
+```json
+// config/base.json
+{
+  "appURL": "http://localhost:${self.port}",
+  "port": "${PORT::-3000}"
+}
 ```
 
-Additionally, all environment variables are treated as strings. If a slot is used for a value that should be a number, like `port`, the resulting configuration will have a string value:
+Layerfig looks for the `self.*` syntax in the configuration file and uses the value after the dot as an "object path" to find the value in the same configuration. In this case, it will look for the `port` value.
+
+The final configuration will be:
+
+```json
+{
+  "appURL": "http://localhost:3000",
+  "port": "3000"
+}
+```
+
+<Aside type="caution">
+  If the path doesn't match any value, Layerfig will not perform a replacement,
+  and the slot will remain unchanged.
+</Aside>
+
+## Custom Slot Prefix
+
+By default, Layerfig uses `$` as the slot prefix, but you can change it by passing the [`slotPrefix`](/setup/configuration/#optionsslotprefix) option.
+
+## Chaining Environment Variables
+
+Sometimes, you may want to try multiple environment variables for a single value, using a specific order of priority.
+
+For example, imagine you want to determine the current Git branch. This value could come from different sources:
+
+1.  `process.env.GIT_REF`
+2.  `process.env.REF`
+3.  `.branch` (from the same configuration file)
+
+To do this, you can use the extended slot syntax, separating each variable name with a colon:
+
+```json
+// config/base.json
+{
+  "branch": "${GIT_REF::REF::self.branch}"
+}
+```
+
+Layerfig processes this from left to right, checking for `GIT_REF`, then `REF`, and so on, using the first environment variable it finds. If none of the environment variables in the chain are found, Layerfig keeps the original slot string.
+
+## Literal Fallbacks
+
+In addition to chaining variables, you can also provide a literal fallback value if none of the environment variables are set.
+
+This is done by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
+
+```json
+// config/base.json
+{
+  "port": "${PORT::-3000}"
+}
+```
+
+If the `PORT` environment variable is not defined, Layerfig will use `3000` as the value.
+
+You can combine this operator with variable chaining for more complex cases:
+
+```json
+// config/base.json
+{
+  "branch": "${GIT_REF::REF::MAIN_REF::-main}"
+}
+```
+
+If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, the value will fall back to the literal string `main`.
+
+## Caveats
+
+Here are a few things to keep in mind when working with slots.
+
+### Undefined values
+
+If an environment variable for a slot is not defined, Layerfig will not replace it, and the configuration value will keep the original slot string:
+
+```ts
+config.appURL; // undefined
+```
+
+If your schema expects a defined value, it will throw an error during validation. Also, for array items, if a value gets resolved to undefined, it will be removed.
+
+For example, let's say only `ORIGIN_1` is defined in your environment variables.
+
+```
+ORIGIN_1=*
+```
+
+The following config:
+
+```
+allowOrigins: ["${ORIGIN_1}", "${ORIGIN_2}"]
+```
+
+Will be resolved to:
+
+```ts
+const config = {
+  allowOrigins: ["*"], // ORIGIN_2 was discarded.
+};
+```
+
+### Non-string primitive values
+
+The `runtimeEnv` option can be `process.env` in the server config, `import.meta.env` in the client, or even a plain object. Node's process environment is a record `Record<string, string|undefined>`, but import meta env can hold non-string values such as booleans and numbers.
+
+Layerfig supports all these value types, but in your final configuration, you will most likely have string values in your `validate(finalConfig)` function.
 
 ```js
 const finalConfig = {
   appURL: "http://localhost:3000",
   port: "3000",
+  dev: "true",
+  prod: "false",
 };
 ```
 
-To handle this, you can use a validation schema to coerce the string value into a number. For example, with Zod:
+To handle this, you can use a validation schema to coerce the string value into the type you expect. For example, with Zod:
 
 ```ts {5}
 import { z } from "@layerfig/config";
@@ -65,55 +178,9 @@ import { z } from "@layerfig/config";
 const schema = z.object({
   appURL: z.string(),
   port: z.coerce.number().positive().int(),
+  dev: z.coerce.boolean(),
+  prod: z.coerce.boolean(),
 });
 ```
 
-The `z.coerce.number()` function will parse the string `"3000"` and transform it into the number `3000`.
-
-## Different Prefix
-
-By default, Layerfig uses `$` as the slot prefix, but you can change it by passing the [`slotPrefix`](/setup/configuration/#optionsslotprefix) option.
-
-## Chaining Environment Variables
-
-There are cases where you might want to try multiple environment variables for a single value, providing a chain of options in a specific order of priority.
-
-For example, imagine you want to determine the current Git branch. This value could be sourced from several environment variables:
-
-1.  `process.env.GIT_REF`
-2.  `process.env.REF`
-3.  `process.env.MAIN_REF`
-
-To achieve this, you can use the extended slot syntax, separating each variable name with a colon:
-
-```json
-{
-  "branch": "${GIT_REF:REF:MAIN_REF}"
-}
-```
-
-Layerfig processes this from left to right. It checks for `GIT_REF`, then `REF`, and so on, using the first defined environment variable it finds. If no environment variables in the chain are found, Layerfig will preserve the original slot string.
-
-## Literal Fallbacks
-
-In addition to chaining variables, you can also provide a literal fallback value to be used if none of the environment variables are set.
-
-This is achieved by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
-
-```json
-{
-  "port": "${PORT:-3000}"
-}
-```
-
-If the `PORT` environment variable is not defined, Layerfig will use `3000` as the value.
-
-Of course, this operator can be combined with variable chaining for more complex cases:
-
-```json
-{
-  "branch": "${GIT_REF:REF:MAIN_REF:-main}"
-}
-```
-
-If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, the value will fall back to the literal string `main`.
+The `z.coerce.*` function will parse the string value and transform it into the type you want.

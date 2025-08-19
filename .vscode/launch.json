@@ -1,0 +1,19 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Config Tests",
+			"type": "node",
+			"request": "launch",
+			"runtimeExecutable": "bun",
+			"runtimeArgs": ["--inspect-wait", "run", "test"],
+			"cwd": "${workspaceFolder}/packages/config",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"skipFiles": ["<node_internals>/**"],
+			"env": {
+				"NODE_ENV": "test"
+			}
+		}
+	]
+}

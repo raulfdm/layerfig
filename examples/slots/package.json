@@ -1,17 +1,17 @@
 {
-  "name": "slots",
+  "name": "slots-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "cross-env PORT=3000 APP_ENV=prod node server",
+    "dev": "cross-env LEGACY_DEBUG_LEVEL=debug PORT=3000 node server",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build --outDir dist/client",
     "build:server": "vite build --ssr src/entry-server.ts --outDir dist/server",
-    "preview": "cross-env NODE_ENV=production PORT=8080 APP_ENV=prod node server"
+    "preview": "cross-env NODE_ENV=production DEBUG_LEVEL=info PORT=8080 node server"
   },
   "dependencies": {
-    "@layerfig/config": "2.1.0",
+    "@layerfig/config": "3.0.0",
     "compression": "1.8.0",
     "express": "5.1.0",
     "sirv": "3.0.1"

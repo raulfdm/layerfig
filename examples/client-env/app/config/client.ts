@@ -1,11 +1,10 @@
-import { ConfigBuilder, type z } from "@layerfig/config";
-import { ObjectSource } from "@layerfig/config/sources/object";
+import { ConfigBuilder, ObjectSource, type z } from "@layerfig/config/client";
 import { ConfigSchema } from "./schema";
 
 const ClientEnvSchema = ConfigSchema.pick({
   env: true,
 });
-type ClientEnvSchema = z.infer<typeof ClientEnvSchema>;
+type ClientEnvSchema = z.output<typeof ClientEnvSchema>;
 
 export const clientEnv = new ConfigBuilder({
   validate: (finalConfig) => ClientEnvSchema.parse(finalConfig),
@@ -13,7 +12,7 @@ export const clientEnv = new ConfigBuilder({
 })
   .addSource(
     new ObjectSource<ClientEnvSchema>({
-      env: "$VITE_APP_ENV",
-    })
+      env: "${VITE_APP_ENV}",
+    }),
   )
   .build();

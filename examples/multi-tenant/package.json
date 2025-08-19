@@ -1,5 +1,5 @@
 {
-  "name": "multitenant-app",
+  "name": "multi-tenant-app-example",
   "version": "1.0.0",
   "description": "Multi-tenant application example",
   "scripts": {
@@ -7,7 +7,7 @@
     "start": "bun run server/server.js"
   },
   "dependencies": {
-    "@layerfig/config": "2.1.0",
+    "@layerfig/config": "3.0.0",
     "cors": "2.8.5",
     "express": "4.18.2",
     "helmet": "7.1.0"

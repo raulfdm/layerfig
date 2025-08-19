@@ -1,14 +1,19 @@
-import { config } from "./config";
-import type { Task, Tenant } from "./types";
+import {
+  availableTenants,
+  getTenantConfig,
+  type TenantConfigType,
+  type TenantId,
+} from "./config";
+import type { AugmentedTenant, Task } from "./types";
 
 // In-memory data store (in production, use a proper database)
-const tenants = new Map<string, Tenant>();
-const tenantTasks = new Map<string, Map<string, Task>>();
+const tenants = new Map<TenantId, AugmentedTenant<TenantId>>();
+const tenantTasks = new Map<TenantId, Map<string, Task>>();
 
 // Initialize sample tenants
 export const initializeSampleData = (): void => {
-  const sampleTenants: Tenant[] = Object.values(config.tenants).map((t) => ({
-    ...t,
+  const sampleTenants = availableTenants.map((t) => ({
+    ...getTenantConfig(t),
     createdAt: new Date(),
   }));
 
@@ -19,31 +24,35 @@ export const initializeSampleData = (): void => {
 };
 
 // Tenant operations
-export const getTenantById = (tenantId: string): Tenant | undefined => {
+export const getTenantById = (
+  tenantId: TenantId,
+): AugmentedTenant<TenantId> | undefined => {
   return tenants.get(tenantId);
 };
 
-export const getTenantBySubdomain = (subdomain: string): Tenant | undefined => {
+export const getTenantBySubdomain = (
+  subdomain: string,
+): AugmentedTenant<TenantId> | undefined => {
   return Array.from(tenants.values()).find(
     (tenant) => tenant.subdomain === subdomain,
   );
 };
 
 // Task operations
-export const getTasksByTenant = (tenantId: string): Task[] => {
+export const getTasksByTenant = (tenantId: TenantId): Task[] => {
   const tasks = tenantTasks.get(tenantId);
   return tasks ? Array.from(tasks.values()) : [];
 };
 
 export const getTaskById = (
-  tenantId: string,
+  tenantId: TenantId,
   taskId: string,
 ): Task | undefined => {
   const tasks = tenantTasks.get(tenantId);
   return tasks?.get(taskId);
 };
 
-export const createTask = (tenantId: string, taskData: {
+export const createTask = (tenantId: TenantId, taskData: {
   title: string;
   description: string;
 }): Task => {
@@ -67,7 +76,7 @@ export const createTask = (tenantId: string, taskData: {
 };
 
 export const updateTask = (
-  tenantId: string,
+  tenantId: TenantId,
   taskId: string,
   updates: Partial<Pick<Task, "title" | "description" | "completed">>,
 ): Task | undefined => {
@@ -88,7 +97,7 @@ export const updateTask = (
   return updatedTask;
 };
 
-export const deleteTask = (tenantId: string, taskId: string): boolean => {
+export const deleteTask = (tenantId: TenantId, taskId: string): boolean => {
   const tasks = tenantTasks.get(tenantId);
   return tasks?.delete(taskId) ?? false;
 };

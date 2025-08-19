@@ -1,5 +1,31 @@
 # @layerfig/parser-toml
 
+## 6.0.1
+
+### Patch Changes
+
+- 9129fa6: update peerDependency range
+
+## 6.0.0
+
+### Patch Changes
+
+- f159e86: Update smol-toml to ^1.4.2
+
+## 6.0.0-next.1
+
+### Patch Changes
+
+- f159e86: Update smol-toml to ^1.4.2
+
+## 6.0.0-next.0
+
+### Patch Changes
+
+- Updated dependencies [928dcc4]
+- Updated dependencies [b81e683]
+  - @layerfig/config@3.0.0-next.0
+
 ## 5.0.0
 
 ### Major Changes

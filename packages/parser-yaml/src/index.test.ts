@@ -1,7 +1,10 @@
-import { ConfigBuilder, type ConfigBuilderOptions } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import path from "node:path";
+import {
+	ConfigBuilder,
+	type ConfigBuilderOptions,
+	FileSource,
+} from "@layerfig/config";
 import { describe, expect, it } from "vitest";
-import { z } from "zod/v4";
 import yamlParser from "./index";
 
 describe("yamlParser", () => {
@@ -61,19 +64,17 @@ describe("yamlParser", () => {
 });
 
 function getConfig(options?: Partial<ConfigBuilderOptions>) {
-	const schema = z.object({
-		appURL: z.url(),
-		api: z.object({
-			port: z
-				.string()
-				.transform((val) => Number.parseInt(val, 10))
-				.or(z.number()),
-		}),
-	});
-
 	return new ConfigBuilder({
-		validate: (config) => schema.parse(config),
-		configFolder: "./src/__fixtures__",
+		validate: (config, z) =>
+			z
+				.object({
+					appURL: z.url(),
+					api: z.object({
+						port: z.coerce.number().int().positive(),
+					}),
+				})
+				.parse(config),
+		absoluteConfigFolderPath: path.resolve(process.cwd(), "./src/__fixtures__"),
 		parser: yamlParser,
 		...options,
 	});
