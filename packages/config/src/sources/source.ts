@@ -80,10 +80,6 @@ export abstract class Source<T = Record<string, unknown>> {
 	): Slot[] {
 		const result: Slot[] = [];
 
-		if (value === undefined || value === null) {
-			return result;
-		}
-
 		if (Array.isArray(value)) {
 			for (const item of value) {
 				result.push(...this.#extractSlots(item as UnknownRecord, slotPrefix));
