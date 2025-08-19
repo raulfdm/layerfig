@@ -79,7 +79,7 @@
 	},
 	"dependencies": {
 		"es-toolkit": "^1.39.8",
-		"zod": "^4.0.10"
+		"zod": "^4.0.17"
 	},
 	"devDependencies": {
 		"@arethetypeswrong/cli": "0.18.2",

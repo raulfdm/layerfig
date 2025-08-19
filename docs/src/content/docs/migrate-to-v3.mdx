@@ -122,6 +122,39 @@ For server-side code, you can still import everything from the main module:
 import { ConfigBuilder } from "@layerfig/config";
 ```
 
+### Slots syntax
+
+In v2, slots could be defined in a few ways:
+
+- `$PORT` => it would get `process.env.PORT`
+- `${APP_PORT:PORT}` => it would try to resolve `process.env.APP_PORT` and if not found, `process.env.PORT`
+- `${APP_PORT:PORT:3000}` => same but if both not found, fallback to `3000`
+- `${self.port}` => reference to the `.port` value of the config
+
+This strategy made unnecessarily complex and error prone to define what is a slot and split the values inside.
+
+Now, every slot needs to be wrapped by `${}` (or defining your own slotPrefix, e.g., `#{}`, `@{}`, etc.).
+
+```diff
+-port: $PORT
++port: ${PORT}
+```
+
+Also, when channing values, instead using single colon (`:`) to separate the values, you must use double colon (`::`):
+
+```diff
+-port: ${APP_PORT:PORT:-3000}
++port: ${APP_PORT::PORT::-3000}
+```
+
+This refactor now allow you to specify more complex cases, such as multiple slots in the same value:
+
+```yaml
+host:
+  ${HOST::-localhost}:${self.port::-3000}
+  # 👆🏽 gets resolved to `localhost:3000` if neither `HOST` nor `self.port` are defined
+```
+
 ---
 
 ## Other Changes

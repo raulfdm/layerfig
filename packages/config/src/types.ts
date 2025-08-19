@@ -57,6 +57,7 @@ export type RuntimeEnv = zm.output<typeof RuntimeEnv>;
 export const DEFAULT_SLOT_PREFIX = "$" as const;
 
 export type UnknownRecord = Record<string, unknown>;
+export type UnknownArray = Array<unknown>;
 
 interface BaseConfigBuilderOptions {
 	/**

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { assertType, describe, expect, it, vi } from "vitest";
+import { assertType, describe, expect, it } from "vitest";
 import * as ClientModule from "./client";
 import { basicJsonParser } from "./parser/parser-json";
 import * as ServerModule from "./server";
@@ -19,8 +19,156 @@ const builders = [
 describe.each(builders)(
 	"[Shared Features] ConfigBuilder ($mode)",
 	({ ConfigBuilder }) => {
-		describe("basic slot", () => {
-			it("should replace basic slots", () => {
+		it("should build config correctly (complex case)", () => {
+			const config = new ConfigBuilder({
+				validate: (finalConfig) => finalConfig,
+				runtimeEnv: {
+					DB_PASS: "supersecret",
+					DB_POOL_MAX: "20",
+					HOSTNAME: "app.example.com",
+					LOG_LEVEL: "debug",
+					METRICS_ENABLED: "true",
+					PORT: "3000",
+					PRIMARY_DB_HOST: "primary.db.example.com",
+					PROTOCOL: "https",
+				},
+			})
+				.addSource(
+					new ObjectSource({
+						server: {
+							port: "${PORT}",
+							hostname: "${HOSTNAME::-localhost}",
+							protocol: "${PROTOCOL::SCHEME::-http}",
+							baseUrl: "${BASE_URL::self.server.hostname}:${PORT::-8080}",
+							endpoints: [
+								{
+									name: "health",
+									path: "/health",
+									enabled: true,
+								},
+								{
+									name: "metrics",
+									path: "/metrics",
+									enabled: "${METRICS_ENABLED::-false}",
+								},
+							],
+						},
+						database: {
+							host: "${DB_HOST::PRIMARY_DB_HOST::SECONDARY_DB_HOST::-db.local}",
+							port: "${DB_PORT::-5432}",
+							user: "${DB_USER::-appuser}",
+							password: "${DB_PASS::-secret}",
+							name: "${DB_NAME::-appdb}",
+							pool: {
+								min: 2,
+								max: "${DB_POOL_MAX::-10}",
+							},
+						},
+						cache: {
+							enabled: "${CACHE_ENABLED::-true}",
+							provider: "${CACHE_PROVIDER::-redis}",
+							redis: {
+								host: "${REDIS_HOST::-localhost}",
+								port: "${REDIS_PORT::-6379}",
+								ttl: "${REDIS_TTL::-3600}",
+							},
+						},
+						logging: {
+							level: "${LOG_LEVEL::-info}",
+							file: {
+								enabled: "${LOG_FILE_ENABLED::-false}",
+								path: "${LOG_FILE_PATH::-/var/log/app.log}",
+							},
+						},
+						features: {
+							beta: "${FEATURE_BETA::-false}",
+							newUI: "${FEATURE_NEW_UI::-true}",
+							experiments: [
+								"${EXPERIMENT_A::-off}",
+								"${EXPERIMENT_B::-on}",
+								"${EXPERIMENT_C::-off}",
+							],
+						},
+						security: {
+							jwtSecret: "${JWT_SECRET::-changeme}",
+							cors: {
+								allowedOrigins: [
+									"${CORS_ORIGIN1::-*}",
+									"${CORS_ORIGIN2::-https://example.com}",
+									"${CORS_ORIGIN3}",
+								],
+								allowedMethods: ["GET", "POST", "PUT", "DELETE"],
+							},
+						},
+						selfReference: {
+							port: "${PORT}",
+							hostname: "${HOSTNAME::-localhost}",
+							url: "${self.selfReference.hostname}:${self.selfReference.port}",
+						},
+					}),
+				)
+				.build();
+
+			expect(config).toEqual({
+				server: {
+					port: "3000",
+					protocol: "https",
+					hostname: "app.example.com",
+					baseUrl: "app.example.com:3000",
+					endpoints: [
+						{ name: "health", path: "/health", enabled: true },
+						{ name: "metrics", path: "/metrics", enabled: "true" },
+					],
+				},
+				database: {
+					port: "5432",
+					user: "appuser",
+					host: "primary.db.example.com",
+					password: "supersecret",
+					name: "appdb",
+					pool: {
+						min: 2,
+						max: "20",
+					},
+				},
+				cache: {
+					enabled: "true",
+					provider: "redis",
+					redis: {
+						host: "localhost",
+						port: "6379",
+						ttl: "3600",
+					},
+				},
+				logging: {
+					level: "debug",
+					file: {
+						enabled: "false",
+						path: "/var/log/app.log",
+					},
+				},
+				features: {
+					beta: "false",
+					newUI: "true",
+					experiments: ["off", "on", "off"],
+				},
+				security: {
+					jwtSecret: "changeme",
+					cors: {
+						allowedOrigins: ["*", "https://example.com"],
+						allowedMethods: ["GET", "POST", "PUT", "DELETE"],
+					},
+				},
+				selfReference: {
+					port: "3000",
+					hostname: "app.example.com",
+					url: "app.example.com:3000",
+				},
+			});
+		});
+
+		describe("slots", () => {
+			it("should replace single slots", () => {
 				const schema = z.object({
 					port: z.coerce.number().int().positive(),
 					host: z.string(),
@@ -34,8 +182,8 @@ describe.each(builders)(
 				})
 					.addSource(
 						new ObjectSource({
-							port: "$PORT",
-							host: "localhost:$PORT",
+							port: "${PORT}",
+							host: "localhost:${PORT}",
 						}),
 					)
 					.build();
@@ -46,81 +194,56 @@ describe.each(builders)(
 				});
 			});
 
-			it("should replace basic slots with fallback", () => {
-				const schema = z.object({
-					port: z.coerce.number().int().positive(),
-					host: z.string(),
+			it("should replace value with undefined if env var is undefined", () => {
+				expect(
+					new ConfigBuilder({
+						validate: (finalConfig) => finalConfig,
+					})
+						.addSource(
+							new ObjectSource({
+								host: "localhost:${PORT}",
+							}),
+						)
+						.build(),
+				).toEqual({
+					host: undefined,
 				});
 
-				const config = new ConfigBuilder({
-					validate: (finalConfig) => schema.parse(finalConfig),
-				})
-					.addSource(
-						new ObjectSource({
-							port: "${PORT:-3000}",
-							host: "localhost:${PORT:-3000}",
-						}),
-					)
-					.build();
-
-				expect(config).toEqual({
-					port: 3000,
-					host: "localhost:3000",
+				expect(
+					new ConfigBuilder({
+						validate: (finalConfig) => finalConfig,
+					})
+						.addSource(
+							new ObjectSource({
+								host: "${PORT_1:PORT_2:PORT_3}",
+							}),
+						)
+						.build(),
+				).toEqual({
+					host: undefined,
 				});
 			});
 
-			it("should not replace value if env var is undefined and console.warn", () => {
-				const warnSpy = vi.spyOn(console, "warn");
-
-				const schema = z.object({
-					host: z.string(),
-				});
-
-				const config = new ConfigBuilder({
-					validate: (finalConfig) => schema.parse(finalConfig),
-				})
-					.addSource(
-						new ObjectSource({
-							host: "localhost:$PORT",
-						}),
-					)
-					.build();
-
-				expect(config).toEqual({
-					host: "localhost:$PORT",
-				});
-
-				expect(warnSpy).toHaveBeenCalledWith(
-					"[SINGLE_VARIABLE_SLOT]",
-					'The value for the slot "PORT" is not defined in the runtime environment. The slot will not be replaced.',
-				);
-			});
-		});
-
-		describe("multi variable slot", () => {
-			it("should replace multi variable slots", () => {
-				const schema = z.object({
-					port: z.coerce.number().int().positive(),
-					host: z.string(),
-				});
-
-				const config = new ConfigBuilder({
-					validate: (finalConfig) => schema.parse(finalConfig),
-					runtimeEnv: {
-						APP_PORT: "5432",
-					},
-				})
-					.addSource(
-						new ObjectSource({
-							port: "${PORT:APP_PORT}",
-							host: "localhost:${PORT:APP_PORT}",
-						}),
-					)
-					.build();
-
-				expect(config).toEqual({
-					port: 5432,
-					host: "localhost:5432",
+			it("should remove undefined from array", () => {
+				expect(
+					new ConfigBuilder({
+						validate: (finalConfig) => finalConfig,
+						runtimeEnv: {
+							CORS_ORIGIN2: "https://example.com",
+						},
+					})
+						.addSource(
+							new ObjectSource({
+								hosts: [
+									"${CORS_ORIGIN1}",
+									"${CORS_ORIGIN2}",
+									"${CORS_ORIGIN3}",
+								],
+							}),
+						)
+						.build(),
+				).toEqual({
+					hosts: ["https://example.com"],
 				});
 			});
 
@@ -145,8 +268,8 @@ describe.each(builders)(
 					})
 						.addSource(
 							new ObjectSource({
-								port: "${PORT_1:PORT_2:PORT_3}",
-								host: "localhost:${PORT_1:PORT_2:PORT_3}",
+								port: "${PORT_1::PORT_2::PORT_3}",
+								host: "localhost:${self.port}",
 							}),
 						)
 						.build(),
@@ -166,8 +289,8 @@ describe.each(builders)(
 					})
 						.addSource(
 							new ObjectSource({
-								port: "${PORT_1:PORT_2:PORT_3}",
-								host: "localhost:${PORT_1:PORT_2:PORT_3}",
+								port: "${PORT_1::PORT_2::PORT_3}",
+								host: "localhost:${PORT_1::PORT_2::PORT_3}",
 							}),
 						)
 						.build(),
@@ -187,8 +310,8 @@ describe.each(builders)(
 					})
 						.addSource(
 							new ObjectSource({
-								port: "${PORT_1:PORT_2:PORT_3}",
-								host: "localhost:${PORT_1:PORT_2:PORT_3}",
+								port: "${PORT_1::PORT_2::PORT_3}",
+								host: "localhost:${PORT_1::PORT_2::PORT_3}",
 							}),
 						)
 						.build(),
@@ -210,8 +333,24 @@ describe.each(builders)(
 					})
 						.addSource(
 							new ObjectSource({
-								port: "${PORT_1:PORT_2:PORT_3:-3000}",
-								host: "localhost:${PORT_1:PORT_2:PORT_3:-3000}",
+								port: "${PORT::-3000}",
+								host: "localhost:${PORT::-3000}",
+							}),
+						)
+						.build(),
+				).toEqual({
+					port: 3000,
+					host: "localhost:3000",
+				});
+
+				expect(
+					new ConfigBuilder({
+						validate: (finalConfig) => schema.parse(finalConfig),
+					})
+						.addSource(
+							new ObjectSource({
+								port: "${PORT_1:PORT_2:PORT_3::-3000}",
+								host: "localhost:${PORT_1:PORT_2:PORT_3::-3000}",
 							}),
 						)
 						.build(),
@@ -221,69 +360,38 @@ describe.each(builders)(
 				});
 			});
 
-			it("should not replace value if env var is undefined and console.warn", () => {
-				const warnSpy = vi.spyOn(console, "warn");
-				const schema = z.object({
-					host: z.string(),
-				});
+			describe("Self-referencing slot", () => {
+				it("should replace the self-reference slot with the property value", () => {
+					const schema = z.object({
+						port: z.coerce.number().int().positive(),
+						host: z.string(),
+					});
 
-				expect(
-					new ConfigBuilder({
-						validate: (finalConfig) => schema.parse(finalConfig),
-					})
-						.addSource(
-							new ObjectSource({
-								host: "${PORT_1:PORT_2:PORT_3}",
-							}),
-						)
-						.build(),
-				).toEqual({
-					host: "${PORT_1:PORT_2:PORT_3}",
-				});
-
-				expect(warnSpy).toHaveBeenCalledWith(
-					"[MULTI_VARIABLE_SLOT]",
-					'None of the variables \"PORT_1, PORT_2, PORT_3\" are defined in the runtime environment. The slot will not be replaced.',
-				);
-			});
-		});
-
-		describe("Self-referencing slot", () => {
-			it("should replace the self-reference slot with the property value", () => {
-				const schema = z.object({
-					port: z.coerce.number().int().positive(),
-					host: z.string(),
-				});
-
-				expect(
-					new ConfigBuilder({
-						validate: (finalConfig) => schema.parse(finalConfig),
-						runtimeEnv: {
-							PORT: "3000",
-						},
-					})
-						.addSource(
-							new ObjectSource({
-								host: "localhost:${self.port}",
-								port: "$PORT",
-							}),
-						)
-						.build(),
-				).toEqual({
-					host: "localhost:3000",
-					port: 3000,
+					expect(
+						new ConfigBuilder({
+							validate: (finalConfig) => schema.parse(finalConfig),
+							runtimeEnv: {
+								PORT: "3000",
+							},
+						})
+							.addSource(
+								new ObjectSource({
+									host: "localhost:${self.port}",
+									port: "${PORT}",
+								}),
+							)
+							.build(),
+					).toEqual({
+						host: "localhost:3000",
+						port: 3000,
+					});
 				});
 			});
 
-			it("should not replace self-reference if value is not defined and console.warn", () => {
-				const warnSpy = vi.spyOn(console, "warn");
-				const schema = z.object({
-					host: z.string(),
-				});
-
+			it("should replace self-reference slot with undefined if it points to a non-existing property", () => {
 				expect(
 					new ConfigBuilder({
-						validate: (finalConfig) => schema.parse(finalConfig),
+						validate: (finalConfig) => finalConfig,
 						runtimeEnv: {},
 					})
 						.addSource(
@@ -293,13 +401,8 @@ describe.each(builders)(
 						)
 						.build(),
 				).toEqual({
-					host: "localhost:${self.port}",
+					host: undefined,
 				});
-
-				expect(warnSpy).toHaveBeenCalledWith(
-					"[SELF_REFERENCING_SLOT]",
-					'Self-referencing slot (path \"port\") is not defined in the config object. The slot will not be replaced.',
-				);
 			});
 
 			it("should throw error if path is not defined", () => {
@@ -428,7 +531,7 @@ describe.each(builders)(
 				});
 			});
 
-			it("should not replace anything if env var value is not defined", () => {
+			it("should replace value with undefined if env var is undefined", () => {
 				expect(
 					new ClientModule.ConfigBuilder({
 						validate: (finalConfig) => finalConfig,
@@ -438,13 +541,13 @@ describe.each(builders)(
 					})
 						.addSource(
 							new ObjectSource({
-								host: "$HOST",
+								host: "${HOST}",
 							}),
 						)
 						.addSource(new EnvironmentVariableSource())
 						.build(),
 				).toEqual({
-					host: "$HOST",
+					host: undefined,
 				});
 			});
 
