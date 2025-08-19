@@ -20,7 +20,6 @@ export const ServerConfigBuilderOptionsSchema: z.ZodMiniType<ValidatedServerConf
 				),
 			path.resolve(process.cwd(), "./config"),
 		),
-		configFolder: z._default(z.string(), "./config"),
 		runtimeEnv: z._default(RuntimeEnv, process.env),
 		parser: z._default(z.custom<ConfigParser>(), basicJsonParser),
 		validate: z.custom<ServerConfigBuilderOptions["validate"]>(),
