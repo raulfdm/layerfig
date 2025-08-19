@@ -54,7 +54,7 @@
         "vitest": "3.2.4",
       },
       "peerDependencies": {
-        "@layerfig/config": "^3.0.0-next.0",
+        "@layerfig/config": "^3.0.0",
       },
     },
     "packages/parser-toml": {
@@ -71,7 +71,7 @@
         "vitest": "3.2.4",
       },
       "peerDependencies": {
-        "@layerfig/config": "^3.0.0-next.0",
+        "@layerfig/config": "^3.0.0",
       },
     },
     "packages/parser-yaml": {
@@ -88,7 +88,7 @@
         "vitest": "3.2.4",
       },
       "peerDependencies": {
-        "@layerfig/config": "^3.0.0-next.0",
+        "@layerfig/config": "^3.0.0",
       },
     },
     "packages/tsconfig": {
