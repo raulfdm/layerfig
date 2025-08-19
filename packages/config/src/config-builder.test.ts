@@ -95,6 +95,7 @@ describe.each(builders)(
 								allowedOrigins: [
 									"${CORS_ORIGIN1::-*}",
 									"${CORS_ORIGIN2::-https://example.com}",
+									"${CORS_ORIGIN3}",
 								],
 								allowedMethods: ["GET", "POST", "PUT", "DELETE"],
 							},
@@ -220,6 +221,29 @@ describe.each(builders)(
 						.build(),
 				).toEqual({
 					host: undefined,
+				});
+			});
+
+			it("should remove undefined from array", () => {
+				expect(
+					new ConfigBuilder({
+						validate: (finalConfig) => finalConfig,
+						runtimeEnv: {
+							CORS_ORIGIN2: "https://example.com",
+						},
+					})
+						.addSource(
+							new ObjectSource({
+								hosts: [
+									"${CORS_ORIGIN1}",
+									"${CORS_ORIGIN2}",
+									"${CORS_ORIGIN3}",
+								],
+							}),
+						)
+						.build(),
+				).toEqual({
+					hosts: ["https://example.com"],
 				});
 			});
 

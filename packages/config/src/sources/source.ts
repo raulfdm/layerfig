@@ -110,8 +110,16 @@ export abstract class Source<T = Record<string, unknown>> {
 		}
 
 		if (Array.isArray(value)) {
-			// TODO: FILTER UNDEFINED
-			return value.map((item) => this.#cleanUndefinedMarkers(item));
+			const newList: any[] = [];
+
+			for (const item of value) {
+				const cleanedItem = this.#cleanUndefinedMarkers(item);
+				if (cleanedItem !== undefined) {
+					newList.push(cleanedItem);
+				}
+			}
+
+			return newList;
 		}
 
 		if (value && typeof value === "object") {
