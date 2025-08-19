@@ -1,5 +1,11 @@
 # @layerfig/parser-toml
 
+## 6.0.1
+
+### Patch Changes
+
+- 9129fa6: update peerDependency range
+
 ## 6.0.0
 
 ### Patch Changes
