@@ -58,6 +58,41 @@ These are useful if you want to:
 
 ## Breaking Changes
 
+### Remove `configFolder`
+
+Before, if you wanted to point out a different config folder to Layerfig search for files, you would use the `configFolder` option:
+
+```ts
+import path from "node:path";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  configFolder: "./path/to/config-folder",
+})
+  .addSource(new FileSource("base.json"))
+  .build();
+```
+
+The problem was that internally, Layerfig would use `process.cwd()` and resolve to the folder you've specified but in some cases this caused issues.
+
+Now, if you want to change the default folder (or have a different one based on the environment), you can use the `absoluteConfigFolderPath` option:
+
+```ts
+import path from "node:path";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  absoluteConfigFolderPath: path.resolve(
+    process.cwd(),
+    "./path/to/config-folder"
+  ),
+})
+  .addSource(new FileSource("base.json"))
+  .build();
+```
+
+Please notice that as the name states, this option expects an **absolute** path to the folder where Layerfig should look for configuration files. If not it will throw an error.
+
 ### Custom Parser API
 
 In v2, creating a custom configuration parser looked like this:

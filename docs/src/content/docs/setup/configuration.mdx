@@ -43,22 +43,32 @@ export const config = new ConfigBuilder({
   .build();
 ```
 
-## options.configFolder
+## options.absoluteConfigFolderPath
 
-> Default: `'./config'`
+> Default: `'<process.cwd()>/config'`
 
-By default, file-based sources added via `addSource` are loaded from a `config` folder in the project's root. You can customize this path using the `configFolder` option:
+By default, file-based sources added via `addSource` are loaded from a `config` folder in the project's root. You can customize this path using the `absoluteConfigFolderPath` option:
 
 ```ts
+import path from "node:path";
+
 const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
-  configFolder: "./path/to/config-folder",
+  absoluteConfigFolderPath: path.resolve(
+    process.cwd(),
+    "./path/to/config-folder"
+  ),
 })
   .addSource(new FileSource("base.json"))
   .build();
 ```
 
 In this example, the library will look for `<root>/path/to/config-folder/base.json`.
+
+<Aside type="danger">
+  `absoluteConfigFolderPath` must be an absolute path, otherwise it'll throw an
+  error.
+</Aside>
 
 ## options.parser
 
