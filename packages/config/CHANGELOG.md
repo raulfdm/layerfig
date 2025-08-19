@@ -1,5 +1,13 @@
 # @layerfig/config
 
+## 3.0.0-next.9
+
+### Patch Changes
+
+- 2db9405: Refactor zod imports to use the official `zod` and `zod/mini` packages instead of local re-exports.
+
+  This will fix types not being resolved properly.
+
 ## 3.0.0-next.8
 
 ### Minor Changes
