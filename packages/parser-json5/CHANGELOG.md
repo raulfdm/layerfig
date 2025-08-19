@@ -1,5 +1,11 @@
 # @layerfig/parser-json5
 
+## 6.0.1
+
+### Patch Changes
+
+- 9129fa6: update peerDependency range
+
 ## 6.0.0
 
 ## 6.0.0-next.1

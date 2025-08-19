@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/parser-yaml",
 	"description": "Source parser for .yaml and .yml config files",
-	"version": "6.0.0",
+	"version": "6.0.1",
 	"keywords": [
 		"@layerfig/config",
 		"source",
