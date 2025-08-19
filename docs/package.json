@@ -11,12 +11,12 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"@astrojs/starlight": "0.34.4",
+		"@astrojs/starlight": "0.35.2",
 		"@layerfig/config": "3.0.0-next.9",
 		"@layerfig/parser-yaml": "6.0.0-next.0",
-		"astro": "5.10.1",
-		"sharp": "0.34.2",
-		"starlight-theme-nova": "0.9.0",
+		"astro": "5.13.2",
+		"sharp": "0.34.3",
+		"starlight-theme-nova": "0.9.4",
 		"zod": "3.25.76"
 	}
 }
