@@ -1,3 +1,4 @@
+import { z } from "zod/mini";
 import { EnvironmentVariableSource } from "../sources/env-var";
 import { ObjectSource } from "../sources/object";
 import {
@@ -7,7 +8,6 @@ import {
 	type UnknownRecord,
 	type ValidatedClientConfigBuilderOptions,
 } from "../types";
-import { z } from "../zod-mini";
 
 /**
  * This notation only serves to not have the following error:

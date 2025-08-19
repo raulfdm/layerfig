@@ -1,12 +1,12 @@
 import path from "node:path";
 import { assertType, describe, expect, it } from "vitest";
+import { z } from "zod";
 import * as ClientModule from "./client";
 import { basicJsonParser } from "./parser/parser-json";
 import * as ServerModule from "./server";
 import { FileSource } from "./server";
 import { EnvironmentVariableSource } from "./sources/env-var";
 import { ObjectSource } from "./sources/object";
-import { z } from "./zod";
 
 const builders = [
 	{ ConfigBuilder: ClientModule.ConfigBuilder, mode: "Client" },
