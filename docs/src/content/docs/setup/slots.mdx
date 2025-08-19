@@ -42,7 +42,7 @@ $PORT => process.env.PORT => 3000
 
 ## Self-Referencing Slots
 
-For a more convenient experience, you can also reference values within the same configuration file. This is particularly useful for avoiding duplication and ensuring consistency.
+For convenience, you can also reference values within the same configuration file. This helps avoid duplication and keeps your configuration consistent.
 
 In the previous "port" example, instead of defining the `$PORT` slot in two places, you can use a self-referencing slot:
 
@@ -54,7 +54,7 @@ In the previous "port" example, instead of defining the `$PORT` slot in two plac
 }
 ```
 
-Layerfig searches for the `self.*` syntax in the configuration file and uses the value after the dot as an "object-path" to find the value in the same configuration. In this case, it will look for the `port` value.
+Layerfig looks for the `self.*` syntax in the configuration file and uses the value after the dot as an "object path" to find the value in the same configuration. In this case, it will look for the `port` value.
 
 The final configuration will be:
 
@@ -70,21 +70,21 @@ The final configuration will be:
   and the slot will remain unchanged.
 </Aside>
 
-## Different Prefix
+## Custom Slot Prefix
 
 By default, Layerfig uses `$` as the slot prefix, but you can change it by passing the [`slotPrefix`](/setup/configuration/#optionsslotprefix) option.
 
 ## Chaining Environment Variables
 
-You may want to try multiple environment variables for a single value, providing a chain of options in a specific order of priority.
+Sometimes, you may want to try multiple environment variables for a single value, using a specific order of priority.
 
-For example, imagine you want to determine the current Git branch. This value could be sourced different sources:
+For example, imagine you want to determine the current Git branch. This value could come from different sources:
 
 1.  `process.env.GIT_REF`
 2.  `process.env.REF`
 3.  `.branch` (from the same configuration file)
 
-To achieve this, you can use the extended slot syntax, separating each variable name with a colon:
+To do this, you can use the extended slot syntax, separating each variable name with a colon:
 
 ```json
 // config/base.json
@@ -93,13 +93,13 @@ To achieve this, you can use the extended slot syntax, separating each variable 
 }
 ```
 
-Layerfig processes this from left to right, checking for `GIT_REF`, then `REF`, and so on, using the first defined environment variable it finds. If none of the environment variables in the chain are found, Layerfig preserves the original slot string.
+Layerfig processes this from left to right, checking for `GIT_REF`, then `REF`, and so on, using the first environment variable it finds. If none of the environment variables in the chain are found, Layerfig keeps the original slot string.
 
 ## Literal Fallbacks
 
 In addition to chaining variables, you can also provide a literal fallback value if none of the environment variables are set.
 
-This is achieved by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
+This is done by adding the `:-` operator to the extended slot syntax. This works even with a single variable:
 
 ```json
 // config/base.json
@@ -110,7 +110,7 @@ This is achieved by adding the `:-` operator to the extended slot syntax. This w
 
 If the `PORT` environment variable is not defined, Layerfig will use `3000` as the value.
 
-This operator can be combined with variable chaining for more complex cases:
+You can combine this operator with variable chaining for more complex cases:
 
 ```json
 // config/base.json
@@ -123,17 +123,19 @@ If none of the `GIT_REF`, `REF`, or `MAIN_REF` environment variables are found, 
 
 ## Caveats
 
-There are a few things to keep in mind when working with slots.
+Here are a few things to keep in mind when working with slots.
 
-If an environment variable for a slot is not defined, Layerfig will perform a replacement with `undefined` value. The configuration value will retain the original slot string:
+### Undefined values
+
+If an environment variable for a slot is not defined, Layerfig will not replace it, and the configuration value will keep the original slot string:
 
 ```ts
 config.appURL; // undefined
 ```
 
-In this case, if your schema does expect a defined value, it would throw an error during validation. Also, for array items, if value gets resolved to undefined it'll be removed.
+If your schema expects a defined value, it will throw an error during validation. Also, for array items, if a value gets resolved to undefined, it will be removed.
 
-For example, let's say we only have `ORIGIN_1` defined in our environment variables.
+For example, let's say only `ORIGIN_1` is defined in your environment variables.
 
 ```
 ORIGIN_1=*
@@ -149,20 +151,26 @@ Will be resolved to:
 
 ```ts
 const config = {
-  allowOrigins: ["*"], // ORIGIN_2 got discarded.
+  allowOrigins: ["*"], // ORIGIN_2 was discarded.
 };
 ```
 
-Additionally, all environment variables are treated as strings. If a slot is used for a value that should be a number, like `port`, the resulting configuration will have a string value:
+### Non-string primitive values
+
+The `runtimeEnv` option can be `process.env` in the server config, `import.meta.env` in the client, or even a plain object. Node's process environment is a record `Record<string, string|undefined>`, but import meta env can hold non-string values such as booleans and numbers.
+
+Layerfig supports all these value types, but in your final configuration, you will most likely have string values in your `validate(finalConfig)` function.
 
 ```js
 const finalConfig = {
   appURL: "http://localhost:3000",
   port: "3000",
+  dev: "true",
+  prod: "false",
 };
 ```
 
-To handle this, you can use a validation schema to coerce the string value into a number. For example, with Zod:
+To handle this, you can use a validation schema to coerce the string value into the type you expect. For example, with Zod:
 
 ```ts {5}
 import { z } from "@layerfig/config";
@@ -170,7 +178,9 @@ import { z } from "@layerfig/config";
 const schema = z.object({
   appURL: z.string(),
   port: z.coerce.number().positive().int(),
+  dev: z.coerce.boolean(),
+  prod: z.coerce.boolean(),
 });
 ```
 
-The `z.coerce.number()` function will parse the string `"3000"` and transform it into the number `3000`.
+The `z.coerce.*` function will parse the string value and transform it into the type you want.
