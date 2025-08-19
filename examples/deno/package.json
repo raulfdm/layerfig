@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "description": "A Deno example project using LayerFig",
   "dependencies": {
-    "@layerfig/config": "3.0.0-next.9"
+    "@layerfig/config": "3.0.0"
   }
 }
