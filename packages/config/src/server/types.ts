@@ -1,5 +1,5 @@
 import path from "node:path";
-import { ConfigParser } from "../parser/config-parser";
+import type { ConfigParser } from "../parser/config-parser";
 import { basicJsonParser } from "../parser/parser-json";
 import {
 	DEFAULT_SLOT_PREFIX,
@@ -22,7 +22,7 @@ export const ServerConfigBuilderOptionsSchema: z.ZodMiniType<ValidatedServerConf
 		),
 		configFolder: z._default(z.string(), "./config"),
 		runtimeEnv: z._default(RuntimeEnv, process.env),
-		parser: z._default(z.instanceof(ConfigParser), basicJsonParser),
+		parser: z._default(z.custom<ConfigParser>(), basicJsonParser),
 		validate: z.custom<ServerConfigBuilderOptions["validate"]>(),
 		slotPrefix: z._default(z.string(), DEFAULT_SLOT_PREFIX),
 	});
