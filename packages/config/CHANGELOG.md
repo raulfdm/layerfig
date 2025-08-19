@@ -1,5 +1,13 @@
 # @layerfig/config
 
+## 3.0.0-next.7
+
+### Patch Changes
+
+- a600d51: Accept more primitive types for `runtimeEnv`.
+
+  While `process.env` gives a record like `Record<string, string|undefined>`, `import.meta.env` can provide other values such as boolean, numbers, etc.
+
 ## 3.0.0-next.6
 
 ### Major Changes
