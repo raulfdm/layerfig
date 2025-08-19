@@ -1,5 +1,230 @@
 # @layerfig/config
 
+## 3.0.0
+
+### Major Changes
+
+- 5862249: BREAKING CHANGE: refactor slot syntax.
+
+  ### Changes
+
+  Simple slots needs to be wrapped by `${}`:
+
+  ```diff
+  {
+  - "port": "$PORT"
+  + "port": "${PORT}"
+  }
+  ```
+
+  Slot separator changed from `:` to `::`:
+
+  ```diff
+  {
+  - "port": "${APP_PORT:PORT}"
+  + "port": "${APP_PORT::PORT}"
+  }
+  ```
+
+  ### Fixes
+
+  #### URL case
+
+  If a slot contained an URL, it didn't resolve properly the fallback value:
+
+  Before:
+
+  ```
+  ${URL:-http://localhost:3000} => "//localhost:3000"
+  ```
+
+  After:
+
+  ```
+  ${URL::-http://localhost:3000} => "http://localhost:3000"
+  ```
+
+  #### Multiple slots
+
+  When multiple slots were defined in the same property, the final value didn't get resolved:
+
+  Before:
+
+  ```
+  ${self.hostname:-local}:${PORT:-3000} => "local:${PORT:-3000}"
+  ```
+
+  Now:
+
+  ```
+  ${self.hostname::-local}:${PORT::-3000} => "local:3000"
+  ```
+
+- bbdda8f: BREAKING CHANGE: remove `/source/*` submodule.
+
+  When first introduced, the `/source/*` submodule prevented accidental imports of server-only APIs when using Layerfig in the browser.
+
+  We now ship a dedicated `/client` submodule built for the browser platform, making the separate `/source/*` entry point obsolete.
+
+  Because bundle size is irrelevant on the server, you can import everything from the main entry:
+
+  ```ts
+  import {
+    ConfigBuilder,
+    FileSource, // server only
+    ObjectSource,
+    EnvironmentVariableSource,
+    z, // zod 4
+  } from "@layerfig/config";
+  ```
+
+  For the client:
+
+  ```ts
+  import {
+    ConfigBuilder,
+    ObjectSource,
+    EnvironmentVariableSource,
+    z, // zod 4 mini
+  } from "@layerfig/config/client";
+  ```
+
+- d6960bc: BREAKING CHANGES:
+
+  - Updated validation logic for configuration options
+  - Changed validation error handling and messages
+  - Modified the structure of validation result objects
+
+  This refactor improves the robustness and consistency of options validation across the package.
+
+- b81e683: BREAKING CHANGE: Remove `defineConfigParser` in favor of `ConfigParser` class.
+
+  ### Details
+
+  Before, for creating a custom parser you'd use the `defineConfigParser` function:
+
+  ```ts
+  import { defineConfigParser } from "@layerfig/config";
+
+  export const customParser = defineConfigParser({
+    acceptedFileExtensions: ["ini"],
+    parse: (fileContent) => {
+      // Logic to fetch, read, and parse the content
+    },
+  });
+  ```
+
+  Now, to achieve the same you have to define a class that extends `ConfigParser`:
+
+  ```ts
+  // ./path/to/custom-parser.ts
+  import { ConfigParser } from "@layerfig/config";
+
+  class IniParser extends ConfigParser {
+    constructor() {
+      super({
+        acceptedFileExtensions: ["ini"],
+      });
+    }
+
+    load(fileContent: string) {
+      // Logic to fetch, read, and parse the content
+      // should return a Result
+    }
+  }
+
+  export const iniParser = new InitParser();
+  ```
+
+  This will mostly help on lib internal checks and validations.
+
+- 3f2c387: BREAKING CHANGE: Remove `configFolder` option in favor of `absoluteConfigFolderPath`
+
+  The `configFolder` option has been removed and replaced with `absoluteConfigFolderPath` to provide more explicit control over configuration file locations.
+
+  **Migration:**
+
+  ```diff
+  const config = new ConfigBuilder({
+  - configFolder: './my-config-folder',
+  + absoluteConfigFolderPath: path.resolve(process.cwd(), './my-config-folder')
+  })
+  ```
+
+  This change ensures clearer semantics about path resolution and removes ambiguity about relative path handling.
+
+### Minor Changes
+
+- 928dcc4: Feature: Client submodule
+
+  To improve separation of concerns and prevent accidental use of server-only APIs, a new submodule is now available for client-side configuration: `@layerfig/config/client`.
+
+  This module is built for the browser and omits all file-system, folder, and parser-related options.
+
+  It exports everything you need:
+
+  ```ts
+  import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+
+  const config = new ConfigBuilder({
+    validate: (finalConfig, z) =>
+      z
+        .object({
+          baseURL: z.url(),
+        })
+        .parse(finalConfig),
+
+    runtimeEnv: import.meta.env,
+  })
+    .addSource(
+      new ObjectSource({
+        baseURL: "$BASE_URL",
+      })
+    )
+    .build();
+  ```
+
+  > It also exports `z` (zod 4 mini) in case you want to separate your schema.
+
+- 87c9054: Adds self-referencing slots to Layerfig. Now you can reference other values within the same configuration file using the `${self.path.to.value}` syntax. This helps to reduce duplication and improve consistency in your configuration.
+
+  For example:
+
+  ```json
+  {
+    "port": "${PORT:-3000}",
+    "appURL": "http://localhost:${self.port}"
+  }
+  ```
+
+  In this case, `appURL` will resolve to `http://localhost:3000` by referencing the `port` value from the same configuration object.
+
+- 10eb2f6: Removed the `z.instanceOf(ConfigParser)` validation from the server's
+  `ConfigBuilder.options.parser` option.
+
+  Previously, this validation could incorrectly fail when using parsers such as
+  `@layerfig/parser-toml`. At runtime, `instanceof tomlParser` was not considered
+  equal to `ConfigParser`, even though `tomlParser` extends `ConfigParser`.
+
+  Now, the `parser` option is no longer validated in this way.
+
+### Patch Changes
+
+- 38b091a: Fix zod types.
+
+  `z` on validate were being inferred as `any` and it shouldn't be the case.
+
+- 5862249: Update zod to v4.0.17
+- a600d51: Accept more primitive types for `runtimeEnv`.
+
+  While `process.env` gives a record like `Record<string, string|undefined>`, `import.meta.env` can provide other values such as boolean, numbers, etc.
+
+- 2db9405: Refactor zod imports to use the official `zod` and `zod/mini` packages instead of local re-exports.
+
+  This will fix types not being resolved properly.
+
+- 4dc1595: Remove configFolder from type
+
 ## 3.0.0-next.10
 
 ### Patch Changes
