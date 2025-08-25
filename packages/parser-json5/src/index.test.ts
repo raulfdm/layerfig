@@ -72,6 +72,14 @@ describe("json5Parser", () => {
 			getConfig().addSource(new FileSource("base.yaml")).build(),
 		).toThrowError();
 	});
+
+	it("should load the PEM key from the environment variable", () => {
+		const result = getConfig().addSource(new FileSource("pem.jsonc")).build();
+
+		expect(result).toEqual({
+			pem: process.env.PEM_KEY,
+		});
+	});
 });
 
 function getConfig(options?: Partial<ConfigBuilderOptions>) {

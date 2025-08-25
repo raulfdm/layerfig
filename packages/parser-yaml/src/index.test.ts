@@ -7,6 +7,8 @@ import {
 import { describe, expect, it } from "vitest";
 import yamlParser from "./index";
 
+console.log(process.env.PEM_KEY);
+
 describe("yamlParser", () => {
 	it("should load config from .yaml file", () => {
 		const result = getConfig().addSource(new FileSource("base.yaml")).build();
@@ -58,8 +60,16 @@ describe("yamlParser", () => {
 
 	it("should throw an error if the file extension is not supported", () => {
 		expect(() =>
-			getConfig().addSource(new FileSource("base.json")).build(),
+			getConfig().addSource(new FileSource("test.json")).build(),
 		).toThrowError();
+	});
+
+	it("should load the PEM key from the environment variable", () => {
+		const result = getConfig().addSource(new FileSource("pem.yaml")).build();
+
+		expect(result).toEqual({
+			pem: process.env.PEM_KEY,
+		});
 	});
 });
 

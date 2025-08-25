@@ -1,4 +1,5 @@
-import { get } from "es-toolkit/compat";
+import { flattenObject } from "es-toolkit";
+import { get, set } from "es-toolkit/compat";
 import type {
 	ClientConfigBuilderOptions,
 	Prettify,
@@ -10,6 +11,10 @@ import type {
 import { extractSlotsFromExpression, hasSlot, type Slot } from "../utils/slot";
 
 const UNDEFINED_MARKER = "___UNDEFINED_MARKER___" as const;
+
+type ObjectPath = string;
+type FlattenObjectValue = string | boolean | number;
+type FlattenedObject = Record<ObjectPath, FlattenObjectValue>;
 
 export abstract class Source<T = Record<string, unknown>> {
 	/**
@@ -29,79 +34,84 @@ export abstract class Source<T = Record<string, unknown>> {
 			return initialObject;
 		}
 
-		const slots = this.#extractSlots(
-			initialObject as UnknownRecord,
-			options.slotPrefix,
-		);
+		const finalObject: FlattenedObject = {};
 
-		let updatedContentString = options.contentString;
+		// const mappedSlots = this.#extractSlots(flattenedObject, options.slotPrefix);
 
-		for (const slot of slots) {
-			let envVarValue: RuntimeEnvValue;
+		for (const [propertyPath, slotValue] of Object.entries(
+			flattenObject(initialObject as UnknownRecord) as [string, string],
+		)) {
+			if (hasSlot(slotValue, options.slotPrefix)) {
+				const { envVarSlots, selfReferenceSlots } = extractSlotsFromExpression(
+					slotValue,
+					options.slotPrefix,
+				);
 
-			for (const reference of slot.references) {
-				if (reference.type === "env_var") {
-					envVarValue = options.runtimeEnv[reference.envVar];
+				// let envVarValue: RuntimeEnvValue | undefined;
+				let updatedSlotValue = slotValue;
+
+				for (const envVarSlot of envVarSlots) {
+					const envVarValue = options.runtimeEnv[envVarSlot.envVar];
+
+					if (envVarValue !== null && envVarValue !== undefined) {
+						// a = envVarSlot.fullMatch;
+						// If we found a value for the env var, we can stop looking
+						updatedSlotValue = updatedSlotValue.replaceAll(
+							envVarSlot.fullMatch,
+							String(envVarValue),
+						);
+						break;
+					}
 				}
 
-				if (reference.type === "self_reference") {
-					const partialObj = options.transform(updatedContentString);
+				console.log(updatedSlotValue);
 
-					envVarValue = get(
-						partialObj,
-						reference.propertyPath,
-					) as RuntimeEnvValue;
+				for (const selfReferenceSlot of selfReferenceSlots) {
+					const propertyValue = get(
+						finalObject,
+						selfReferenceSlot.propertyPath,
+					);
 				}
 
-				if (envVarValue !== null && envVarValue !== undefined) {
-					// If we found a value for the env var, we can stop looking
-					break;
-				}
-			}
-
-			if (!envVarValue && slot.fallbackValue) {
-				envVarValue = slot.fallbackValue;
-			}
-
-			updatedContentString = updatedContentString.replaceAll(
-				slot.slotMatch,
-				envVarValue !== null && envVarValue !== undefined
-					? String(envVarValue)
-					: UNDEFINED_MARKER,
-			);
-		}
-
-		const partialConfig = this.#cleanUndefinedMarkers(
-			options.transform(updatedContentString),
-		);
-
-		return partialConfig;
-	}
-
-	#extractSlots(
-		value: UnknownRecord | UnknownArray,
-		slotPrefix: string,
-	): Slot[] {
-		const result: Slot[] = [];
-
-		if (Array.isArray(value)) {
-			for (const item of value) {
-				result.push(...this.#extractSlots(item as UnknownRecord, slotPrefix));
-			}
-		} else if (typeof value === "string") {
-			result.push(...extractSlotsFromExpression(value, slotPrefix));
-		} else if (value && typeof value === "object") {
-			for (const [_, v] of Object.entries(value)) {
-				if (typeof v === "string") {
-					result.push(...extractSlotsFromExpression(v, slotPrefix));
-				} else {
-					result.push(...this.#extractSlots(v as UnknownRecord, slotPrefix));
-				}
+				set(finalObject, propertyPath, updatedSlotValue);
+			} else {
+				set(finalObject, propertyPath, slotValue);
 			}
 		}
 
-		return result;
+		return finalObject;
 	}
+
+	// #extractSlots(
+	// 	obj: FlattenedObject,
+	// 	slotPrefix: string,
+	// ): Map<ObjectPath, Slot[]> {
+	// 	const result: Map<ObjectPath, Slot[]> = new Map();
+
+	// 	for (const [path, value] of Object.entries(obj)) {
+	// 		const existingSlots = result.get(path);
+
+	// 		// If not string, it can't have slots
+	// 		if (typeof value !== "string") {
+	// 			continue;
+	// 		}
+
+	// 		if (hasSlot(value, slotPrefix) === false) {
+	// 			continue;
+	// 		}
+
+	// 		if (existingSlots) {
+	// 			result.set(path, [
+	// 				...existingSlots,
+	// 				...extractSlotsFromExpression(value, slotPrefix),
+	// 			]);
+	// 		} else {
+	// 			result.set(path, extractSlotsFromExpression(value, slotPrefix));
+	// 		}
+	// 	}
+
+	// 	return result;
+	// }
 
 	#cleanUndefinedMarkers<T = unknown>(value: T): any {
 		if (value === UNDEFINED_MARKER) {

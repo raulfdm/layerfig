@@ -1,18 +1,26 @@
 interface EnvVarSlot {
 	type: "env_var";
 	envVar: string;
+	fallbackValue: string | undefined;
+	fullMatch: string;
 }
 
 interface SelfReferenceSlot {
 	type: "self_reference";
 	propertyPath: string;
+	fallbackValue: string | undefined;
+	fullMatch: string;
 }
 
 export function extractSlotsFromExpression(
 	content: string,
 	slotPrefix: string,
-): Slot[] {
-	const slots: Slot[] = [];
+): {
+	selfReferenceSlots: SelfReferenceSlot[];
+	envVarSlots: EnvVarSlot[];
+} {
+	const selfReferenceSlots: SelfReferenceSlot[] = [];
+	const envVarSlots: EnvVarSlot[] = [];
 	const regex = getTemplateRegex(slotPrefix);
 
 	let match: RegExpExecArray | null;
@@ -20,41 +28,19 @@ export function extractSlotsFromExpression(
 	// biome-ignore lint/suspicious/noAssignInExpressions: easy brow, it's fine.
 	while ((match = regex.exec(content)) !== null) {
 		const [fullMatch, slotValue] = match;
+		let fallbackValue: string | undefined;
 
 		if (!slotValue) {
 			throw new Error("Slot value is missing");
 		}
 
-		slots.push(new Slot(fullMatch, slotValue));
-	}
+		const slotParts = slotValue.split("::");
 
-	return slots;
-}
-
-export function hasSlot(content: string, slotPrefix: string): boolean {
-	const regex = getTemplateRegex(slotPrefix);
-	return regex.test(content);
-}
-
-export class Slot {
-	#references: (SelfReferenceSlot | EnvVarSlot)[] = [];
-	#slotMatch: string;
-	#slotContent: string;
-	#fallbackValue: string | undefined;
-	#separator = "::";
-
-	constructor(slotMatch: string, slotContent: string) {
-		this.#slotMatch = slotMatch;
-		this.#slotContent = slotContent;
-
-		const slotParts = this.#slotContent.split(this.#separator);
-
-		//Check for fallback (last value starting with -)
 		if (
 			slotParts.length > 1 &&
 			slotParts[slotParts.length - 1]?.startsWith("-")
 		) {
-			this.#fallbackValue = slotParts.pop()?.slice(1);
+			fallbackValue = slotParts.pop()?.slice(1);
 		}
 
 		for (const slotPart of slotParts) {
@@ -67,30 +53,32 @@ export class Slot {
 					);
 				}
 
-				this.#references.push({
+				selfReferenceSlots.push({
 					type: "self_reference",
 					propertyPath,
+					fallbackValue,
+					fullMatch,
 				});
 			} else {
-				this.#references.push({
+				envVarSlots.push({
 					type: "env_var",
-					envVar: slotPart.trim(),
+					envVar: slotPart,
+					fallbackValue,
+					fullMatch,
 				});
 			}
 		}
 	}
 
-	get fallbackValue(): string | undefined {
-		return this.#fallbackValue;
-	}
+	return {
+		selfReferenceSlots,
+		envVarSlots,
+	};
+}
 
-	get slotMatch(): string {
-		return this.#slotMatch;
-	}
-
-	get references(): (SelfReferenceSlot | EnvVarSlot)[] {
-		return [...this.#references];
-	}
+export function hasSlot(content: string, slotPrefix: string): boolean {
+	const regex = getTemplateRegex(slotPrefix);
+	return regex.test(content);
 }
 
 function getTemplateRegex(slotPrefix: string) {
