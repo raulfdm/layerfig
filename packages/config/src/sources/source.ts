@@ -3,14 +3,10 @@ import { get, set } from "es-toolkit/compat";
 import type {
 	ClientConfigBuilderOptions,
 	Prettify,
-	RuntimeEnvValue,
 	ServerConfigBuilderOptions,
-	UnknownArray,
 	UnknownRecord,
 } from "../types";
-import { extractSlotsFromExpression, hasSlot, type Slot } from "../utils/slot";
-
-const UNDEFINED_MARKER = "___UNDEFINED_MARKER___" as const;
+import { extractSlotsFromExpression, hasSlot } from "../utils/slot";
 
 type ObjectPath = string;
 type FlattenObjectValue = string | boolean | number;
@@ -36,8 +32,6 @@ export abstract class Source<T = Record<string, unknown>> {
 
 		const finalObject: FlattenedObject = {};
 
-		// const mappedSlots = this.#extractSlots(flattenedObject, options.slotPrefix);
-
 		for (const [propertyPath, slotValue] of Object.entries(
 			flattenObject(initialObject as UnknownRecord) as [string, string],
 		)) {
@@ -47,7 +41,6 @@ export abstract class Source<T = Record<string, unknown>> {
 					options.slotPrefix,
 				);
 
-				// let envVarValue: RuntimeEnvValue | undefined;
 				let updatedSlotValue = slotValue;
 
 				for (const envVarSlot of envVarSlots) {
@@ -64,12 +57,15 @@ export abstract class Source<T = Record<string, unknown>> {
 					}
 				}
 
-				console.log(updatedSlotValue);
-
 				for (const selfReferenceSlot of selfReferenceSlots) {
 					const propertyValue = get(
 						finalObject,
 						selfReferenceSlot.propertyPath,
+					);
+
+					updatedSlotValue = updatedSlotValue.replaceAll(
+						selfReferenceSlot.fullMatch,
+						String(propertyValue),
 					);
 				}
 
@@ -80,73 +76,6 @@ export abstract class Source<T = Record<string, unknown>> {
 		}
 
 		return finalObject;
-	}
-
-	// #extractSlots(
-	// 	obj: FlattenedObject,
-	// 	slotPrefix: string,
-	// ): Map<ObjectPath, Slot[]> {
-	// 	const result: Map<ObjectPath, Slot[]> = new Map();
-
-	// 	for (const [path, value] of Object.entries(obj)) {
-	// 		const existingSlots = result.get(path);
-
-	// 		// If not string, it can't have slots
-	// 		if (typeof value !== "string") {
-	// 			continue;
-	// 		}
-
-	// 		if (hasSlot(value, slotPrefix) === false) {
-	// 			continue;
-	// 		}
-
-	// 		if (existingSlots) {
-	// 			result.set(path, [
-	// 				...existingSlots,
-	// 				...extractSlotsFromExpression(value, slotPrefix),
-	// 			]);
-	// 		} else {
-	// 			result.set(path, extractSlotsFromExpression(value, slotPrefix));
-	// 		}
-	// 	}
-
-	// 	return result;
-	// }
-
-	#cleanUndefinedMarkers<T = unknown>(value: T): any {
-		if (value === UNDEFINED_MARKER) {
-			return undefined;
-		}
-
-		if (typeof value === "string" && value.includes(UNDEFINED_MARKER)) {
-			// If it's mixed content with undefined slots, return undefined
-			return undefined;
-		}
-
-		if (Array.isArray(value)) {
-			const newList: any[] = [];
-
-			for (const item of value) {
-				const cleanedItem = this.#cleanUndefinedMarkers(item);
-				if (cleanedItem !== undefined) {
-					newList.push(cleanedItem);
-				}
-			}
-
-			return newList;
-		}
-
-		if (value && typeof value === "object") {
-			const result: UnknownRecord = {};
-
-			for (const [oKey, oValue] of Object.entries(value)) {
-				result[oKey] = this.#cleanUndefinedMarkers(oValue);
-			}
-
-			return result;
-		}
-
-		return value;
 	}
 }
 

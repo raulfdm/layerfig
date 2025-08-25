@@ -37,7 +37,7 @@ describe.each(builders)(
 					new ObjectSource({
 						server: {
 							port: "${PORT::-8080}",
-							// hostname: "${HOSTNAME::-localhost}",
+							hostname: "${HOSTNAME::-localhost}",
 							// protocol: "${PROTOCOL::SCHEME::-http}",
 							// baseUrl: "${BASE_URL::self.server.hostname}:${self.port}",
 							// endpoints: [
@@ -100,11 +100,11 @@ describe.each(builders)(
 						// 		allowedMethods: ["GET", "POST", "PUT", "DELETE"],
 						// 	},
 						// },
-						// selfReference: {
-						// 	port: "${PORT}",
-						// 	hostname: "${HOSTNAME::-localhost}",
-						// 	url: "${self.selfReference.hostname}:${self.selfReference.port}",
-						// },
+						selfReference: {
+							port: "${self.server.port}",
+							// 	hostname: "${HOSTNAME::-localhost}",
+							// 	url: "${self.selfReference.hostname}:${self.selfReference.port}",
+						},
 					}),
 				)
 				.build();
@@ -112,8 +112,8 @@ describe.each(builders)(
 			expect(config).toEqual({
 				server: {
 					port: "3000",
+					hostname: "app.example.com",
 					// protocol: "https",
-					// hostname: "app.example.com",
 					// baseUrl: "app.example.com:3000",
 					// endpoints: [
 					// 	{ name: "health", path: "/health", enabled: true },
@@ -159,11 +159,11 @@ describe.each(builders)(
 				// 		allowedMethods: ["GET", "POST", "PUT", "DELETE"],
 				// 	},
 				// },
-				// selfReference: {
-				// 	port: "3000",
-				// 	hostname: "app.example.com",
-				// 	url: "app.example.com:3000",
-				// },
+				selfReference: {
+					port: "3000",
+					// 	hostname: "app.example.com",
+					// 	url: "app.example.com:3000",
+				},
 			});
 		});
 
