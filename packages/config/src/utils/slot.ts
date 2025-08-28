@@ -1,34 +1,34 @@
 interface EnvVarSlot {
 	type: "env_var";
 	envVar: string;
-	fallbackValue: string | undefined;
-	fullMatch: string;
+	part: string;
 }
 
-interface SelfReferenceSlot {
+export interface SelfReferenceSlot {
 	type: "self_reference";
 	propertyPath: string;
-	fallbackValue: string | undefined;
+	part: string;
+}
+
+export interface ExtractedSlotReturn {
+	references: (SelfReferenceSlot | EnvVarSlot)[];
+	fallbackValue?: string;
 	fullMatch: string;
 }
 
 export function extractSlotsFromExpression(
-	content: string,
+	content: string | boolean | number,
 	slotPrefix: string,
-): {
-	selfReferenceSlots: SelfReferenceSlot[];
-	envVarSlots: EnvVarSlot[];
-} {
-	const selfReferenceSlots: SelfReferenceSlot[] = [];
-	const envVarSlots: EnvVarSlot[] = [];
+): ExtractedSlotReturn {
 	const regex = getTemplateRegex(slotPrefix);
 
 	let match: RegExpExecArray | null;
+	const references: (SelfReferenceSlot | EnvVarSlot)[] = [];
+	let fallbackValue: string | undefined;
 
 	// biome-ignore lint/suspicious/noAssignInExpressions: easy brow, it's fine.
-	while ((match = regex.exec(content)) !== null) {
-		const [fullMatch, slotValue] = match;
-		let fallbackValue: string | undefined;
+	while ((match = regex.exec(String(content))) !== null) {
+		const [_, slotValue] = match;
 
 		if (!slotValue) {
 			throw new Error("Slot value is missing");
@@ -53,32 +53,38 @@ export function extractSlotsFromExpression(
 					);
 				}
 
-				selfReferenceSlots.push({
+				references.push({
 					type: "self_reference",
 					propertyPath,
-					fallbackValue,
-					fullMatch,
+					part: slotPart,
 				});
 			} else {
-				envVarSlots.push({
+				references.push({
 					type: "env_var",
 					envVar: slotPart,
-					fallbackValue,
-					fullMatch,
+					part: slotPart,
 				});
 			}
 		}
 	}
 
 	return {
-		selfReferenceSlots,
-		envVarSlots,
+		references,
+		fallbackValue,
+		fullMatch: String(content),
 	};
 }
 
-export function hasSlot(content: string, slotPrefix: string): boolean {
+export function hasSlot(
+	content: string | boolean | number,
+	slotPrefix: string,
+): boolean {
 	const regex = getTemplateRegex(slotPrefix);
-	return regex.test(content);
+	return regex.test(String(content));
+}
+
+export function hasSelfReference(content: string | boolean | number): boolean {
+	return content.toLocaleString().includes("self.");
 }
 
 function getTemplateRegex(slotPrefix: string) {

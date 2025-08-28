@@ -6,7 +6,12 @@
 			"type": "node",
 			"request": "launch",
 			"runtimeExecutable": "bun",
-			"runtimeArgs": ["--inspect-wait", "run", "test"],
+			"runtimeArgs": [
+				"--inspect-wait",
+				"run",
+				"test",
+				"config-builder.test.ts"
+			],
 			"cwd": "${workspaceFolder}/packages/config",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen",

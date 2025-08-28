@@ -3,10 +3,17 @@ import { get, set } from "es-toolkit/compat";
 import type {
 	ClientConfigBuilderOptions,
 	Prettify,
+	RuntimeEnvValue,
 	ServerConfigBuilderOptions,
 	UnknownRecord,
 } from "../types";
-import { extractSlotsFromExpression, hasSlot } from "../utils/slot";
+import {
+	type ExtractedSlotReturn,
+	extractSlotsFromExpression,
+	hasSelfReference,
+	hasSlot,
+	type SelfReferenceSlot,
+} from "../utils/slot";
 
 type ObjectPath = string;
 type FlattenObjectValue = string | boolean | number;
@@ -22,7 +29,9 @@ export abstract class Source<T = Record<string, unknown>> {
 	abstract loadSource(loadSourceOptions: LoadSourceOptions): Prettify<T>;
 
 	maybeReplaceSlots<T>(options: MaybeReplaceSlotsOptions<T>) {
+		// debugger;
 		const initialObject = options.transform(options.contentString);
+
 		/**
 		 * If there's no slot, we don't need to do anything
 		 */
@@ -30,52 +39,31 @@ export abstract class Source<T = Record<string, unknown>> {
 			return initialObject;
 		}
 
-		const finalObject: FlattenedObject = {};
+		const flattenedObject = flattenObject(initialObject as UnknownRecord);
 
-		for (const [propertyPath, slotValue] of Object.entries(
-			flattenObject(initialObject as UnknownRecord) as [string, string],
-		)) {
-			if (hasSlot(slotValue, options.slotPrefix)) {
-				const { envVarSlots, selfReferenceSlots } = extractSlotsFromExpression(
-					slotValue,
-					options.slotPrefix,
-				);
+		const propsWithoutSlots: FlattenedObject = {};
+		const propsWithSlots: FlattenedObject = {};
+		const slotsObjs: Map<string, ExtractedSlotReturn> = new Map();
 
-				let updatedSlotValue = slotValue;
-
-				for (const envVarSlot of envVarSlots) {
-					const envVarValue = options.runtimeEnv[envVarSlot.envVar];
-
-					if (envVarValue !== null && envVarValue !== undefined) {
-						// a = envVarSlot.fullMatch;
-						// If we found a value for the env var, we can stop looking
-						updatedSlotValue = updatedSlotValue.replaceAll(
-							envVarSlot.fullMatch,
-							String(envVarValue),
-						);
-						break;
-					}
-				}
-
-				for (const selfReferenceSlot of selfReferenceSlots) {
-					const propertyValue = get(
-						finalObject,
-						selfReferenceSlot.propertyPath,
-					);
-
-					updatedSlotValue = updatedSlotValue.replaceAll(
-						selfReferenceSlot.fullMatch,
-						String(propertyValue),
-					);
-				}
-
-				set(finalObject, propertyPath, updatedSlotValue);
+		for (const [key, value] of Object.entries(flattenedObject) as [
+			string,
+			FlattenObjectValue,
+		][]) {
+			if (!hasSlot(value.toString(), options.slotPrefix)) {
+				propsWithoutSlots[key] = value;
 			} else {
-				set(finalObject, propertyPath, slotValue);
+				propsWithSlots[key] = value;
+
+				slotsObjs.set(
+					key,
+					extractSlotsFromExpression(value, options.slotPrefix),
+				);
 			}
 		}
 
-		return finalObject;
+		const flattenedStr = JSON.stringify(propsWithSlots);
+
+		console.log(flattenedStr);
 	}
 }
 
