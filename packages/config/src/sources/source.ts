@@ -35,7 +35,11 @@ export abstract class Source<T = Record<string, unknown>> {
 			options.slotPrefix,
 		);
 
-		let updatedContentString = options.contentString;
+		/**
+		 * At this moment it does not matter what parser the user had defined,
+		 * we're in the JS/JSON land.
+		 */
+		let updatedContentString = JSON.stringify(initialObject);
 
 		for (const slot of slots) {
 			let envVarValue: RuntimeEnvValue;
