@@ -1,5 +1,13 @@
 # @layerfig/config
 
+## 3.0.1
+
+### Patch Changes
+
+- f715693: Fix: escape line breaks and special characters in slot values
+
+  - Safely escape \, ", \n, \r, and \t before insertion to avoid misparse/misrender issues.
+
 ## 3.0.0
 
 ### Major Changes
