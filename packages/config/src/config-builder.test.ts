@@ -199,6 +199,31 @@ describe.each(builders)(
 		});
 
 		describe("slots", () => {
+			it("should handle multiline values", () => {
+				const pemKeyMock = `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEINofexMSQApYFYPK1/oISaOG4BgHm9SEkiHRUQOcmloToAoGCCqGSM49
+AwEHoUQDQgAEoRFl5IWEgK9PTCvI8lzT1kBdvFvVw/EZzKT8XHQczrBnVSc+S8qw
+tQrWvRJknz7jP0GHpvUm2GXHx6aOcbdBag==
+-----END EC PRIVATE KEY-----`;
+
+				const config = new ConfigBuilder({
+					validate: (finalConfig) => finalConfig,
+					runtimeEnv: {
+						PEM_KEY: pemKeyMock,
+					},
+				})
+					.addSource(
+						new ObjectSource({
+							multiline: "${PEM_KEY}",
+						}),
+					)
+					.build();
+
+				expect(config).toEqual({
+					multiline: pemKeyMock,
+				});
+			});
+
 			it("should replace single slots", () => {
 				const schema = z.object({
 					port: z.coerce.number().int().positive(),

@@ -7,6 +7,7 @@ import type {
 	UnknownArray,
 	UnknownRecord,
 } from "../types";
+import { escapeBreakLine } from "../utils/escape-break-line";
 import { extractSlotsFromExpression, hasSlot, type Slot } from "../utils/slot";
 
 const UNDEFINED_MARKER = "___UNDEFINED_MARKER___" as const;
@@ -45,7 +46,7 @@ export abstract class Source<T = Record<string, unknown>> {
 				}
 
 				if (reference.type === "self_reference") {
-					const partialObj = options.transform(updatedContentString);
+					const partialObj = JSON.parse(updatedContentString);
 
 					envVarValue = get(
 						partialObj,
@@ -63,16 +64,19 @@ export abstract class Source<T = Record<string, unknown>> {
 				envVarValue = slot.fallbackValue;
 			}
 
-			updatedContentString = updatedContentString.replaceAll(
-				slot.slotMatch,
+			const valueToInsert =
 				envVarValue !== null && envVarValue !== undefined
 					? String(envVarValue)
-					: UNDEFINED_MARKER,
+					: UNDEFINED_MARKER;
+
+			updatedContentString = updatedContentString.replaceAll(
+				slot.slotMatch,
+				escapeBreakLine(valueToInsert),
 			);
 		}
 
 		const partialConfig = this.#cleanUndefinedMarkers(
-			options.transform(updatedContentString),
+			JSON.parse(updatedContentString),
 		);
 
 		return partialConfig;
