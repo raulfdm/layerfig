@@ -1,0 +1,8 @@
+appURL: ${APP_URL}
+api:
+  # Unquoted slots, the way YAML allows them to be written
+  port: ${API_PORT}
+  version: ${API_VERSION}
+  ratio: ${API_RATIO}
+  enabled: ${API_ENABLED}
+  nothing: ${API_NOTHING}

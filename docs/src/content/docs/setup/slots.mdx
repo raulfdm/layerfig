@@ -226,3 +226,12 @@ const schema = z.object({
 ```
 
 The `z.coerce.*` function will parse the string value and transform it into the type you want.
+
+This is true no matter which parser you use. Formats that do not require quoting strings, such as YAML, are no exception:
+
+```yaml
+# config/base.yaml
+version: ${APP_VERSION}
+```
+
+Slots are resolved after the file is parsed, so `APP_VERSION="1"` resolves to the string `"1"` and not to the number `1`. If you need a number, coerce it in your validation schema.
