@@ -36,7 +36,7 @@ export const getTaskPage = (req: Request, res: Response): void => {
     return;
   }
 
-  if (!taskId) {
+  if (typeof taskId !== "string") {
     res.status(400).send(renderError("Task ID is required"));
     return;
   }
@@ -91,7 +91,7 @@ export const getEditTaskPage = (req: Request, res: Response): void => {
     return;
   }
 
-  if (!taskId) {
+  if (typeof taskId !== "string") {
     res.status(400).send(renderError("Task ID is required"));
     return;
   }
@@ -118,7 +118,7 @@ export const updateTaskHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  if (!taskId) {
+  if (typeof taskId !== "string") {
     res.status(400).send(renderError("Task ID is required"));
     return;
   }
@@ -148,7 +148,7 @@ export const completeTaskHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  if (!taskId) {
+  if (typeof taskId !== "string") {
     res.status(400).send(renderError("Task ID is required"));
     return;
   }
@@ -166,7 +166,7 @@ export const uncompleteTaskHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  if (!taskId) {
+  if (typeof taskId !== "string") {
     res.status(400).send(renderError("Task ID is required"));
     return;
   }
@@ -184,7 +184,7 @@ export const deleteTaskHandler = (req: Request, res: Response): void => {
     return;
   }
 
-  if (!taskId) {
+  if (typeof taskId !== "string") {
     res.status(400).send(renderError("Task ID is required"));
     return;
   }

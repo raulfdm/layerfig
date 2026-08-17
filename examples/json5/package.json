@@ -11,17 +11,17 @@
     "preview": "cross-env NODE_ENV=production node server"
   },
   "dependencies": {
-    "@layerfig/config": "3.0.0",
-    "@layerfig/parser-json5": "6.0.0",
-    "compression": "1.8.0",
-    "express": "5.1.0",
-    "sirv": "3.0.1"
+    "@layerfig/config": "3.0.1",
+    "@layerfig/parser-json5": "6.0.1",
+    "compression": "1.8.1",
+    "express": "5.2.1",
+    "sirv": "3.0.2"
   },
   "devDependencies": {
-    "@types/express": "5.0.3",
-    "@types/node": "22.13.4",
-    "cross-env": "7.0.3",
-    "typescript": "5.8.3",
-    "vite": "7.0.2"
+    "@types/express": "5.0.6",
+    "@types/node": "26.2.0",
+    "cross-env": "10.1.0",
+    "typescript": "7.0.2",
+    "vite": "8.2.1"
   }
 }

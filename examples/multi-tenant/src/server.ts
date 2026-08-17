@@ -85,7 +85,8 @@ app.get("/tasks/:taskId/delete", deleteTaskHandler);
 app.use(errorHandler);
 
 // 404 handler
-app.use("*", (req, res) => {
+// Express 5 dropped the bare "*" path pattern; a path-less `use` matches everything.
+app.use((req, res) => {
   res.status(404).send(`
     <h1>404 - Page Not Found</h1>
     <p>The page you're looking for doesn't exist.</p>
