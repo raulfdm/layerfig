@@ -1,0 +1,3 @@
+{
+  "healthCheckURL": "http://localhost:${self.port}/health"
+}

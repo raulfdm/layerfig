@@ -16,11 +16,7 @@ export class EnvironmentVariableSource extends Source {
 
 	loadSource({
 		runtimeEnv,
-		slotPrefix,
-	}: Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix">): Record<
-		string,
-		unknown
-	> {
+	}: Pick<LoadSourceOptions, "runtimeEnv">): Record<string, unknown> {
 		const envKeys = Object.keys(runtimeEnv).filter((key) =>
 			key.startsWith(this.#prefixWithSeparator),
 		);
@@ -39,14 +35,7 @@ export class EnvironmentVariableSource extends Source {
 				.split(this.#options.separator)
 				.join(".");
 
-			const value = this.maybeReplaceSlots({
-				slotPrefix,
-				contentString: String(envVarValue),
-				runtimeEnv,
-				transform: (content) => content,
-			});
-
-			set(tempObject, keyParts, value);
+			set(tempObject, keyParts, String(envVarValue));
 		}
 
 		return tempObject;

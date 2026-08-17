@@ -40,20 +40,13 @@ export class FileSource extends Source {
 			throw new Error(fileContentResult.error);
 		}
 
-		return this.maybeReplaceSlots({
-			contentString: fileContentResult.data,
-			slotPrefix: validatedOptions.slotPrefix,
-			runtimeEnv: validatedOptions.runtimeEnv,
-			transform: (contentString: string) => {
-				const parserResult = validatedOptions.parser.load(contentString);
+		const parserResult = validatedOptions.parser.load(fileContentResult.data);
 
-				if (!parserResult.ok) {
-					throw parserResult.error;
-				}
+		if (!parserResult.ok) {
+			throw parserResult.error;
+		}
 
-				return parserResult.data;
-			},
-		});
+		return parserResult.data;
 	}
 
 	#getFileExtension(filePath: string): string {

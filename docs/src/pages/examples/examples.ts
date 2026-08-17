@@ -114,7 +114,7 @@ export const examples = new Map<string, Example>([
     "slots",
     new Example({
       name: "slots",
-      startFile: "config/basic.json",
+      startFile: "config/base.json",
       title: "Slots example",
       sideMenu:{
         label: 'Slots'

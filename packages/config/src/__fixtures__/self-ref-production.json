@@ -1,0 +1,5 @@
+{
+	"foo": {
+		"anotherValue": "test-${self.foo.value}"
+	}
+}

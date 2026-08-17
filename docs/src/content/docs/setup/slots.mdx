@@ -42,7 +42,7 @@ $PORT => process.env.PORT => 3000
 
 ## Self-Referencing Slots
 
-For convenience, you can also reference values within the same configuration file. This helps avoid duplication and keeps your configuration consistent.
+For convenience, you can also reference other values of your configuration. This helps avoid duplication and keeps your configuration consistent.
 
 In the previous "port" example, instead of defining the `$PORT` slot in two places, you can use a self-referencing slot:
 
@@ -54,7 +54,7 @@ In the previous "port" example, instead of defining the `$PORT` slot in two plac
 }
 ```
 
-Layerfig looks for the `self.*` syntax in the configuration file and uses the value after the dot as an "object path" to find the value in the same configuration. In this case, it will look for the `port` value.
+Layerfig looks for the `self.*` syntax and uses the value after the dot as an "object path" to find the value in your configuration. In this case, it will look for the `port` value.
 
 The final configuration will be:
 
@@ -64,6 +64,48 @@ The final configuration will be:
   "port": "3000"
 }
 ```
+
+### Referencing values from other sources
+
+Slots are resolved only **after** all sources are merged, which means a self-referencing slot can point to a value defined in any other source, no matter the order they were added:
+
+```json
+// config/base.json
+{
+  "foo": {
+    "value": "${MY_VALUE::-bar}"
+  }
+}
+```
+
+```json
+// config/production.json
+{
+  "foo": {
+    "anotherValue": "test-${self.foo.value}"
+  }
+}
+```
+
+Even though `production.json` doesn't define `foo.value`, the slot resolves against the merged configuration:
+
+```json
+{
+  "foo": {
+    "value": "bar",
+    "anotherValue": "test-bar"
+  }
+}
+```
+
+The same applies to values coming from the `EnvironmentVariableSource` or an `ObjectSource`.
+
+<Aside type="caution">
+  Because the merge happens before the replacement, the last source that defines
+  a key always wins. If that source declares a slot that can't be resolved, the
+  value becomes `undefined` instead of falling back to the value defined by a
+  previously added source.
+</Aside>
 
 <Aside type="caution">
   If the path doesn't match any value, Layerfig will not perform a replacement,
