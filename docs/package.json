@@ -13,8 +13,8 @@
 	},
 	"dependencies": {
 		"@astrojs/starlight": "0.41.7",
-		"@layerfig/config": "3.1.0",
-		"@layerfig/parser-yaml": "6.0.2",
+		"@layerfig/config": "3.1.1",
+		"@layerfig/parser-yaml": "6.0.3",
 		"astro": "7.2.2",
 		"sharp": "0.35.3",
 		"starlight-theme-nova": "0.12.2",

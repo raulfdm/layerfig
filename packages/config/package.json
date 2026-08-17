@@ -1,7 +1,7 @@
 {
 	"name": "@layerfig/config",
 	"description": "Layer and runtime-validate type-safe configs for JavaScript apps.",
-	"version": "3.1.0",
+	"version": "3.1.1",
 	"keywords": [
 		"configuration",
 		"layered",
