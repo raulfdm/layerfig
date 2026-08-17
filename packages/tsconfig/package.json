@@ -8,9 +8,9 @@
 		".": "./tsconfig.json"
 	},
 	"peerDependencies": {
-		"typescript": "^5.9.0-beta"
+		"typescript": "^7.0.2"
 	},
 	"devDependencies": {
-		"typescript": "^5.9.0-beta"
+		"typescript": "^7.0.2"
 	}
 }

@@ -17,6 +17,9 @@
 		"noEmit": true,
 		/* If your code doesn't run in the DOM: */
 		"lib": ["es2022"],
+		/* TypeScript 7 no longer auto-discovers @types packages hoisted to the
+		   workspace root, so the ambient globals have to be requested explicitly. */
+		"types": ["bun"],
 		"allowImportingTsExtensions": true
 	},
 	"exclude": ["**/node_modules", "**/dist"]

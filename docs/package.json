@@ -8,15 +8,15 @@
 		"start": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
-		"astro": "astro"
+		"astro": "7.2.2"
 	},
 	"dependencies": {
-		"@astrojs/starlight": "0.35.2",
+		"@astrojs/starlight": "0.41.7",
 		"@layerfig/config": "3.0.1",
 		"@layerfig/parser-yaml": "6.0.1",
-		"astro": "5.13.2",
-		"sharp": "0.34.3",
-		"starlight-theme-nova": "0.9.4",
-		"zod": "3.25.76"
+		"astro": "7.2.2",
+		"sharp": "0.35.3",
+		"starlight-theme-nova": "0.12.2",
+		"zod": "4.4.3"
 	}
 }

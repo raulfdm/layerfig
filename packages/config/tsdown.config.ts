@@ -13,6 +13,9 @@ export default defineConfig([
 		dts: true,
 		format: ["cjs", "esm"],
 		platform: "node",
+		// tsdown >=0.16 defaults `fixedExtension` to true on the node platform,
+		// which would rename dist output to .mjs/.d.mts. Keep the published filenames.
+		fixedExtension: false,
 		sourcemap: true,
 	},
 	{
