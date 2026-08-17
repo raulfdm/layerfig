@@ -1,0 +1,62 @@
+---
+title: Every bug the bug bash found
+---
+
+A1 / A4 — custom prefix without braces:
+
+```ts
+const config = new ConfigBuilder({ validate, slotPrefix: "__" });
+```
+
+```json
+{ "appURL": "http://localhost:__PORT", "port": "__PORT" }
+```
+
+A2 / A3 — v2 bare slot in a config file:
+
+```json
+{ "baseURL": "$PUBLIC_BASE_URL", "appVersion": "$PUBLIC_APP_VERSION" }
+```
+
+A6 — v2 single-colon fallback:
+
+```json
+{ "port": "${PORT:-3000}", "host": "localhost:${PORT:-3000}" }
+```
+
+A7 — instantiating a class that does not exist:
+
+```ts
+import { ConfigParser } from "@layerfig/config";
+
+class IniParser extends ConfigParser {}
+
+export const iniParser = new InitParser();
+```
+
+A8 / A9 — using a source that was never imported:
+
+```ts
+import { ConfigBuilder, FileSource } from "@layerfig/config";
+
+export const config = new ConfigBuilder({ validate })
+  .addSource(new FileSource("base.json"))
+  .addSource(new EnvironmentVariableSource())
+  .build();
+```
+
+A5 — the Object global instead of ObjectSource:
+
+```ts
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+
+const config = new ConfigBuilder({ validate })
+  .addSource(new Object({ appURL: "$PUBLIC_APP_URL" }))
+  .build();
+```
+
+A11 — a subpath that is not exported:
+
+```ts
+import { FileSource } from "@layerfig/config/sources/file";
+```

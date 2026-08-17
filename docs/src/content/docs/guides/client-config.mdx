@@ -1,12 +1,13 @@
 ---
 title: Client Setup
+description: "Derive a browser-safe config from your server schema using the client ConfigBuilder, ObjectSource and slots."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
 Layerfig was originally designed to work on the server side. This is because it relies on configuration files that you commit (which use Node.js APIs) or on environment variables accessed via `process.env`.
 
-We don't recommend using Layerfig solely for client-side configuration, as this can be accomplished with only a schema validation library like Zod:
+If all you need is a couple of public values, a schema validation library on its own is enough — reach for Layerfig on the client when you want the layering, not just the validation:
 
 ```ts
 // client-config.ts
@@ -21,18 +22,23 @@ export const config = schema.parse({
 });
 ```
 
+<Aside type="tip">
+  For the full trade-off, see [Server or client?](/guides/server-or-client/).
+</Aside>
+
 However, if you are already using Layerfig and want to leverage your existing setup, you can achieve a similar result by using `ObjectSource` and the `slots` feature.
 
 The advantage of this approach is that you can have separate `server-config.ts`, `client-config.ts`, and `schema.ts` files. The client schema can then be derived from the main schema to include only client-specific properties:
 
-> The following example uses [`.pick`](https://zod.dev/api?id=pick) from Zod.
+> The following example uses [`z.pick`](https://zod.dev/api?id=pick). In Zod Mini
+> this is a top-level function, not a method on the schema.
 
 ```ts
 // client-config.ts
 import { ConfigBuilder, ObjectSource, z } from "@layerfig/config/client";
 import { configSchema } from "./schema";
 
-const ClientSchema = configSchema.pick({
+const ClientSchema = z.pick(configSchema, {
   appURL: true,
 });
 type ClientSchema = z.output<typeof ClientSchema>;
@@ -42,8 +48,8 @@ export const config = new ConfigBuilder({
   runtimeEnv: import.meta.env,
 })
   .addSource(
-    new Object<ClientSchema>({
-      appURL: "$PUBLIC_APP_URL",
+    new ObjectSource<ClientSchema>({
+      appURL: "${PUBLIC_APP_URL}",
     })
   )
   .build();
@@ -51,5 +57,13 @@ export const config = new ConfigBuilder({
 
 <Aside>
   [Zod mini](https://zod.dev/packages/mini) is recommended for client versions
-  since it ships a smaller bundle of zod.
+  since it ships a smaller bundle of zod. If `schema.ts` is shared with the
+  server and built with classic Zod, use `configSchema.pick({ … })` there
+  instead — the two flavours differ on chained methods.
+</Aside>
+
+<Aside type="danger">
+  Everything the client builder resolves is inlined into your bundle. Only
+  reference variables your framework marks as public, and never a server-side
+  secret.
 </Aside>

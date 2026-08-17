@@ -1,8 +1,26 @@
 ---
 title: Client Configuration
+description: "Every option the browser-safe ConfigBuilder accepts, and how it differs from the server one."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
+
+`@layerfig/config/client` exports a `ConfigBuilder` that is safe to bundle for the browser. It accepts a smaller set of options than the server one, because there is no filesystem to read from:
+
+| Option                     | Client         | Default                  |
+| -------------------------- | -------------- | ------------------------ |
+| `validate`                 | ✅ required    | —                        |
+| `runtimeEnv`               | ✅             | `import.meta.env`        |
+| `slotPrefix`               | ✅             | `"$"`                    |
+| `absoluteConfigFolderPath` | ❌ not available | —                      |
+| `parser`                   | ❌ not available | —                      |
+
+The accepted sources are narrower too: the client builder takes `ObjectSource` and `EnvironmentVariableSource` only. Passing a `FileSource` throws `Invalid source. Client ConfigBuilder only Accepts ObjectSource or EnvironmentVariableSource`.
+
+<Aside type="tip">
+  Not sure which builder you need? See [Server or
+  client?](/guides/server-or-client/).
+</Aside>
 
 ## options.validate
 
@@ -25,11 +43,18 @@ export const config = new ConfigBuilder({
 })
   .addSource(
     new ObjectSource({
-      appVersion: "$PUBLIC_APP_VERSION",
+      appVersion: "${PUBLIC_APP_VERSION}",
     })
   )
   .build();
 ```
+
+<Aside>
+  The `z` passed to `validate` is [Zod Mini](https://zod.dev/packages/mini), not
+  classic Zod. Most schema factories are identical, but methods that classic Zod
+  chains are top-level functions in Mini — `z.pick(schema, { … })` rather than
+  `schema.pick({ … })`.
+</Aside>
 
 You can also use other validation libraries. Return the result of the schema validation from the `validate` function, and the `config` object will be typed accordingly:
 
@@ -48,10 +73,35 @@ export const config = new ConfigBuilder({
 })
   .addSource(
     new ObjectSource({
-      appVersion: "$PUBLIC_APP_VERSION",
+      appVersion: "${PUBLIC_APP_VERSION}",
     })
   )
   .build();
+```
+
+## options.runtimeEnv
+
+> Default: `import.meta.env`
+
+The object [slots](/setup/slots/) are resolved against. On the client this is almost always `import.meta.env`, which is what bundlers like Vite replace at build time with the subset of variables your framework exposes to the browser.
+
+```ts
+runtimeEnv: import.meta.env,
+```
+
+Pass it explicitly. The default is read once when the module is first evaluated, and some bundlers only substitute `import.meta.env` where it appears literally in your source — naming it in your own file is the reliable form.
+
+<Aside type="danger">
+  Only variables your framework marks as public (`PUBLIC_*`, `VITE_*`, `NEXT_PUBLIC_*`,
+  depending on the tool) reach the browser. Never reference a server-only secret
+  from a client slot — anything the client builder resolves ends up in the
+  bundle.
+</Aside>
+
+Any plain object works too, which is what makes client configs testable:
+
+```ts
+runtimeEnv: { PUBLIC_APP_VERSION: "1f550b7" },
 ```
 
 ## options.slotPrefix
@@ -83,13 +133,19 @@ export const config = new ConfigBuilder({
 })
   .addSource(
     new ObjectSource({
-      appVersion: "__PUBLIC_APP_VERSION",
+      appVersion: "__{PUBLIC_APP_VERSION}",
     })
   )
   .build();
 ```
 
-Layerfig will now look for placeholders like `__PUBLIC_APP_VERSION` in your configuration files.
+Layerfig will now look for placeholders like `__{PUBLIC_APP_VERSION}`.
+
+<Aside type="caution">
+  Only the prefix changes — the braces are always part of the slot syntax. With
+  `slotPrefix: "__"`, `__{PUBLIC_APP_VERSION}` is a slot and
+  `__PUBLIC_APP_VERSION` is a plain string.
+</Aside>
 
 Assuming the `PUBLIC_APP_VERSION` environment variable is set, the resolved configuration will be:
 

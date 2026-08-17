@@ -13,17 +13,16 @@ npm add @layerfig/parser-yaml
 Define it in the layerfig config:
 
 ```ts
-import { ConfigBuilder } from "@layerfig/config";
-import { FileSource } from "@layerfig/config/sources/file";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
 import yamlParser from "@layerfig/parser-yaml";
 
 import { schema } from "./schema";
 
 const config = new ConfigBuilder({
-  validate: (fullConfig) => schema.parse(fullConfig),
+  validate: (finalConfig) => schema.parse(finalConfig),
   parser: yamlParser,
 })
   .addSource(new FileSource("base.yaml"))
-  .addSource(new FileSource("live.yml"))
+  .addSource(new FileSource("production.yaml"))
   .build();
 ```

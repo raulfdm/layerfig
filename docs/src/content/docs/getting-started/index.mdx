@@ -1,8 +1,9 @@
 ---
 title: Getting Started
+description: "Install Layerfig, define a base configuration file, and read a validated, type-safe config object anywhere in your app."
 ---
 
-import { FileTree, Steps } from "@astrojs/starlight/components";
+import { Aside, FileTree, Steps } from "@astrojs/starlight/components";
 import { CodePackageManagers } from "starlight-theme-nova/components";
 import BaseFiles from "./base-files.astro";
 
@@ -10,6 +11,11 @@ import BaseFiles from "./base-files.astro";
     1. Install the dependencies
 
         <CodePackageManagers packages="@layerfig/config" />
+
+        <Aside>
+          Zod v4 ships with the package — you don't need to install it
+          separately. See [Compatibility](#compatibility).
+        </Aside>
 
     2. Define your files
 
@@ -21,7 +27,6 @@ import BaseFiles from "./base-files.astro";
                 - ...
                 - config
                     - index.ts
-                    - schema.ts
 
         </FileTree>
 
@@ -34,8 +39,38 @@ import BaseFiles from "./base-files.astro";
         ```ts
         import { config } from "./config";
 
-        config.appURL; // string => "https://live.my-app.company"
+        config.appURL; // string => "http://localhost:3000"
         config.port; // number => 3000
         ```
 
 </Steps>
+
+## Next steps
+
+That is a single layer. The point of Layerfig is stacking several:
+
+- [Add a per-environment file](/guides/dynamic-environment/) on top of `base.json`.
+- [Override values at runtime](/setup/sources/#environment-variables) with environment variables.
+- [Reference environment variables](/setup/slots/) from inside your config files with slots.
+
+## Compatibility
+
+| Requirement     | Detail                                                       |
+| --------------- | ------------------------------------------------------------ |
+| Zod             | v4 — bundled, and re-exported as `z`                          |
+| Parser packages | `@layerfig/parser-*` v6 pairs with `@layerfig/config` v3      |
+| Module formats  | ESM and CommonJS on the server; ESM only for `/client`        |
+| Runtime         | Any runtime with `node:fs` and `node:path` — see [Deno](/guides/deno/) |
+
+<Aside>
+  The parser packages are versioned independently of `@layerfig/config`, so the
+  major numbers differ on purpose: `@layerfig/config@3.x` works with
+  `@layerfig/parser-yaml@6.x`, `@layerfig/parser-toml@6.x` and
+  `@layerfig/parser-json5@6.x`. Each parser declares
+  `"@layerfig/config": "^3.0.0"` as a peer dependency.
+</Aside>
+
+<Aside type="tip">
+  Only `FileSource` needs `node:fs`. The [client
+  builder](/setup/configuration-client/) is pure JavaScript and runs anywhere.
+</Aside>

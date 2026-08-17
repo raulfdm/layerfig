@@ -15,29 +15,26 @@ hero:
 
 <nav style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
     <a href="https://www.npmjs.com/package/@layerfig/config" target="\_parent">
-      <img alt="" src="https://img.shields.io/npm/dm/@layerfig/config.svg" />
+      <img alt="npm version" src="https://img.shields.io/npm/v/@layerfig/config.svg" />
+    </a>
+
+    <a href="https://www.npmjs.com/package/@layerfig/config" target="\_parent">
+      <img alt="npm downloads" src="https://img.shields.io/npm/dm/@layerfig/config.svg" />
     </a>
 
     <a
-      href="https://bundlejs.com/?q=%40layerfig%2Fconfig&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22json5%22%2C%22lodash-es%22%2C%22yaml%22%5D%7D%7D&badge="
+      href="https://bundlejs.com/?q=%40layerfig%2Fconfig&badge="
       target="\_parent"
     >
       <img
-        alt=""
-        src="https://deno.bundlejs.com/badge?config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22json5%22%2C%22lodash-es%22%2C%22yaml%22%5D%7D%7D&q=%40layerfig%2Fconfig"
-      />
-    </a>
-
-    <a href="#badge">
-      <img
-        alt="semantic-release"
-        src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg"
+        alt="bundle size"
+        src="https://deno.bundlejs.com/badge?q=%40layerfig%2Fconfig"
       />
     </a>
 
     <a href="https://github.com/raulfdm/layerfig/" target="\_parent">
       <img
-        alt=""
+        alt="GitHub stars"
         src="https://img.shields.io/github/stars/raulfdm/layerfig.svg?style=social&label=Star"
       />
     </a>
@@ -46,9 +43,12 @@ hero:
 
 ## Features
 
-- Define declarative, isolated, and per-environment configuration files (`.json`, or other file extensions via [parsers](/setup/sources#other-file-extensions)).
+- Define declarative, isolated, and per-environment configuration files (`.json`, or other file extensions via [parsers](/setup/sources/#other-file-extensions)).
 - Validate your configuration with [_zod_](https://zod.dev), or bring your preferred schema validation library.
 - Use a type-safe and runtime-checked configuration object across your app.
+- Reference environment variables from inside your config files with [slots](/setup/slots/), including chains, fallbacks and self-references.
+- Override anything at runtime with [environment variables](/setup/sources/#environment-variables) — no rebuild required.
+- Ship a separate, browser-safe [client configuration](/guides/server-or-client/) derived from the same schema.
 
 ## How It Works
 

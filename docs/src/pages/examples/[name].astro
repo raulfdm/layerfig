@@ -1,5 +1,8 @@
 ---
 import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import { Code } from "starlight-theme-nova/components";
+import fs from "node:fs";
+import path from "node:path";
 import { examples } from "./examples";
 
 export function getStaticPaths() {
@@ -19,6 +22,40 @@ const example = examples.get(name);
 if (!example) {
   throw new Error(`Example "${name}" not found`);
 }
+
+const LANG_BY_EXTENSION: Record<string, string> = {
+  ".ts": "ts",
+  ".tsx": "tsx",
+  ".js": "js",
+  ".json": "json",
+  ".jsonc": "jsonc",
+  ".json5": "json5",
+  ".yaml": "yaml",
+  ".yml": "yaml",
+  ".toml": "toml",
+};
+
+/**
+ * The embed below is the whole example, but an iframe is invisible to search
+ * engines and useless on a narrow screen — so the entry file is also rendered
+ * inline. Reading it from the repo means it can never drift from the example
+ * that actually runs.
+ */
+const repoRoot = path.resolve(process.cwd(), "..");
+const sourcePath = path.join(repoRoot, example.startFilePath);
+
+let source: string | null = null;
+try {
+  source = fs.readFileSync(sourcePath, "utf8").trimEnd();
+} catch {
+  throw new Error(
+    `Example "${name}" points at "${example.startFilePath}", which does not exist. ` +
+      `Update startFile in src/pages/examples/examples.ts.`,
+  );
+}
+
+const language =
+  LANG_BY_EXTENSION[path.extname(example.startFile)] ?? "plaintext";
 ---
 
 <StarlightPage
@@ -28,7 +65,18 @@ if (!example) {
   }}
 >
   {example.note && <p>{example.note}</p>}
-  <iframe src={example.src}></iframe>
+
+  <details class="source" open>
+    <summary>
+      <code>{example.startFile}</code>
+      <a href={example.repoURL} target="_blank" rel="noreferrer">
+        View the full example on GitHub →
+      </a>
+    </summary>
+    <Code code={source} lang={language} />
+  </details>
+
+  <iframe src={example.src} title={`${example.title} — live example`}></iframe>
 </StarlightPage>
 
 <style lang="postcss">
@@ -37,30 +85,15 @@ if (!example) {
     --sl-content-width: 100% !important;
   }
 
-  :global(.main-frame, .main-frame > div) {
-    height: calc(100svh - var(--sl-nav-height)) !important;
-  }
-
-  :global(.main-pane){
-    height: 100%;
-  }
-
+  /**
+   * The page used to be nothing but the embed, so the whole frame was pinned to
+   * the viewport height to make the iframe fill it. Now that the entry file is
+   * rendered above it, the page scrolls normally and the embed takes a fixed
+   * share of the viewport instead.
+   */
   :global(main[data-pagefind-body]) {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    .content-panel:nth-child(2) {
-      flex: 1;
-
-      .sl-container,
-      .sl-markdown-content {
-        height: 100%;
-      }
-
-      footer {
-        display: none;
-      }
+    .content-panel:nth-child(2) footer {
+      display: none;
     }
   }
 
@@ -68,7 +101,25 @@ if (!example) {
     width: 100%;
     border: none;
     border-radius: 0.8rem;
-    min-height: 100%;
+    height: clamp(30rem, 75svh, 60rem);
+  }
+
+  .source {
+    margin-block-end: 1rem;
+  }
+
+  .source summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    cursor: pointer;
+    padding-block-end: 0.5rem;
+  }
+
+  .source summary a {
+    font-size: 0.875rem;
   }
 </style>
 

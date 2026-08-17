@@ -6,14 +6,24 @@ import { examples } from "./src/pages/examples/examples";
 
 // https://astro.build/config
 export default defineConfig({
+	/**
+	 * Required for canonical URLs, absolute Open Graph URLs and the sitemap
+	 * Starlight generates automatically.
+	 */
+	site: "https://layerfig.dev",
 	integrations: [
 		starlight({
 			plugins: [starlightThemeNova()],
-			title: "",
+			/**
+			 * The site name is used for `<title>` suffixes and `og:site_name`, so it
+			 * must be set. `replacesTitle` keeps the header showing the logo alone.
+			 */
+			title: "Layerfig",
 			logo: {
 				light: "./src/assets/light-logo.svg",
 				dark: "./src/assets/dark-logo.svg",
 				alt: "Layerfig",
+				replacesTitle: true,
 			},
 			customCss: ["./src/styles/globals.css"],
 			social: [
@@ -30,23 +40,10 @@ export default defineConfig({
 				{
 					label: "Start Here",
 					items: [
-						{ label: "Introduction", slug: "introduction", link: "intro" },
-						{
-							label: "Motivation",
-							link: "getting-started/motivation",
-						},
-						{
-							label: "Getting Started",
-							slug: "getting-started",
-							link: "getting-started/index",
-						},
-						{
-							label: "Migrate to v3",
-							link: "migrate-to-v3",
-							badge: {
-								text: "New",
-							},
-						},
+						{ label: "Introduction", slug: "introduction" },
+						{ label: "Motivation", slug: "getting-started/motivation" },
+						{ label: "Getting Started", slug: "getting-started" },
+						{ label: "Migrate to v3", slug: "migrate-to-v3" },
 					],
 				},
 				{
@@ -70,11 +67,17 @@ export default defineConfig({
 				{
 					label: "Guides & Best Practices",
 					items: [
-						"guides/deno",
-						"guides/docker",
+						"guides/server-or-client",
 						"guides/dynamic-environment",
 						"guides/client-config",
+						"guides/testing",
+						"guides/docker",
+						"guides/deno",
 					],
+				},
+				{
+					label: "Reference",
+					items: ["reference/api", "reference/troubleshooting"],
 				},
 				{
 					label: "Examples",

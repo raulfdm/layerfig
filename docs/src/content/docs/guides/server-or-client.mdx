@@ -1,0 +1,76 @@
+---
+title: Server or client?
+description: "Which Layerfig entry point to use, what each one can do, and when a client config is worth it at all."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Layerfig ships two builders. They share a name and an API, but they solve different problems.
+
+## The short version
+
+Use `@layerfig/config` — the server builder — unless the configuration has to be readable from code running in the browser. Then use `@layerfig/config/client` for that subset, and keep the server one for everything else.
+
+| | `@layerfig/config` | `@layerfig/config/client` |
+| --- | --- | --- |
+| Reads config files | ✅ `FileSource` | ❌ |
+| Plain objects | ✅ `ObjectSource` | ✅ `ObjectSource` |
+| Environment variables | ✅ `EnvironmentVariableSource` | ✅ `EnvironmentVariableSource` |
+| Custom parsers | ✅ | ❌ |
+| Reads from | `process.env` | `import.meta.env` |
+| Zod flavour | classic | [Mini](https://zod.dev/packages/mini) |
+| Module formats | ESM + CJS | ESM only |
+
+## Why they're separate
+
+`FileSource` uses `node:fs` and `node:path`, and `absoluteConfigFolderPath` is resolved from `process.cwd()`. None of that exists in a browser. Rather than shipping a build that breaks when bundled, the client entry point simply doesn't include it — and `addSource` rejects a `FileSource` with a clear message if one reaches it anyway.
+
+The client build also swaps classic Zod for Zod Mini, which tree-shakes considerably better. That is the whole reason the two `z` instances differ.
+
+<Aside type="caution" title="Don't mix the two entry points">
+  Each entry point ships its own copy of the source classes, so an
+  `ObjectSource` imported from `@layerfig/config` is not the same class as one
+  from `@layerfig/config/client`. Passing the wrong one fails the instance check
+  with `Invalid source. Client ConfigBuilder only Accepts ObjectSource or
+  EnvironmentVariableSource`, which reads like a bug in your code rather than a
+  mismatched import. Always take a builder and its sources from the same import
+  path.
+</Aside>
+
+## Do you need a client config at all?
+
+Often not. If you only need a couple of public values, a schema and a literal object do the job with no extra dependency:
+
+```ts
+// client-config.ts
+import { z } from "zod/mini";
+
+export const config = z
+  .object({ appURL: z.url() })
+  .parse({ appURL: import.meta.env.PUBLIC_APP_URL });
+```
+
+The client builder earns its place when you want the things Layerfig actually adds:
+
+- **Layering** — a base object with per-environment overrides on top.
+- **Slots** — `${PUBLIC_API_URL::-http://localhost:3000}`, including fallbacks and [self-references](/setup/slots/#self-referencing-slots).
+- **One schema** — deriving the client shape from your server schema so the two can't drift. See [Client Setup](/guides/client-config/).
+
+If none of those apply, the four lines above are the better answer.
+
+## Using both
+
+The common arrangement is three files: a shared schema, a server config, and a client config that picks from the schema.
+
+<Aside type="danger">
+  Anything the client builder resolves is inlined into your JavaScript bundle and
+  is public. Only reference variables your framework marks as browser-safe
+  (`PUBLIC_*`, `VITE_*`, `NEXT_PUBLIC_*`, depending on the tool), and never a
+  server-side secret. Keeping the two configs in separate files is what makes
+  that boundary reviewable.
+</Aside>
+
+<Aside type="tip">
+  Check the [Client Environment example](/examples/client-env) to see the
+  arrangement in a real React Router app.
+</Aside>

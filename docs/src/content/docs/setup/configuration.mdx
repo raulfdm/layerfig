@@ -1,8 +1,24 @@
 ---
 title: Configuration
+description: "Every option the server ConfigBuilder accepts — validate, absoluteConfigFolderPath, parser, runtimeEnv and slotPrefix."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
+
+The server `ConfigBuilder` accepts the following options. Only `validate` is required.
+
+| Option                     | Default                     | Purpose                                     |
+| -------------------------- | --------------------------- | ------------------------------------------- |
+| `validate`                 | —                           | Validates and types the merged config       |
+| `absoluteConfigFolderPath` | `<process.cwd()>/config`    | Where `FileSource` looks for files          |
+| `parser`                   | simple JSON parser          | How file contents are parsed                |
+| `runtimeEnv`               | `process.env`               | Where slots and env vars are read from      |
+| `slotPrefix`               | `"$"`                       | The prefix that marks a [slot](/setup/slots) |
+
+<Aside type="caution">
+  Unknown options are silently ignored, not rejected. If a value seems to have no
+  effect, check the spelling against this table.
+</Aside>
 
 ## options.validate
 
@@ -16,7 +32,7 @@ export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
       appURL: z.url(),
-      port: z.number(),
+      port: z.coerce.number().int().positive(),
     });
 
     return schema.parse(finalConfig);
@@ -25,6 +41,12 @@ export const config = new ConfigBuilder({
   .addSource(new FileSource("base.json"))
   .build();
 ```
+
+<Aside type="tip">
+  `port` uses `z.coerce.number()` rather than `z.number()` so that the same
+  schema accepts both the number in `base.json` and the string produced by an
+  `APP_port` override or a [slot](/setup/slots/#non-string-primitive-values).
+</Aside>
 
 You can also use other validation libraries. Return the result of the schema validation from the `validate` function, and the `config` object will be typed accordingly:
 
@@ -93,6 +115,43 @@ const config = new ConfigBuilder({
 
 In this case, the library will look for `<root>/config/base.yaml` and load it.
 
+## options.runtimeEnv
+
+> Default: `process.env`
+
+The object Layerfig reads environment values from. It is used in two places: to resolve [slots](/setup/slots/) such as `${PORT}`, and as the input to [`EnvironmentVariableSource`](/setup/sources/#environment-variables).
+
+You normally leave it alone on the server. Override it when the environment does not live on `process.env`, or when you want to control it explicitly:
+
+```ts
+// Deno — process.env is a partial shim, so pass the real environment
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  runtimeEnv: Deno.env.toObject(),
+})
+  .addSource(new FileSource("base.json"))
+  .build();
+```
+
+```ts
+// Cloudflare Workers — the environment arrives per request
+export function buildConfig(env: Env) {
+  return new ConfigBuilder({
+    validate: (finalConfig) => schema.parse(finalConfig),
+    runtimeEnv: env,
+  })
+    .addSource(new FileSource("base.json"))
+    .build();
+}
+```
+
+Passing an explicit object is also how you build a configuration in a test without touching the real environment — see the [Testing](/guides/testing/) guide.
+
+<Aside>
+  Accepted values are `string`, `number`, `boolean`, `null` and `undefined`.
+  Whatever the input type, a resolved slot is always inserted as a string.
+</Aside>
+
 ## options.slotPrefix
 
 > Default: `"$"`
@@ -114,19 +173,24 @@ const config = new ConfigBuilder({
   .build();
 ```
 
-Layerfig will now look for placeholders like `__PORT` in your configuration files.
+Layerfig will now look for placeholders like `__{PORT}` in your configuration files.
 
 ```json
 // config/base.json
 {
-  "appURL": "http://localhost:__PORT",
-  "port": "__PORT"
+  "appURL": "http://localhost:__{PORT}",
+  "port": "__{PORT}"
 }
 ```
+
+<Aside type="caution">
+  Only the prefix changes — the braces are always part of the slot syntax. With
+  `slotPrefix: "__"`, `__{PORT}` is a slot and `__PORT` is a plain string.
+</Aside>
 
 Assuming the `PORT` environment variable is set, the resolved configuration will be:
 
 ```js
-config.appURL; // http://localhost:3000
-config.port; // 3000
+config.appURL; // "http://localhost:3000"
+config.port; // "3000" — a string, unless your schema coerces it
 ```
