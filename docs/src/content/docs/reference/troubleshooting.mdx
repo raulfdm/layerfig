@@ -1,0 +1,99 @@
+---
+title: Troubleshooting
+description: "Every error Layerfig throws, what causes it, and how to fix it — plus the failures that produce no error at all."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Errors Layerfig throws
+
+### `No source was added. Please provide one by using .addSource(<source>)`
+
+`build()` was called on a builder with no sources. Usually a conditional that added the only source didn't run, or `.addSource()` was called after `.build()` — the chain has to end with `build()`.
+
+### `File "…" does not exist`
+
+A [`FileSource`](/setup/sources/#file) pointed at a missing file. Check, in order:
+
+1. **The folder.** Files resolve against `absoluteConfigFolderPath`, which defaults to `<process.cwd()>/config` — the *working directory*, not the file that defines the config. Running from a subdirectory changes it.
+2. **The file name.** If it's interpolated, an unset variable produces `undefined.json`. See [Dynamic Environment](/guides/dynamic-environment/).
+3. **Your deployment.** Config files are frequently left out of a Docker image or a serverless bundle. See the [Docker guide](/guides/docker/).
+
+### `".x" file is not supported by this parser. Accepted files are: …`
+
+The file extension isn't in the parser's `acceptedFileExtensions`. Either you didn't pass a [`parser`](/setup/configuration/#optionsparser) (the default only reads `.json`), or the file uses a different extension than the parser expects — `.yml` vs `.yaml`, `.jsonc` vs `.json5`.
+
+```ts
+import yamlParser from "@layerfig/parser-yaml";
+
+new ConfigBuilder({ validate, parser: yamlParser });
+```
+
+### `Path must be absolute`
+
+`absoluteConfigFolderPath` was given a relative path. Resolve it first:
+
+```ts
+absoluteConfigFolderPath: path.resolve(process.cwd(), "./config"),
+```
+
+### `Invalid source. Client ConfigBuilder only Accepts ObjectSource or EnvironmentVariableSource`
+
+Either a `FileSource` was passed to the builder from `@layerfig/config/client` — the client build has no filesystem access — or the sources were imported from the *other* entry point.
+
+`@layerfig/config` and `@layerfig/config/client` are separate bundles, each with its own copy of the source classes, so the instance check fails across them even though the names match:
+
+```ts
+// ❌ throws — this ObjectSource is the server one
+import { ConfigBuilder } from "@layerfig/config/client";
+import { ObjectSource } from "@layerfig/config";
+
+// ✅ take the builder and its sources from the same entry point
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+```
+
+See [Server or client?](/guides/server-or-client/).
+
+### `Invalid source. Please provide a valid one (EnvironmentVariableSource, FileSource, or ObjectSource)`
+
+`addSource()` received something that isn't a Layerfig source — commonly a plain object (`addSource({ … })` instead of `addSource(new ObjectSource({ … }))`). Custom source classes are not supported.
+
+### `Invalid self-referencing slot pattern: "${self.}". Object Path is missing.`
+
+A slot was written as `${self.}` with nothing after the dot. Provide the path to the value you want: `${self.server.port}`.
+
+## Failures with no error message
+
+These are the ones that cost the most time, because nothing throws.
+
+### A key is missing from the final config
+
+A [slot](/setup/slots/) didn't resolve. Unresolved slots become `undefined`, and undefined keys are dropped — so the symptom is a schema complaining that a *required key is missing* rather than that a value is wrong.
+
+Check that the slot has braces (`${VAR}`, never `$VAR`), that chains use double colons (`${A::B::-fallback}`, never single), and that the variable is actually present in `runtimeEnv`. Add a [literal fallback](/setup/slots/#literal-fallbacks) for anything that must always exist.
+
+### A boolean is always `true`
+
+You used `z.coerce.boolean()` on a string. `Boolean("false")` is `true`. Use `z.stringbool()` instead — see [Non-string primitive values](/setup/slots/#non-string-primitive-values).
+
+### A number fails validation only in production
+
+The value comes from a file locally (a real number) but from an environment variable in production (a string). Use `z.coerce.number()` so one schema accepts both. See [Coercing overridden values](/setup/sources/#coercing-overridden-values).
+
+### An array keeps stale entries from a lower layer
+
+Arrays merge by index, so a shorter array doesn't replace a longer one — `["z"]` over `["a","b","c"]` gives `["z","b","c"]`. See [How sources are merged](/setup/sources/#how-sources-are-merged).
+
+### An option seems to be ignored
+
+Unknown options are stripped silently. Check the spelling against the [options table](/setup/configuration/), and if you're upgrading, search for the removed `configFolder` — see [Migrate to v3](/migrate-to-v3/#remove-configfolder).
+
+### An environment variable override does nothing
+
+The key must match your config exactly, including case: `APP_port` overrides `port`, and `APP_PORT` does not. Confirm the prefix and separators match the [source's options](/setup/sources/#customizing-environment-variable-settings), and remember a `.` in the name nests the key.
+
+<Aside type="tip">
+  When you're stuck, log the merged object before validation:
+  `validate: (finalConfig) => { console.dir(finalConfig, { depth: null }); return schema.parse(finalConfig); }`.
+  That shows exactly what the layers produced, slots included.
+</Aside>

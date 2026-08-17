@@ -1,5 +1,6 @@
 ---
 title: Dynamic Environment
+description: "Load one environment-specific configuration file per deploy instead of stacking all of them."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -31,15 +32,37 @@ A better solution is to use an environment variable (for example, `APP_ENV=local
 import { ConfigBuilder, FileSource } from "@layerfig/config";
 import { schema } from "./schema";
 
+const appEnv = process.env.APP_ENV ?? "local";
+
 export const config = new ConfigBuilder({
   validate: (finalConfig) => schema.parse(finalConfig),
 })
   .addSource(new FileSource("base.jsonc"))
-  .addSource(new FileSource(`${process.env.APP_ENV}.jsonc`))
+  .addSource(new FileSource(`${appEnv}.jsonc`))
   .build();
 ```
 
 Now, when you run your application with different `APP_ENV` values, it automatically loads the matching configuration file.
+
+<Aside type="caution" title="Always provide a default">
+  Every file source is required: if the file doesn't exist, `.build()` throws
+  `File "…" does not exist`. Without the `?? "local"` above, an unset `APP_ENV`
+  makes Layerfig look for `undefined.jsonc` and fail at startup.
+</Aside>
+
+If only a known set of names is valid, validate the variable itself so a typo fails with a message that says what is wrong:
+
+```ts
+const APP_ENVS = ["local", "dev", "staging", "prod"] as const;
+
+const appEnv = process.env.APP_ENV ?? "local";
+
+if (!APP_ENVS.includes(appEnv as (typeof APP_ENVS)[number])) {
+  throw new Error(
+    `Unknown APP_ENV "${appEnv}". Expected one of: ${APP_ENVS.join(", ")}`
+  );
+}
+```
 
 <Aside type="tip">
   Check the [Dynamic Environment example](/examples/dynamic-env) to see it in

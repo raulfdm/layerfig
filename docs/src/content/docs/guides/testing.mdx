@@ -1,0 +1,115 @@
+---
+title: Testing
+description: "Build a Layerfig configuration in a test without touching process.env or the filesystem."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A configuration that reads `process.env` and the filesystem at import time is awkward to test. Layerfig gives you two options that make it hermetic: `runtimeEnv` decides where environment values come from, and `ObjectSource` removes the need for files.
+
+## Pass the environment in
+
+[`runtimeEnv`](/setup/configuration/#optionsruntimeenv) accepts any plain object, so a test can supply exactly the variables under test — no mutation of `process.env`, no leakage between test cases:
+
+```ts
+import { ConfigBuilder, FileSource } from "@layerfig/config";
+import { schema } from "./schema";
+
+export function buildConfig(runtimeEnv: Record<string, string | undefined>) {
+  return new ConfigBuilder({
+    validate: (finalConfig) => schema.parse(finalConfig),
+    runtimeEnv,
+  })
+    .addSource(new FileSource("base.json"))
+    .build();
+}
+
+// production code
+export const config = buildConfig(process.env);
+```
+
+```ts
+import { expect, test } from "vitest";
+import { buildConfig } from "./config";
+
+test("PORT overrides the default", () => {
+  expect(buildConfig({ PORT: "8080" }).port).toBe(8080);
+});
+
+test("falls back when PORT is unset", () => {
+  expect(buildConfig({}).port).toBe(3000);
+});
+```
+
+<Aside type="tip">
+  Exporting a factory alongside the eagerly-built `config` keeps production usage
+  unchanged while giving tests a seam. It also makes the config usable in
+  request-scoped runtimes like Cloudflare Workers.
+</Aside>
+
+## Drop the filesystem too
+
+Swap `FileSource` for [`ObjectSource`](/setup/sources/#object) and the test needs no fixture files at all. Because both are plain sources, the layering behaves identically:
+
+```ts
+import { ConfigBuilder, ObjectSource } from "@layerfig/config";
+import { schema } from "./schema";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  runtimeEnv: { PORT: "8080" },
+})
+  .addSource(new ObjectSource({ appURL: "http://localhost:${PORT}", port: "${PORT}" }))
+  .build();
+
+expect(config.appURL).toBe("http://localhost:8080");
+```
+
+This is the fastest way to unit-test a slot expression or a schema rule in isolation.
+
+## Testing the real files
+
+To assert that your committed configuration is valid — a useful test in itself — point `absoluteConfigFolderPath` at the real folder and let it throw:
+
+```ts
+import path from "node:path";
+import { expect, test } from "vitest";
+import { ConfigBuilder, FileSource } from "@layerfig/config";
+import { schema } from "./schema";
+
+test.each(["local", "staging", "prod"])("%s config is valid", (env) => {
+  expect(() =>
+    new ConfigBuilder({
+      validate: (finalConfig) => schema.parse(finalConfig),
+      absoluteConfigFolderPath: path.resolve(import.meta.dirname, "../config"),
+      runtimeEnv: { APP_VERSION: "test", DATABASE_URL: "postgres://test" },
+    })
+      .addSource(new FileSource("base.json"))
+      .addSource(new FileSource(`${env}.json`))
+      .build()
+  ).not.toThrow();
+});
+```
+
+Supplying `runtimeEnv` explicitly matters here: it means the test fails when a config file references a variable nobody remembered to document, instead of quietly passing on whatever happens to be in the developer's shell.
+
+<Aside type="caution">
+  Resolve the folder from `import.meta.dirname` rather than `process.cwd()`, so
+  the test passes no matter which directory the runner was started from.
+</Aside>
+
+## Testing a client config
+
+The client builder takes the same `runtimeEnv`, so the identical pattern works — pass an object instead of `import.meta.env`:
+
+```ts
+import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
+
+const config = new ConfigBuilder({
+  validate: (finalConfig, z) =>
+    z.object({ appVersion: z.string() }).parse(finalConfig),
+  runtimeEnv: { PUBLIC_APP_VERSION: "1f550b7" },
+})
+  .addSource(new ObjectSource({ appVersion: "${PUBLIC_APP_VERSION}" }))
+  .build();
+```

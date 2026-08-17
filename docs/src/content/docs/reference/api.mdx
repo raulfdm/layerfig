@@ -1,0 +1,156 @@
+---
+title: API Reference
+description: "Every export of @layerfig/config and @layerfig/config/client, with its signature and defaults."
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Entry points
+
+| Import path                   | Contains                                                        |
+| ----------------------------- | --------------------------------------------------------------- |
+| `@layerfig/config`            | Server builder, all sources, `ConfigParser`, classic `z`         |
+| `@layerfig/config/client`     | Browser-safe builder, object + env sources, Zod Mini `z`         |
+| `@layerfig/config/zod`        | A re-export of Zod v4 (classic)                                  |
+| `@layerfig/config/zod-mini`   | A re-export of Zod v4 Mini                                       |
+
+The server entry point ships both ESM and CommonJS builds. `@layerfig/config/client` is ESM only.
+
+```ts
+// server
+import {
+  ConfigBuilder,
+  ConfigParser,
+  EnvironmentVariableSource,
+  FileSource,
+  ObjectSource,
+  z,
+  type ConfigBuilderOptions,
+} from "@layerfig/config";
+
+// client
+import {
+  ConfigBuilder,
+  EnvironmentVariableSource,
+  ObjectSource,
+  z,
+  type ConfigBuilderOptions,
+} from "@layerfig/config/client";
+```
+
+<Aside type="caution">
+  `FileSource` and `ConfigParser` are server-only — they are not exported from
+  `@layerfig/config/client`.
+</Aside>
+
+## ConfigBuilder
+
+```ts
+new ConfigBuilder<T>(options: ConfigBuilderOptions<T>)
+  .addSource(source: Source): this
+  .build(): T
+```
+
+Sources are applied in the order they are added, each layered over the result so far. `build()` merges every source, resolves [slots](/setup/slots/), then hands the result to `validate` and returns whatever `validate` returns — which is where `T` comes from.
+
+Calling `build()` with no sources throws.
+
+### Options
+
+See [Configuration](/setup/configuration/) for the server builder and [Client Configuration](/setup/configuration-client/) for the client one.
+
+| Option                     | Type                                    | Server | Client | Default                  |
+| -------------------------- | --------------------------------------- | ------ | ------ | ------------------------ |
+| `validate`                 | `(config, z) => T`                      | ✅      | ✅      | — (required)             |
+| `runtimeEnv`               | `Record<string, string \| number \| boolean \| null \| undefined>` | ✅ | ✅ | `process.env` / `import.meta.env` |
+| `slotPrefix`               | `string`                                | ✅      | ✅      | `"$"`                    |
+| `absoluteConfigFolderPath` | `string` (absolute)                     | ✅      | ❌      | `<process.cwd()>/config` |
+| `parser`                   | `ConfigParser`                          | ✅      | ❌      | JSON parser              |
+
+<Aside type="caution">
+  Unknown options are stripped silently rather than rejected.
+</Aside>
+
+## Sources
+
+### FileSource
+
+```ts
+new FileSource(fileName: string)
+```
+
+Reads `<absoluteConfigFolderPath>/<fileName>` and parses it with the configured `parser`. Server only.
+
+Throws if the file does not exist, or if its extension is not accepted by the parser. There is no optional file source.
+
+### ObjectSource
+
+```ts
+new ObjectSource<T>(object: T | PartialDeepUnknown<T>)
+```
+
+Layers a plain object. The object is deep-cloned on load, so later slot replacement never mutates what you passed in. Available on both server and client.
+
+The generic is optional. Supplying it lets you type a partial override against your full config shape:
+
+```ts
+new ObjectSource<AppConfig>({ api: { timeout: "${TIMEOUT::-5000}" } });
+```
+
+### EnvironmentVariableSource
+
+```ts
+new EnvironmentVariableSource(options?: {
+  prefix?: string;          // default "APP"
+  prefixSeparator?: string; // default "_"
+  separator?: string;       // default "__"
+})
+```
+
+Collects every key of `runtimeEnv` that starts with `prefix + prefixSeparator`, strips that prefix, and splits the rest on `separator` into an object path. Available on both server and client.
+
+Every value is inserted as a **string**. Numeric path segments produce array indices. See [Environment Variables](/setup/sources/#environment-variables).
+
+## ConfigParser
+
+```ts
+abstract class ConfigParser {
+  constructor(options: { acceptedFileExtensions: string[] });
+  acceptedFileExtensions: string[];
+  acceptsExtension(fileExtension: string): boolean;
+  abstract load(fileContent: string): Result;
+}
+```
+
+Extend this to support a file format Layerfig doesn't ship — see [Custom Parser](/parsers/custom/). Extensions may be written with or without a leading dot.
+
+`load` returns a result object:
+
+```ts
+type Result =
+  | { ok: true; data: Record<string, unknown> }
+  | { ok: false; error?: Error };
+```
+
+<Aside type="caution">
+  The `Result` type is not currently exported from the package, so declare the
+  shape inline (or let TypeScript infer it with `as const`, which is what the
+  built-in parsers do) rather than importing it.
+</Aside>
+
+## z
+
+Both entry points re-export a Zod v4 instance, and the same instance is passed as the second argument to `validate`.
+
+| Entry point                 | Flavour                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `@layerfig/config`          | [Classic Zod](https://zod.dev) — chained methods          |
+| `@layerfig/config/client`   | [Zod Mini](https://zod.dev/packages/mini) — smaller bundle |
+
+The two differ on chained helpers: `schema.pick({ … })` in classic is `z.pick(schema, { … })` in Mini.
+
+You are not required to use Zod at all — `validate` can call any validator, and the return type flows through. See [the valibot example](/examples/valibot).
+
+## Not exported
+
+These exist in the source but are intentionally not part of the public API: the abstract `Source` class (custom sources are not supported — `addSource` rejects anything that isn't one of the three built-ins) and the `Result` type described above.

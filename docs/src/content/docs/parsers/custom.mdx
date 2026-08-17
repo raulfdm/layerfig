@@ -1,12 +1,13 @@
 ---
 title: Custom Parser
+description: "Write your own ConfigParser to load a file format Layerfig doesn't support out of the box."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
 The library provides abstractions to support common configuration file extensions. However, you may need to parse a file type that isn't supported out-of-the-box.
 
-To do so, you can write a custom parser extending the `ConfigParser` abstracted class:
+To do so, you can write a custom parser extending the abstract `ConfigParser` class:
 
 ```ts
 // ./path/to/custom-parser.ts
@@ -25,7 +26,7 @@ class IniParser extends ConfigParser {
   }
 }
 
-export const iniParser = new InitParser();
+export const iniParser = new IniParser();
 ```
 
 <Aside>
@@ -33,7 +34,7 @@ export const iniParser = new InitParser();
   allowed. Else it'll throw an error.
 </Aside>
 
-The `parse` function must return an object that conforms to the `Result` type:
+The `load` method must return an object that conforms to the `Result` type:
 
 ```ts
 const successResult = {
@@ -57,7 +58,8 @@ export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
       appURL: z.url(),
-      port: z.number(),
+      // INI has no number type, so every value arrives as a string
+      port: z.coerce.number().int().positive(),
     });
 
     return schema.parse(finalConfig);

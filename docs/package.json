@@ -8,7 +8,8 @@
 		"start": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
-		"astro": "7.2.2"
+		"astro": "7.2.2",
+		"check-docs": "bun scripts/check-snippets.ts && bun scripts/check-snippets-selftest.ts"
 	},
 	"dependencies": {
 		"@astrojs/starlight": "0.41.7",

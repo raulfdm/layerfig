@@ -1,5 +1,6 @@
 ---
 title: Sources
+description: "Where Layerfig reads configuration from — files, plain objects, and environment variables — and how the layers are merged into one object."
 ---
 
 import { Tabs, TabItem, Aside } from "@astrojs/starlight/components";
@@ -25,6 +26,14 @@ In this case, `base.json` is a file located in the `<root-project-dir>/config` d
 
 <Aside>Without a specified parser, you can only load `.json`.</Aside>
 
+<Aside type="caution" title="Every file source is required">
+  If the file does not exist, `.build()` throws `File "…" does not exist`. There
+  is no optional file source — if a layer is conditional, decide the file name
+  before adding it (see the [Dynamic
+  Environment](/guides/dynamic-environment/) guide) rather than relying on a
+  missing file being skipped.
+</Aside>
+
 ### Other File Extensions
 
 To support various project needs and preferences, we provide parsers for other common configuration file formats:
@@ -37,7 +46,7 @@ To support various project needs and preferences, we provide parsers for other c
 
 ## Object
 
-The `ObjectSource` is a simple yet powerful tool for creating client-side configurations with Layerfig. It's ideal when you want to avoid using files or need to override/debug your configuration. It also supports `slots`, allowing you to use environment variables:
+The `ObjectSource` layers a plain JavaScript object into your configuration. It is available from both the server and the [client](/setup/configuration-client/) entry points, and it is the right choice when you want to avoid files entirely, override a value while debugging, or [build a config in a test](/guides/testing/). It also supports `slots`, allowing you to use environment variables:
 
 ```ts {1,8-12}
 import { ConfigBuilder, ObjectSource } from "@layerfig/config/client";
@@ -48,7 +57,7 @@ export const config = new ConfigBuilder({
 })
   .addSource(
     new ObjectSource({
-      baseURL: "$PUBLIC_BASE_URL",
+      baseURL: "${PUBLIC_BASE_URL}",
       randomValue: true,
     })
   )
@@ -98,6 +107,13 @@ For example, the environment variable `APP_port` overrides the `port` key in you
   defined in your schema.
 </Aside>
 
+<Aside type="caution" title="Values are always strings">
+  Every value read from an environment variable is inserted as a **string**, so
+  `APP_port=8080` produces `"8080"` and `APP_debug=false` produces `"false"`.
+  Any key that can be overridden this way needs a coercing schema — see
+  [Coercing overridden values](#coercing-overridden-values).
+</Aside>
+
 ### Example Usage
 
 Suppose your `base.json` contains:
@@ -113,13 +129,17 @@ Suppose your `base.json` contains:
 Define your schema and load the sources:
 
 ```ts
-import { ConfigBuilder, FileSource } from "@layerfig/config";
+import {
+  ConfigBuilder,
+  FileSource,
+  EnvironmentVariableSource,
+} from "@layerfig/config";
 
 export const config = new ConfigBuilder({
   validate: (finalConfig, z) => {
     const schema = z.object({
       appURL: z.url(),
-      port: z.coerce.number().check(z.int(), z.positive()),
+      port: z.coerce.number().int().positive(),
       appEnv: z.enum(["local", "dev", "prod"]),
     });
 
@@ -138,6 +158,28 @@ APP_appEnv=prod node index.js
 ```
 
 Since the environment variable source is added last, its values take precedence.
+
+### Coercing overridden values
+
+`port` above is declared as `z.coerce.number()` rather than `z.number()` on purpose. `base.json` provides the number `4444`, but `APP_port=8080` provides the string `"8080"`, and the schema has to accept both.
+
+The same applies to booleans, with one extra trap:
+
+```ts
+const schema = z.object({
+  // ✅ understands "true"/"false", "1"/"0", "yes"/"no", "on"/"off"
+  debug: z.stringbool(),
+  // ❌ Boolean("false") === true — this is always true
+  // debug: z.coerce.boolean(),
+});
+```
+
+<Aside type="danger">
+  `z.coerce.boolean()` applies JavaScript's `Boolean()`, and every non-empty
+  string is truthy — so `APP_debug=false` would switch debugging **on**. Use
+  [`z.stringbool()`](https://zod.dev/api?id=stringbools) for any boolean that
+  can come from an environment variable or a [slot](/setup/slots/).
+</Aside>
 
 ### Overriding Nested Objects
 
@@ -173,12 +215,41 @@ const config = new ConfigBuilder({
 APP_api__vendor__aws__apiToken=12345 node index.js
 ```
 
+### Targeting array items
+
+A numeric key segment creates (or updates) an array item:
+
+```bash
+APP_servers__0__host=a.example.com APP_servers__1__host=b.example.com node index.js
+```
+
+```json
+{
+  "servers": [{ "host": "a.example.com" }, { "host": "b.example.com" }]
+}
+```
+
+<Aside type="caution">
+  Environment variables can set and replace array items, but they cannot
+  *shorten* an array — see [How sources are merged](#how-sources-are-merged).
+</Aside>
+
+<Aside type="caution" title="Dots are separators too">
+  The part after the prefix is read as an object path, so a `.` also nests:
+  `APP_foo.bar=1` produces `{ foo: { bar: "1" } }`, not `{ "foo.bar": "1" }`.
+  Avoid dots in configuration keys you intend to override.
+</Aside>
+
 ### Customizing Environment Variable Settings
 
 You can customize the prefix, prefix separator, and nested-key separator:
 
 ```ts
-import { ConfigBuilder, FileSource } from "@layerfig/config";
+import {
+  ConfigBuilder,
+  FileSource,
+  EnvironmentVariableSource,
+} from "@layerfig/config";
 import { schema } from "./schema";
 
 const config = new ConfigBuilder({
@@ -198,3 +269,38 @@ const config = new ConfigBuilder({
 ```bash
 VULCAN--api----vendor----aws----apiToken=12345 node index.js
 ```
+
+## How sources are merged
+
+Sources are merged in the order they are added, and each one is layered on top of the result so far. Objects are merged deeply, so a later source only has to declare the keys it changes:
+
+```json
+// base.json                    // production.json
+{ "db": { "host": "localhost",  { "db": { "host": "db.internal" } }
+          "port": 5432 } }
+
+// result
+{ "db": { "host": "db.internal", "port": 5432 } }
+```
+
+<Aside type="caution" title="Arrays merge by index">
+  Arrays are merged **element by element**, not replaced. Layering a shorter
+  array over a longer one leaves the extra items in place:
+
+  ```json
+  // base.json        { "origins": ["a", "b", "c"] }
+  // production.json  { "origins": ["z"] }
+  // result           { "origins": ["z", "b", "c"] }
+  ```
+
+  There is no way to shorten an array from a later layer. If a list needs to be
+  fully replaceable per environment, either declare it only in the
+  environment-specific files (and not in `base`), or model it as a delimited
+  string and split it in your schema:
+
+  ```ts
+  origins: z.string().transform((v) => v.split(","));
+  ```
+</Aside>
+
+Slots are resolved **after** all sources are merged, so a `${self.*}` reference can point at a value contributed by any layer. See [Slots](/setup/slots/#referencing-values-from-other-sources).

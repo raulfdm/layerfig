@@ -1,5 +1,6 @@
 ---
 title: 'Deno'
+description: "Run Layerfig on Deno, including the permission flags its file loading requires."
 ---
 
 import { Aside } from '@astrojs/starlight/components';
@@ -14,10 +15,13 @@ deno add npm:@layerfig/config
 
 After installation, follow the setup process described in the [Getting Started](/getting-started) guide.
 
-The main difference when using Deno is its security model, which restricts file system access by default. Therefore, you must use the `--allow-read` flag when running your application.
+The main difference when using Deno is its security model, which restricts access by default. Layerfig needs two permissions:
+
+- `--allow-read` to load your configuration files.
+- `--allow-env` to read the environment, which Layerfig uses for [slots](/setup/slots/) and [`EnvironmentVariableSource`](/setup/sources/#environment-variables).
 
 ```bash
-deno run --allow-read --allow-net --watch server.ts
+deno run --allow-read --allow-env --allow-net --watch server.ts
 ```
 
 <Aside>
@@ -26,8 +30,25 @@ deno run --allow-read --allow-net --watch server.ts
   > On Windows, use `--allow-read=%cd%` in the command prompt.
 </Aside>
 
+### Reading the environment explicitly
+
+Layerfig defaults to `process.env`, which Deno polyfills. If you would rather use Deno's native API — or you want to grant `--allow-env` for a specific list of variables — pass [`runtimeEnv`](/setup/configuration/#optionsruntimeenv) yourself:
+
+```ts
+import { ConfigBuilder, FileSource } from "@layerfig/config";
+
+export const config = new ConfigBuilder({
+  validate: (finalConfig) => schema.parse(finalConfig),
+  runtimeEnv: Deno.env.toObject(),
+})
+  .addSource(new FileSource("base.json"))
+  .build();
+```
+
 With this setup complete, you can load your configuration files and access the config object throughout your application.
 
 <Aside type="tip">
-  Check out the [Deno example](/examples/deno) to see a complete implementation.
+  Check out the [Deno
+  example](https://github.com/raulfdm/layerfig/tree/main/examples/deno) to see a
+  complete implementation.
 </Aside>

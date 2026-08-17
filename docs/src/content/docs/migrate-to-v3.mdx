@@ -1,5 +1,6 @@
 ---
 title: Migrate to v3
+description: "What changed between Layerfig v2 and v3: slot syntax, the custom parser API, the client submodule, and absoluteConfigFolderPath."
 ---
 
 import { Aside } from "@astrojs/starlight/components";
@@ -14,8 +15,8 @@ Previously, if you wanted to reuse the same slot value in multiple places, you h
 
 ```jsonc
 {
-  "port": "${PORT:-3000}",
-  "host": "localhost:${PORT:-3000}" // repeating port logic
+  "port": "${PORT::-3000}",
+  "host": "localhost:${PORT::-3000}" // repeating port logic
 }
 ```
 
@@ -25,7 +26,7 @@ With **self-referencing slots**, you can now reference a value defined in the sa
 
 ```json
 {
-  "port": "${PORT:-3000}",
+  "port": "${PORT::-3000}",
   "host": "localhost:${self.port}"
 }
 ```
@@ -93,9 +94,18 @@ const config = new ConfigBuilder({
 
 Please notice that as the name states, this option expects an **absolute** path to the folder where Layerfig should look for configuration files. If not it will throw an error.
 
+<Aside type="danger">
+  Unknown options are stripped silently rather than rejected, so a leftover
+  `configFolder` produces no error — Layerfig just falls back to
+  `<process.cwd()>/config` and loads the wrong files. Search your codebase for
+  `configFolder` when upgrading.
+</Aside>
+
 ### Custom Parser API
 
 In v2, creating a custom configuration parser looked like this:
+
+{/* docs-lint-disable import-name */}
 
 ```ts
 import { defineConfigParser } from "@layerfig/config";
@@ -175,7 +185,7 @@ Now, every slot needs to be wrapped by `${}` (or defining your own slotPrefix, e
 +port: ${PORT}
 ```
 
-Also, when channing values, instead using single colon (`:`) to separate the values, you must use double colon (`::`):
+Also, when chaining values, instead of using a single colon (`:`) to separate the values, you must use a double colon (`::`):
 
 ```diff
 -port: ${APP_PORT:PORT:-3000}
