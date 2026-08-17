@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "layerfig",
@@ -26,7 +27,7 @@
     },
     "packages/config": {
       "name": "@layerfig/config",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "dependencies": {
         "es-toolkit": "^1.39.8",
         "zod": "^4.0.17",
