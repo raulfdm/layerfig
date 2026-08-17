@@ -1,15 +1,17 @@
 {
   "name": "client-env-example",
   "private": true,
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "react-router build",
+    "build": "cross-env VITE_APP_ENV=production react-router build",
     "dev": "cross-env NODE_ENV=development PORT=3000 VITE_APP_ENV=local node server.js",
     "start": "node server.js",
+    "preview": "cross-env NODE_ENV=production PORT=3000 VITE_APP_ENV=production node server.js",
     "typecheck": "react-router typegen && tsc -b"
   },
   "dependencies": {
-    "@layerfig/config": "3.0.1",
+    "@layerfig/config": "3.1.0",
     "@react-router/express": "^8.3.0",
     "@react-router/node": "^8.3.0",
     "compression": "^1.8.1",

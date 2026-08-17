@@ -1,91 +1,81 @@
-# Welcome to React Router!
+# Layerfig: Client Environment Example
 
-A modern, production-ready template for building full-stack React applications
-using React Router.
+Splitting configuration between the **server** and the **client** in a React
+Router (framework mode) app, so that secrets never leak into the browser bundle.
 
-## Features
+## Getting started
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
-
-## Getting Started
-
-### Installation
-
-Install the dependencies:
+Install dependencies:
 
 ```bash
-npm install
+npm i
 ```
 
-### Development
-
-Start the development server with HMR:
+Run the server:
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+The app is available at `http://localhost:3000`.
 
-## Building for Production
-
-Create a production build:
+To run the production build locally:
 
 ```bash
 npm run build
+npm run preview
 ```
+
+`start` is the same thing without `cross-env`, for deployment targets that supply
+`NODE_ENV`, `PORT`, and `VITE_APP_ENV` themselves (see the Dockerfile).
+
+## What this example shows
+
+There are two config instances, built from the same schema:
+
+| File                   | Import                      | Runs on          |
+| ---------------------- | --------------------------- | ---------------- |
+| `app/config/server.ts` | `@layerfig/config`          | server only      |
+| `app/config/client.ts` | `@layerfig/config/client`   | server + browser |
+
+`app/config/schema.ts` holds the single source of truth. The client config picks
+only the fields that are safe to ship:
+
+```ts
+const ClientEnvSchema = ConfigSchema.pick({ env: true });
+```
+
+### Server config
+
+`app/config/server.ts` reads `config/base.json` and layers `process.env` on top
+via `EnvironmentVariableSource`. It has access to everything, so it must only be
+used in loaders, actions, and other server-side code.
+
+### Client config
+
+`app/config/client.ts` uses the `/client` entrypoint with an `ObjectSource` and
+`runtimeEnv: import.meta.env`. Vite **inlines** these values at build time, which
+is why `VITE_APP_ENV` is set in the `dev`, `build`, and `start` scripts — the
+value baked in during `build` is the one the browser sees at runtime.
+
+`app/routes/home.tsx` renders both so you can compare them. Note the loader
+returns the full server config purely to make the difference visible — doing that
+in a real app would defeat the purpose.
 
 ## Deployment
 
-### Docker Deployment
-
-To build and run using Docker:
+To build and run with Docker:
 
 ```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+docker build -t layerfig-client-env-example .
+docker run -it --rm -p 3000:3000 layerfig-client-env-example
 ```
 
-The containerized application can be deployed to any platform that supports
-Docker, including:
+Two things the Dockerfile has to get right for Layerfig:
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is
-production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── server.js
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already
-configured for a simple default starting experience. You can use whatever CSS
-framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+- `COPY ./config /app/config` — `FileSource` paths are resolved at **runtime**
+  relative to `<process.cwd()>/config`, so the folder must exist in the final
+  image. Bundlers never inline it.
+- `ENV VITE_APP_ENV=production` is set in *both* the build stage (via the `build`
+  script) and the runtime stage. The build-time value is baked into the client
+  bundle; the runtime value is what the server config reads.

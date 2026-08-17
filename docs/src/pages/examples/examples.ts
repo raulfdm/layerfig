@@ -29,7 +29,7 @@ class Example {
     baseURL.searchParams.set("embed", "1");
     baseURL.searchParams.set(
       "file",
-      this.options.startFile || "src/config/index.ts",
+      this.options.startFile || "src/config.ts",
     );
 
     return baseURL.toString();
@@ -92,7 +92,7 @@ export const examples = new Map<string, Example>([
     "dynamic-env",
     new Example({
       name: "dynamic-env",
-      startFile: "src/config/index.ts",
+      startFile: "src/config.ts",
       title: "Dynamic Environment",
       sideMenu:{
         label: 'Dynamic Environment'
@@ -137,9 +137,10 @@ export const examples = new Map<string, Example>([
     new Example({
       name: 'deno',
       title:'Deno',
+      startFile: "config.ts",
       sideMenu:{
         label: "Deno",
-        link: 'https://github.com/raulfdm/layerfig/tree/main/examples/multi-tenant'
+        link: 'https://github.com/raulfdm/layerfig/tree/main/examples/deno'
       }
     })
   ],
@@ -147,7 +148,7 @@ export const examples = new Map<string, Example>([
     "json5",
     new Example({
       name: "json5",
-      startFile: "src/config/index.ts",
+      startFile: "src/config.ts",
       title: "JSONC-like example",
       sideMenu:{
         label: 'JSON5'
@@ -158,7 +159,7 @@ export const examples = new Map<string, Example>([
     "toml",
     new Example({
       name: "toml",
-      startFile: "src/config/index.ts",
+      startFile: "src/config.ts",
       title: "Toml example",
       sideMenu:{
         label: 'TOML'
@@ -169,7 +170,7 @@ export const examples = new Map<string, Example>([
     "yaml",
     new Example({
       name: "yaml",
-      startFile: "src/config/index.ts",
+      startFile: "src/config.ts",
       title: "Yaml example",
       sideMenu:{
         label: 'YAML'
@@ -180,7 +181,7 @@ export const examples = new Map<string, Example>([
     "valibot",
     new Example({
       name: "valibot",
-      startFile: "src/config/index.ts",
+      startFile: "src/config.ts",
       title: "Valibot example",
       sideMenu:{
         label: 'Valibot'

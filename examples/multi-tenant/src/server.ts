@@ -50,7 +50,7 @@ app.get("/", (req, res, next) => {
       <ul style="list-style: none; padding: 20px;">
         ${
       tenantsSettings.map((t) =>
-        `<li style="margin: 10px 0;"><a href="${t.url}" style="display: inline-block; padding: 10px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">${t.name} Corp</a></li>`
+        `<li style="margin: 10px 0;"><a href="${t.url}" style="display: inline-block; padding: 10px 15px; background: #007bff; color: white; text-decoration: none; border-radius: 4px;">${t.name}</a></li>`
       ).join(" ")
     }
       </ul>
