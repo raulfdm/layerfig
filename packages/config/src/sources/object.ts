@@ -1,4 +1,4 @@
-import type { LoadSourceOptions, PartialDeepUnknown, Prettify } from "../types";
+import type { PartialDeepUnknown, Prettify } from "../types";
 import { Source } from "./source";
 
 export class ObjectSource<
@@ -13,15 +13,11 @@ export class ObjectSource<
 		this.#object = object;
 	}
 
-	override loadSource({
-		slotPrefix,
-		runtimeEnv,
-	}: Pick<LoadSourceOptions, "runtimeEnv" | "slotPrefix">): Prettify<T> {
-		return this.maybeReplaceSlots({
-			contentString: JSON.stringify(this.#object),
-			slotPrefix,
-			runtimeEnv,
-			transform: (contentString) => JSON.parse(contentString) as Prettify<T>,
-		});
+	override loadSource(): Prettify<T> {
+		/**
+		 * Cloning the object so any later slot replacement never mutates
+		 * what the user has passed in.
+		 */
+		return JSON.parse(JSON.stringify(this.#object)) as Prettify<T>;
 	}
 }

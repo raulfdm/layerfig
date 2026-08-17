@@ -4,6 +4,7 @@ import type {
 	UnknownRecord,
 	ValidatedServerConfigBuilderOptions,
 } from "../types";
+import { resolveSlots } from "../utils/resolve-slots";
 import { z } from "./index";
 import {
 	type ConfigBuilderOptions,
@@ -35,7 +36,17 @@ export class ConfigBuilder<T extends object = UnknownRecord> {
 			partialConfig = merge({}, partialConfig, data);
 		}
 
-		return this.#options.validate(partialConfig, z) as T;
+		/**
+		 * Slots are resolved only after every source was merged so a slot
+		 * (specially a self-referencing one) can point to a value defined
+		 * in any other source.
+		 */
+		const finalConfig = resolveSlots(partialConfig, {
+			runtimeEnv: this.#options.runtimeEnv,
+			slotPrefix: this.#options.slotPrefix,
+		});
+
+		return this.#options.validate(finalConfig, z) as T;
 	}
 
 	public addSource(source: Source): this {

@@ -280,6 +280,28 @@ tQrWvRJknz7jP0GHpvUm2GXHx6aOcbdBag==
 				});
 			});
 
+			it("should not fall back to a previous source value when the slot cannot be resolved", () => {
+				expect(
+					new ConfigBuilder({
+						validate: (finalConfig) => finalConfig,
+						runtimeEnv: {},
+					})
+						.addSource(
+							new ObjectSource({
+								port: "3000",
+							}),
+						)
+						.addSource(
+							new ObjectSource({
+								port: "${PORT}",
+							}),
+						)
+						.build(),
+				).toEqual({
+					port: undefined,
+				});
+			});
+
 			it("should remove undefined from array", () => {
 				expect(
 					new ConfigBuilder({
@@ -417,6 +439,80 @@ tQrWvRJknz7jP0GHpvUm2GXHx6aOcbdBag==
 			});
 
 			describe("Self-referencing slot", () => {
+				it("should reference a value defined in a previously added source", () => {
+					expect(
+						new ConfigBuilder({
+							validate: (finalConfig) => finalConfig,
+							runtimeEnv: {},
+						})
+							.addSource(
+								new ObjectSource({
+									foo: {
+										value: "${MY_VALUE::-bar}",
+									},
+								}),
+							)
+							.addSource(
+								new ObjectSource({
+									foo: {
+										anotherValue: "test-${self.foo.value}",
+									},
+								}),
+							)
+							.build(),
+					).toEqual({
+						foo: {
+							value: "bar",
+							anotherValue: "test-bar",
+						},
+					});
+				});
+
+				it("should reference a value defined in a source added afterwards", () => {
+					expect(
+						new ConfigBuilder({
+							validate: (finalConfig) => finalConfig,
+							runtimeEnv: {},
+						})
+							.addSource(
+								new ObjectSource({
+									host: "localhost:${self.port}",
+								}),
+							)
+							.addSource(
+								new ObjectSource({
+									port: "3000",
+								}),
+							)
+							.build(),
+					).toEqual({
+						host: "localhost:3000",
+						port: "3000",
+					});
+				});
+
+				it("should reference a value defined by the EnvironmentVariableSource", () => {
+					expect(
+						new ConfigBuilder({
+							validate: (finalConfig) => finalConfig,
+							runtimeEnv: {
+								APP_port: "8080",
+							},
+						})
+							.addSource(
+								new ObjectSource({
+									port: "3000",
+									host: "localhost:${self.port}",
+								}),
+							)
+							.addSource(new EnvironmentVariableSource())
+							.build(),
+					).toEqual({
+						port: "8080",
+						host: "localhost:8080",
+					});
+				});
+
 				it("should replace the self-reference slot with the property value", () => {
 					const schema = z.object({
 						port: z.coerce.number().int().positive(),
@@ -496,12 +592,7 @@ tQrWvRJknz7jP0GHpvUm2GXHx6aOcbdBag==
 
 				const envVarSource = new ObjectSource(testObject);
 
-				assertType<TestObject>(
-					envVarSource.loadSource({
-						runtimeEnv: {},
-						slotPrefix: "$",
-					}),
-				);
+				assertType<TestObject>(envVarSource.loadSource());
 			});
 		});
 
@@ -688,6 +779,24 @@ describe("[SERVER] ConfigBuilder", () => {
 				appURL: "https://my-site.com",
 				api: {
 					port: 3000,
+				},
+			});
+		});
+
+		it("should resolve a self-reference pointing to a value defined in another file", () => {
+			const config = new ServerModule.ConfigBuilder({
+				...basicConfigOptions,
+				runtimeEnv: {},
+				validate: (finalConfig) => finalConfig,
+			})
+				.addSource(new ServerModule.FileSource("self-ref-base.json"))
+				.addSource(new ServerModule.FileSource("self-ref-production.json"))
+				.build();
+
+			expect(config).toEqual({
+				foo: {
+					value: "bar",
+					anotherValue: "test-bar",
 				},
 			});
 		});
