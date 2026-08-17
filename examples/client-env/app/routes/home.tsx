@@ -2,14 +2,17 @@ import type { Route } from "./+types/home";
 import { clientEnv } from "~/config/client";
 import { serverConfig } from "~/config/server";
 
-export function meta({}: Route.MetaArgs) {
+export function meta(_: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Layerfig: Client Environment Example" },
+    {
+      name: "description",
+      content: "Reading config on the server and on the client with Layerfig.",
+    },
   ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
+export function loader(_: Route.LoaderArgs) {
   return serverConfig;
 }
 

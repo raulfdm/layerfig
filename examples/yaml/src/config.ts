@@ -12,5 +12,4 @@ export const config = new ConfigBuilder({
   parser: yamlParser,
 })
   .addSource(new FileSource("base.yaml"))
-  .addSource(new FileSource("prod.yaml"))
   .build();

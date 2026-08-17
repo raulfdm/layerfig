@@ -1,13 +1,15 @@
 {
-  "name": "multi-tenant-app-example",
-  "version": "1.0.0",
+  "name": "multi-tenant-example",
+  "private": true,
+  "version": "0.0.0",
   "description": "Multi-tenant application example",
+  "type": "module",
   "scripts": {
     "dev": "bun run --watch src/server.ts",
-    "start": "bun run server/server.js"
+    "start": "bun run src/server.ts"
   },
   "dependencies": {
-    "@layerfig/config": "3.0.1",
+    "@layerfig/config": "3.1.0",
     "cors": "2.8.6",
     "express": "5.2.1",
     "helmet": "8.3.0"

@@ -1,8 +1,9 @@
 {
   "name": "deno-example",
-  "version": "1.0.0",
-  "description": "A Deno example project using LayerFig",
+  "private": true,
+  "version": "0.0.0",
+  "description": "A Deno example project using Layerfig",
   "dependencies": {
-    "@layerfig/config": "3.0.1"
+    "@layerfig/config": "3.1.0"
   }
 }
