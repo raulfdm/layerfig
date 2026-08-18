@@ -1,0 +1,10 @@
+# The StackBlitz embeds on the example pages boot a WebContainer, which needs
+# SharedArrayBuffer, which needs the *embedding* page to be cross-origin
+# isolated. Chrome used to grant stackblitz.com an origin trial that waived
+# this for embeds; that trial expired, so the headers are now on us.
+#
+# Scoped to /examples/* on purpose: COEP blocks any cross-origin subresource
+# that does not opt in via CORP, and only these pages need isolation.
+/examples/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
