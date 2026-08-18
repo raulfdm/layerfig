@@ -76,7 +76,10 @@ const language =
     <Code code={source} lang={language} />
   </details>
 
-  <iframe src={example.src} title={`${example.title} — live example`}></iframe>
+  <iframe
+    src={example.src}
+    title={`${example.title} — live example`}
+    allow="cross-origin-isolated"></iframe>
 </StarlightPage>
 
 <style lang="postcss">

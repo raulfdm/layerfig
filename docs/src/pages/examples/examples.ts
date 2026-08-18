@@ -27,6 +27,13 @@ class Example {
       `https://stackblitz.com/github/raulfdm/layerfig/tree/${config.branchName}/examples/${this.options.name}`,
     );
     baseURL.searchParams.set("embed", "1");
+    /**
+     * Makes StackBlitz serve the embedded document with COOP/COEP of its own.
+     * Without it the frame never becomes cross-origin isolated and the
+     * WebContainer refuses to boot, even though we send the headers on our
+     * side. See public/_headers.
+     */
+    baseURL.searchParams.set("corp", "1");
     baseURL.searchParams.set(
       "file",
       this.options.startFile || "src/config.ts",
