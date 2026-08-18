@@ -27,7 +27,17 @@ if (!example) {
     tableOfContents: false,
   }}
 >
-  {example.note && <p>{example.note}</p>}
+  {
+    example.note && (
+      <p class="note">
+        {/* Notes carry file names and API identifiers, so backtick spans in
+            the note text are rendered as inline code. */}
+        {example.note
+          .split(/`([^`]+)`/)
+          .map((part, i) => (i % 2 ? <code>{part}</code> : part))}
+      </p>
+    )
+  }
 
   <iframe
     src={example.src}
@@ -62,17 +72,33 @@ if (!example) {
         height: 100%;
       }
 
+      /**
+       * The note sits above the embed, so the content becomes a column and
+       * the iframe takes whatever height is left over instead of a flat
+       * 100% that would push the page into overflow.
+       */
+      .sl-markdown-content {
+        display: flex;
+        flex-direction: column;
+      }
+
       footer {
         display: none;
       }
     }
   }
 
+  .note {
+    max-width: 75ch;
+  }
+
   iframe {
     width: 100%;
     border: none;
     border-radius: 0.8rem;
-    min-height: 100%;
+    flex: 1;
+    /* Keeps the embed usable when a long note eats the viewport on mobile. */
+    min-height: 25rem;
   }
 </style>
 
