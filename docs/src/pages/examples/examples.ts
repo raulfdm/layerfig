@@ -46,21 +46,6 @@ class Example {
     return { params: { name: this.options.name } };
   }
 
-  /** The example file shown inline above the embed. */
-  get startFile(): string {
-    return this.options.startFile || "src/config.ts";
-  }
-
-  /** Repo-relative path to that file, for reading it at build time. */
-  get startFilePath(): string {
-    return `examples/${this.options.name}/${this.startFile}`;
-  }
-
-  /** Link to the file on GitHub, so the rest of the example stays reachable. */
-  get repoURL(): string {
-    return `https://github.com/raulfdm/layerfig/tree/main/examples/${this.options.name}`;
-  }
-
   get sideMenu(): {
     label: string;
     link: string;
